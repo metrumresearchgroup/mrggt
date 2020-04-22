@@ -45,7 +45,9 @@ Imports:
     stringdist (>= 0.9.5.5),
     grDevices,
     stats,
-    cli
+    cli,
+    R.utils,
+    english
 Suggests:
     knitr,
     paletteer,

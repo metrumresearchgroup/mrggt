@@ -44,9 +44,9 @@ latex_style_headings <- function(label, styles_df, key) {
   changed_label <- key[[label]]
 
   if(label %in% to_style$colname){
-
-    styles <- to_style[to_style$colname == label, ]$styles[[1]]
-    changed_label <- latex_style_it(changed_label, styles)
+    label_metadata <- to_style[to_style$colname == label, ]
+    styles <- label_metadata$styles[[1]]
+    changed_label <- latex_style_it(changed_label, styles, colnum = label_metadata$colnum)
 
   }
 
@@ -93,7 +93,7 @@ style_data_latex <- function(row_splits, styles_df){
       rownum <- as.character(to_style[i, ]$rownum)
       row <- row_splits[[rownum]]
       element <- row[colnum]
-      row_splits[[rownum]][colnum] <- latex_style_it(element, styles)
+      row_splits[[rownum]][colnum] <- latex_style_it(element, styles, colnum)
 
     }
   }
@@ -172,6 +172,8 @@ latex_format_text_size = function(string){
   func
 }
 
+
+
 ### Condensed text helper functions
 
 #user defined condensed values
@@ -228,33 +230,106 @@ latex_format_condensed_size <- function(string){
 ### Highlight/Text Color Helper Functions
 
 #determine wanting text colored or cell colored
-#' @noRd
-latex_style_color <- function(color, cell_type){
+#' #' @noRd
+#' latex_style_color <- function(color, cell_type){
+#'
+#'   if(cell_type == 'cell_text'){
+#'
+#'     if(startsWith(color, '#')){
+#'
+#'       color <- gsub('#', '', color)
+#'
+#'     }
+#'
+#'     expl <- paste0('\\textcolor{', color, '}{')
+#'
+#'     return(rlang::quo(paste0(expl, x, '}')))
+#'
+#'   } else {
+#'
+#'     if(startsWith(color, '#')){
+#'
+#'       color <- gsub('#', '', color)
+#'
+#'     }
+#'
+#'     expl <- paste0('\\cellcolor{', color, '}{')
+#'
+#'     return(rlang::quo(paste0(expl, x, '}')))
+#'   }
+#' }
 
-  if(cell_type == 'cell_text'){
+cell_text.size <-  function(cell_text){
+  stripped <- gsub('px', '', cell_text$size, fixed=TRUE)
+  dblv <- suppressWarnings(as.double(stripped))
 
-    if(startsWith(color, '#')){
+  if(is.na(dblv)){
 
-      color <- gsub('#', '', color)
-
-    }
-
-    expl <- paste0('\\textcolor{', color, '}{')
-
-    return(rlang::quo(paste0(expl, x, '}')))
+    func <- latex_size_preset_values(stripped)
 
   } else {
 
-    if(startsWith(color, '#')){
+    func <- latex_size_custom_values(dblv)
 
-      color <- gsub('#', '', color)
-
-    }
-
-    expl <- paste0('\\cellcolor{', color, '}{')
-
-    return(rlang::quo(paste0(expl, x, '}')))
   }
+
+  func
+}
+
+cell_text.weight <- function(cell_text){
+  value <- cell_text$weight
+  options <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
+                  bolder = rlang::quo(paste0('\\textbf{', x, '}')))
+  return(options[[value]])
+}
+
+cell_text.style <- function(cell_text){
+  value <- cell_text$style
+  options <- list(italic = rlang::quo(paste0('\\textit{', x, '}')),
+                  center = NA,
+                  normal = NA,
+                  oblique = NA
+                  )
+  return(options[[value]])
+}
+
+cell_text.color <- function(cell_text){
+  color <- cell_text$color
+
+  if(startsWith(color, '#')){
+    color <- gsub('#', '', color)
+  }
+
+  expl <- paste0('\\textcolor{', color, '}{')
+  return(rlang::quo(paste0(expl, x, '}')))
+}
+
+cell_text.align <- function(cell_text){
+  value <- cell_text$align
+  options <- list(
+    center = rlang::quo(paste0('\\mC{alignSUB}{',
+                               x,
+                               '}')),
+    left = rlang::quo(paste0('\\mL{alignSUB}{',
+                               x,
+                               '}')),
+    right = rlang::quo(paste0('\\mR{alignSUB}{',
+                              x,
+                              '}'))
+  )
+  options[[value]]
+}
+
+cell_fill.color <- function(cell_fill){
+  color <- cell_fill$color
+
+  if(startsWith(color, '#')){
+    color <- gsub('#', '', color)
+  }
+
+  expl <- paste0('\\cellcolor{', color, '}{')
+
+  return(rlang::quo(paste0(expl, x, '}')))
 }
 
 #construct the color definition latex code lines (required)
@@ -297,86 +372,114 @@ define_colors_latex <- function(styles_df) {
 
 #### LaTeX main Style Functions
 
-#' @noRd
-latex_style_function_list <- function() {
-  weight <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
-                 bolder = rlang::quo(paste0('\\textbf{', x, '}')))
+#' #' @noRd
+#' latex_style_function_list <- function() {
+#'   weight <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
+#'                  bolder = rlang::quo(paste0('\\textbf{', x, '}')))
+#'
+#'   style = list(
+#'     italic = rlang::quo(paste0('\\textit{', x, '}')),
+#'     center = NA,
+#'     normal = NA,
+#'     oblique = NA
+#'   )
+#'
+#'   align = list(center = NA,
+#'                left = NA,
+#'                right = NA)
+#'
+#'   indent = as.list(rep(NA, 1001))
+#'   names(indent) <- glue::glue('{0:1000}', 'px')
+#'
+#'   cell_text <- list(
+#'     weight = weight,
+#'     style = style,
+#'     align = align
+#'   )
+#'
+#'   cell_borders <- list()
+#'   cell_styling <- list(cell_text = cell_text,
+#'                        cell_borders = cell_borders)
+#'   cell_styling
+#' }
 
-  style = list(
-    italic = rlang::quo(paste0('\\textit{', x, '}')),
-    center = NA,
-    normal = NA,
-    oblique = NA
-  )
+get_latex_function_styles <- function(styles_list){
 
-  align = list(center = NA,
-               left = NA,
-               right = NA)
+  styling_functions <- purrr::map(names(unlist(styles_list)),
+                                  R.utils::doCall,
+                                  args = styles_list,
+                                  .ignoreUnusedArgs = TRUE)
 
-  indent = as.list(rep(NA, 1001))
-  names(indent) <- glue::glue('{0:1000}', 'px')
-
-  cell_text <- list(
-    weight = weight,
-    style = style,
-    align = align
-  )
-
-  cell_borders <- list()
-  cell_styling <- list(cell_text = cell_text,
-                       cell_borders = cell_borders)
-  cell_styling
+  names(styling_functions) <- names(unlist(styles_list))
+  styling_functions
 }
-
 #loop through the styles table and resolve all the styling specified
 #' @noRd
-get_latex_function_styles <- function(styles_list) {
-  cell_styling <- latex_style_function_list()
-  operation_vec <- list(NA)
+# get_latex_function_styles2 <- function(styles_list) {
+#   cell_styling <- latex_style_function_list()
+#   operation_vec <- list(NA)
+#   get_operation(styles_list)
+#   for (nm in names(styles_list)) {
+#
+#     for (nm2 in names(styles_list[[nm]])) {
+#
+#       if(nm2 == 'size'){
+#
+#         operation <- latex_format_text_size(styles_list[[nm]][[nm2]])
+#
+#       } else {
+#
+#         if(nm2 == 'color'){
+#           operation <- latex_style_color(styles_list[[nm]][[nm2]], nm)
+#
+#         } else {
+#
+#           if(nm2 == 'stretch'){
+#             operation <- latex_format_condensed_size(styles_list[[nm]][[nm2]])
+#
+#           } else {
+#
+#             operation <- cell_styling[[nm]][[nm2]][[styles_list[[nm]][[nm2]]]]
+#
+#           }
+#         }
+#       }
+#       operation_vec <- append(operation_vec, operation)
+#     }
+#   }
+#   operation_vec
+# }
 
-  for (nm in names(styles_list)) {
-
-    for (nm2 in names(styles_list[[nm]])) {
-
-      if(nm2 == 'size'){
-
-        operation <- latex_format_text_size(styles_list[[nm]][[nm2]])
-
-      } else {
-
-        if(nm2 == 'color'){
-          operation <- latex_style_color(styles_list[[nm]][[nm2]], nm)
-
-        } else {
-
-          if(nm2 == 'stretch'){
-            operation <- latex_format_condensed_size(styles_list[[nm]][[nm2]])
-
-          } else {
-
-            operation <- cell_styling[[nm]][[nm2]][[styles_list[[nm]][[nm2]]]]
-
-          }
-        }
-      }
-      operation_vec <- append(operation_vec, operation)
-    }
+#' @noRd
+order.functions <- function(function.list){
+  function.names <- names(function.list)
+  if('cell_text.align' %in% function.names){
+    ct_align.postion <- which(function.names == 'cell_text.align')
+    without_align <- order(function.names)[!order(function.names) ==  ct_align.postion]
+    function.list <- function.list[c(without_align, ct_align.postion)]
   }
-  operation_vec
+  function.list
 }
 
 #' @noRd
-latex_style_it <- function(value, styles) {
+latex_style_it <- function(value, styles, colnum = NULL) {
   funclist <- get_latex_function_styles(styles)
-  funclist <- funclist[!is.na(funclist)]
+  funclist <- order.functions(funclist)
   val <- list(x = value)
 
-  for (i in funclist) {
+  for(function.name in names(funclist)){
+    function.evaluated <- rlang::eval_tidy(funclist[[function.name]], val)
 
-    val['x'] <- rlang::eval_tidy(i, val)
+    if(function.name == 'cell_text.align'){
+      col.command <- paste0('\\col', english::as.english(colnum))
+      function.evaluated <- gsub('alignSUB',
+                                 col.command,
+                                 function.evaluated,
+                                 fixed = TRUE)
+    }
 
+    val['x'] <- function.evaluated
   }
-
   val[['x']]
 }
 

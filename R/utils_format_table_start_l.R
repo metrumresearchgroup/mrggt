@@ -291,11 +291,38 @@ find_valid_fontsizing <- function(tbl_sizing_data) {
 }
 
 fmt_header_latex <- function(sizing_columns){
-  paste0('\\begin{longtable}{',
-         paste(sprintf(
-           "p{%scm}", as.character(sizing_columns)
-         ), collapse = ''),
-         '} \n')
+
+  commands <-
+    purrr::map_chr(seq(length(sizing_columns)), function(.x) {
+      paste0('\\col',
+             gsub("[^[:alnum:]]", "", english::as.english(.x)))
+    })
+
+  commands.definitions <-
+    paste(purrr::map2_chr(sizing_columns, commands, function(.x, .y) {
+      paste0('\\newcommand',
+             .y,
+             '{',
+             .x,
+             'cm}')
+    }),
+    collapse = '\n')
+
+
+  table.start <- paste0('\\begin{longtable}{',
+                        paste(sprintf("p{%s}", commands), collapse = ''),
+                        '} \n')
+
+  paste(commands.definitions,
+        "\\newcolumntype{R}[1]{>{\\raggedleft\\arraybackslash}p{#1}}",
+        "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1}}",
+        "\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}",
+        "\\newcommand{\\mC}[2]{\\multicolumn{1}{C{#1}}{#2}}",
+        "\\newcommand{\\mR}[2]{\\multicolumn{1}{R{#1}}{#2}}",
+        "\\newcommand{\\mL}[2]{\\multicolumn{1}{L{#1}}{#2}}",
+        table.start,
+        sep = '\n')
+
 }
 
 
