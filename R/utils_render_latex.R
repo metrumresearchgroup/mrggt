@@ -1,7 +1,7 @@
 
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
-  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz")
+  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", 'ulem')
 }
 
 # If the `rmarkdown` package is available, use the
@@ -127,11 +127,11 @@ create_columns_component_l <- function(data) {
 
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
-  headings_labels <- purrr::map_chr(headings_labels, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
 
-  key <- as.list(headings_labels)
-  names(key) <- headings_vars
-  headings_labels <- lapply(headings_vars, latex_style_headings, styles_df = styles_tbl, key = key)  %>% unlist(use.names = FALSE)
+  headings_labels <- purrr::map2_chr(headings_vars,
+                                     headings_labels,
+                                     latex_style_headings,
+                                     styles_df = styles_tbl)
 
   # TODO: Implement hidden boxhead in LaTeX
   # # Should the column labels be hidden?
@@ -146,8 +146,7 @@ create_columns_component_l <- function(data) {
   # label or nothing
   if (isTRUE(stub_available) && length(stubh$label) > 0) {
 
-    stubl <- fmt_latex_math(gsub("\\", "", stubh$label, fixed=TRUE))
-    stublabel <- style_stubhead_l(styles_tbl, stubl)
+    stublabel <- style_stubhead_l(styles_tbl, stubh$label)
 
     headings_labels <- prepend_vec(headings_labels, stublabel)
     headings_vars <- prepend_vec(headings_vars, "::stub")
@@ -180,13 +179,9 @@ create_columns_component_l <- function(data) {
     multicol <- c()
     cmidrule <- c()
 
-    spanners_lengths$values <- purrr::map_chr(spanners_lengths$values, function(.){
-      if(is.na(.)){
-        ''
-      } else {
-        latex_style_spanners(fmt_latex_math(gsub("\\", "", ., fixed=TRUE)), styles_df = styles_tbl)
-      }
-    })
+    spanners_lengths$values <- purrr::map_chr(spanners_lengths$values,
+                                              latex_style_spanners,
+                                              styles_df = styles_tbl)
 
     for (i in seq(spanners_lengths$lengths)) {
 
