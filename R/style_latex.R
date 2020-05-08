@@ -387,9 +387,20 @@ latex_style_it <- function(value, styles) {
 #' @export
 latex_shrink <- function(latex_code, prop_shrink, align = c('l', 'r', 'c')) {
   align <- match.arg(align)
-  #Shrink the column widths
   tex_split <-
     unlist(stringr::str_split(latex_code %>% as.character(), '\n'))
+
+  #Shrink the title/source notes widths
+  caption_rows <-
+    tex_split[grepl('\\w?\\\\begin\\{minipage\\}', tex_split)]
+  shrink_width <-
+    as.double(unlist(
+      qdapRegex::rm_between(caption_rows, '}{', 'cm}', extract = TRUE)
+    )) * prop_shrink
+  tex_split[grepl('\\w?\\\\begin\\{minipage\\}', tex_split)] <-
+    paste0('\\begin{minipage}{', shrink_width, 'cm}')
+
+  #Shrink the column widths
   col_width_row <-
     tex_split[startsWith(tex_split, '\\begin{longtable}')]
   shrink_width <-
