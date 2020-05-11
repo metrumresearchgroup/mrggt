@@ -36,8 +36,8 @@ latex_s <- function(scale_factor,
 #' df %>%
 #' gt() %>%
 #' as_latex() %>%
-#' latex_shrink(scale_factor = list(c(1, 0.5),
-#'                                  c(3, 0.7)))
+#' latex_scale(scale_factor = list(c(1, 0.5),
+#'                                 c(3, 0.7)))
 #'
 #' # shrink all the columns by 0.5.
 #' df %>%
