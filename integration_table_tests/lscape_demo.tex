@@ -1,0 +1,358 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Landscape Table Demo},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Landscape Table Demo}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{}
+    \preauthor{}\postauthor{}
+    \date{}
+    \predate{}\postdate{}
+  
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[singlelinecheck=off]{caption}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{mathptmx}
+\usepackage{tikz}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\usepackage{pdflscape}
+\usepackage{everypage}
+\newlength{\hfoot}
+\newlength{\vfoot}
+\AddEverypageHook{\ifdim\textwidth=\linewidth\relax
+\else\setlength{\hfoot}{-\topmargin}%
+\addtolength{\hfoot}{-\headheight}%
+\addtolength{\hfoot}{-\headsep}%
+\addtolength{\hfoot}{-.5\linewidth}%
+\ifodd\value{page}\setlength{\vfoot}{\oddsidemargin}%
+\else\setlength{\vfoot}{\evensidemargin}\fi%
+\addtolength{\vfoot}{\textheight}%
+\addtolength{\vfoot}{\footskip}%
+\raisebox{\hfoot}[0pt][0pt]{\rlap{\hspace{\vfoot}\rotatebox[origin=cB]{90}{\thepage}}}\fi}
+\newenvironment{lscape-mrggtab}[2][1.5pt]
+{
+\begin{landscape}
+\pagestyle{empty}
+\begin{longtable}{#2}
+}
+{
+\end{longtable}
+\end{landscape}
+}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl_gt <-}
+\StringTok{  }\KeywordTok{gt}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ tbl_colored) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
+    \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#ffcccb"}\NormalTok{),}
+    \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+      \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+      \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'a'}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
+    \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#ffffed"}\NormalTok{),}
+    \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+      \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+      \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'b'}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
+    \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#b19cd9"}\NormalTok{),}
+    \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+      \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+      \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'g'}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
+        \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#90ee90"}\NormalTok{),}
+        \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+          \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+          \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'p'}\NormalTok{)}
+\NormalTok{        )}
+\NormalTok{   ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
+    \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#fed8b1"}\NormalTok{),}
+    \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+      \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+      \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'o'}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  ) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{grpname =} \StringTok{'Fruit'}\NormalTok{,}
+                          \DataTypeTok{count =} \StringTok{'Total'}\NormalTok{,}
+                          \DataTypeTok{color =} \StringTok{'Color'}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'Source code: /integration_table_tests/lscape_demo.R'}\NormalTok{,}
+                    \StringTok{'Source code: /integration_table_tests/lscape_demo.tex'}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{one-landscape-page-per-table}{%
+\section{One Landscape Page Per
+Table}\label{one-landscape-page-per-table}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl_gt }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{lscape}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
+\definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
+\definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
+\definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=0pt}
+\begin{lscape-mrggtab}{p{6.07333333333333cm}p{5.55333333333333cm}p{5.97333333333333cm}} 
+\toprule
+Fruit & Total & Color \\ 
+\midrule
+\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
+\cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
+\cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
+\cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
+\bottomrule
+\\ 
+ \begin{minipage}{18cm}
+Source code: /integration\_table\_tests/lscape\_demo.R\\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
+\end{minipage}
+\end{lscape-mrggtab}
+
+\hypertarget{multiple-tables-on-single-landscape-page}{%
+\section{Multiple Tables on Single Landscape
+Page}\label{multiple-tables-on-single-landscape-page}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(tbl_gt }\OperatorTok{+}\StringTok{ }\NormalTok{tbl_gt }\OperatorTok{+}\StringTok{ }\NormalTok{tbl_gt }\OperatorTok{+}\StringTok{ }\NormalTok{tbl_gt) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{lscape}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{landscape}
+\pagestyle{empty}
+\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
+\definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
+\definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
+\definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=0pt}
+\begin{longtable}{p{6.07333333333333cm}p{5.55333333333333cm}p{5.97333333333333cm}} 
+\toprule
+Fruit & Total & Color \\ 
+\midrule
+\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
+\cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
+\cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
+\cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
+\bottomrule
+\\ 
+ \begin{minipage}{18cm}
+Source code: /integration\_table\_tests/lscape\_demo.R\\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
+\end{minipage}
+\end{longtable}
+
+\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
+\definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
+\definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
+\definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=0pt}
+\begin{longtable}{p{6.07333333333333cm}p{5.55333333333333cm}p{5.97333333333333cm}} 
+\toprule
+Fruit & Total & Color \\ 
+\midrule
+\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
+\cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
+\cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
+\cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
+\bottomrule
+\\ 
+ \begin{minipage}{18cm}
+Source code: /integration\_table\_tests/lscape\_demo.R\\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
+\end{minipage}
+\end{longtable}
+
+\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
+\definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
+\definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
+\definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=0pt}
+\begin{longtable}{p{6.07333333333333cm}p{5.55333333333333cm}p{5.97333333333333cm}} 
+\toprule
+Fruit & Total & Color \\ 
+\midrule
+\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
+\cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
+\cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
+\cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
+\bottomrule
+\\ 
+ \begin{minipage}{18cm}
+Source code: /integration\_table\_tests/lscape\_demo.R\\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
+\end{minipage}
+\end{longtable}
+
+\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
+\definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
+\definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
+\definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=0pt}
+\begin{longtable}{p{6.07333333333333cm}p{5.55333333333333cm}p{5.97333333333333cm}} 
+\toprule
+Fruit & Total & Color \\ 
+\midrule
+\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
+\cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
+\cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
+\cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
+\bottomrule
+\\ 
+ \begin{minipage}{18cm}
+Source code: /integration\_table\_tests/lscape\_demo.R\\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
+\end{minipage}
+\end{longtable}
+
+\end{landscape}
+
+
+\end{document}

@@ -1,7 +1,7 @@
 
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
-  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz")
+  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage" )
 }
 
 # If the `rmarkdown` package is available, use the
@@ -14,11 +14,38 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
     lapply(latex_packages(), rmarkdown::latex_dependency)
 
   if(!shrink){
-    latex_packages[[4]]$extra_lines <- c('\\setlength\\LTleft{-.75cm}', '\\setlength\\LTright{0pt plus 1fill minus 1fill}', '\\setlength\\LTcapwidth{18cm}')
+    latex_packages[[4]]$extra_lines <- c('\\setlength\\LTleft{-.75cm}',
+                                         '\\setlength\\LTright{0pt plus 1fill minus 1fill}',
+                                         '\\setlength\\LTcapwidth{18cm}')
   }
 
   latex_packages[[3]]$options <- c('singlelinecheck=off')
   latex_packages[[11]]$extra_lines <- c('\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}')
+  latex_packages[[13]]$extra_lines <- c('\\newlength{\\hfoot}',
+                                        '\\newlength{\\vfoot}',
+                                        '\\AddEverypageHook{\\ifdim\\textwidth=\\linewidth\\relax',
+                                        '\\else\\setlength{\\hfoot}{-\\topmargin}%',
+                                        '\\addtolength{\\hfoot}{-\\headheight}%',
+                                        '\\addtolength{\\hfoot}{-\\headsep}%',
+                                        '\\addtolength{\\hfoot}{-.5\\linewidth}%',
+                                        '\\ifodd\\value{page}\\setlength{\\vfoot}{\\oddsidemargin}%',
+                                        '\\else\\setlength{\\vfoot}{\\evensidemargin}\\fi%',
+                                        '\\addtolength{\\vfoot}{\\textheight}%',
+                                        '\\addtolength{\\vfoot}{\\footskip}%',
+                                        '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}',
+                                        '\\newenvironment{lscape-mrggtab}[2][1.5pt]',
+                                        '{',
+                                        '\\begin{landscape}',
+                                        "\\pagestyle{empty}",
+                                        #"\\setlength\\LTleft{-.75cm}",
+                                        #"\\setlength\\LTright{0pt plus 1fill minus 1fill}",
+                                        #"\\setlength\\LTcapwidth{18cm}",
+                                        '\\begin{longtable}{#2}',
+                                        '}',
+                                        '{',
+                                        '\\end{longtable}',
+                                        '\\end{landscape}',
+                                        '}')
 
 } else {
   latex_packages <- NULL
