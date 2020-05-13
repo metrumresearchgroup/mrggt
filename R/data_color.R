@@ -109,8 +109,7 @@
 #'     columns = vars(sold, income),
 #'     colors = scales::col_numeric(
 #'       palette = paletteer::paletteer_d(
-#'         package = "ggsci",
-#'         palette = "red_material"
+#'         palette = "ggsci::red_material"
 #'         ) %>% as.character(),
 #'       domain = NULL
 #'       )
