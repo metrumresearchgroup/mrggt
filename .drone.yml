@@ -2,10 +2,6 @@ kind: pipeline
 type: docker
 name: mrggt
 
-#Gobal variable definitions and anchors
-global-variables:
-    environment: &default_environment
-
 steps:
 - name: Pull mpn container from ECR
   image: omerxx/drone-ecr-auth
@@ -21,8 +17,6 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
-    # Reading in entire anchor
-    <<: *default_environment
   commands:
   - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
@@ -34,7 +28,6 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.5/2020-03-24"
-    <<: *default_environment
   commands:
   - /opt/R/3.5.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.5.3/bin/R -e "devtools::test()"
@@ -50,7 +43,6 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
-    <<: *default_environment
   commands:
   - git config --global user.email "drone@metrumrg.com"
   - git config --global user.name "Drony"
