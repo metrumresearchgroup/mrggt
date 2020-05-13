@@ -17,8 +17,6 @@ steps:
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6/2020-03-24"
-    # Reading in entire anchor
-    <<: *default_environment
   commands:
   - /opt/R/3.6.2/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.2/bin/R -e "devtools::test()"
