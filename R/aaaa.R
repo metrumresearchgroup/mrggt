@@ -4,6 +4,7 @@ latex_cache$line.breaks <- TRUE
 latex_cache$column.sep <- NULL
 latex_cache$footnotes.align <- 'l'
 latex_cache$sourcenotes.align <- 'l'
+latex_cache$margin <- c(1, 1)
 latex_cache$env <- rlang::caller_env()
 
 
@@ -16,23 +17,25 @@ reset_latex_cache <- function() {
   latex_cache$sourcenotes.align <- 'l'
 }
 
-#' Additional formatting options for as_latex()
-#' @param shrink The percentage to shrink the width by. Accepts a value < 1. Default is to stretch the table to full width of the page.
-#' @param line.breaks Allow/do not allow line breaks in the table. Default is to allow for line breaks under two circumstances: 1.) When the text of the table at the smallest point size (5pt) cannot fit to the width of the page. 2.) A minimal number of line breaks are required to make point size larger. In the first condition, setting this parameter to FALSE will not affect the output. In the second, the font size will be scaled down to remove the minimal breaks.
-#' @param column.sep set the column separator
-#' @param footnotes.align direction to align footnotes
-#' @param sourcenotes.align direction to align footnotes
-#' @export
+#' Global options to set for mrggt that effect the latex rendering
+#' @param ... args passed on to assign function. possible values to assign are:
+#' - **margin**: numeric vector with values in inches in format ```c(left margin, right margin)```; default is ```c(1, 1)```
+#' - **column.sep**: numeric value in pt; default is 3pt.
+#' - **line.breaks**: logical; allow line breaks in table; default is ```TRUE``` (recommended)
 #'
-latex_tab.options <- function(shrink = NULL,
-                              line.breaks = TRUE,
-                              column.sep = NULL,
-                              footnotes.align = 'l',
-                              sourcenotes.align = 'l'){
-
-  latex_cache$shrink <- shrink
-  latex_cache$line.breaks <- line.breaks
-  latex_cache$column.sep <- column.sep
-  latex_cache$footnotes.align <- footnotes.align
-  latex_cache$sourcenotes.align <- sourcenotes.align
+#' @examples
+#' # set left & right margins to 1in & 2in
+#' # no line breaks
+#' # change column separation in table to 2pt.
+#'
+#' mrggtOptions('margin' = c(3, 4),
+#'              'line.breaks' = FALSE,
+#'              'column.sep' = 2)
+#'
+#' @export
+mrggtOptions <- function(...){
+  opts <- list(...)
+  assign_multiple <- Vectorize(assign, vectorize.args = c('x', 'value'))
+  invisible(assign_multiple(names(opts), opts, envir = latex_cache))
 }
+
