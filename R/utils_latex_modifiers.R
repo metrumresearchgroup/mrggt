@@ -8,6 +8,15 @@ latex_s.list <- function(scale_factor,
 
   shrink_at <- unlist(scale_factor)[c(TRUE, FALSE)]
   shrink_by <- unlist(scale_factor)[c(FALSE, TRUE)]
+  shrink_at_DNE <- shrink_at[shrink_at > length(col_lengths)]
+
+  if(length(shrink_at_DNE) > 0){
+
+    stop(paste0('column index error: specified columns [',
+                paste(shrink_at_DNE, collapse = ', '),
+                '] do not exist'))
+
+  }
   col_lengths[shrink_at] <- col_lengths[shrink_at] * shrink_by
 
   col_lengths
