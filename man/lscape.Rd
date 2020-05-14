@@ -20,6 +20,7 @@ df <- dplyr::tribble(
 )
 
 # single table on a single landscape page
+
 df \%>\%
 gt() \%>\%
 as_latex() \%>\%
@@ -32,7 +33,7 @@ tbl <- df \%>\%
 
 (tbl + tbl + tbl) \%>\% lscape()
 
-       -- or --
+ #      -- or --
 
 list(tbl, tbl, tbl) \%>\% lscape()
 

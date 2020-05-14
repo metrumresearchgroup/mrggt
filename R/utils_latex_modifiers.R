@@ -143,23 +143,23 @@ lscape.list <- function(latex_code){
 #' )
 #'
 #' # single table on a single landscape page
-#'\dontrun{
+#'
 #' df %>%
 #' gt() %>%
 #' as_latex() %>%
 #' lscape()
-#' }
+#'
 #' # multiple tables on a single landscape page
 #' tbl <- df %>%
 #'        gt() %>%
 #'        as_latex()
-#'\dontrun{
+#'
 #' (tbl + tbl + tbl) %>% lscape()
-#'}
-#'        -- or --
-#'\dontrun{
+#'
+#'  #      -- or --
+#'
 #' list(tbl, tbl, tbl) %>% lscape()
-#'}
+#'
 #' @export
 lscape <- function(latex_code){
   UseMethod('lscape')
