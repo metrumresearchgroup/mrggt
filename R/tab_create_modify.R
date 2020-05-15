@@ -225,7 +225,7 @@ tab_spanner_delim <- function(data,
 
       data <-
         data %>%
-        dt_boxhead_edit(var = var_i, column_label = new_labels_i)
+        dt_boxhead_edit(var = var_i, column_label = list(new_labels_i))
     }
 
     spanner_var_list <- split(colnames_with_delim, spanners)
