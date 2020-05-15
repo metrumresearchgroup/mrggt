@@ -68,6 +68,7 @@ dt_boxhead_edit <- function(data, var, ...) {
     dplyr::as_tibble(val_list)
 
   dt_boxhead %>% dt_boxhead_set(data = data)
+
 }
 
 dt_boxhead_add_var <- function(data,
