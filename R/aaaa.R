@@ -26,7 +26,7 @@ orient <- function(x = c('portrait', 'landscape')){
   latex_cache$orient <- x
 }
 
-margin <- function(x){
+pagemargin <- function(x){
   if(!length(x) == 2){
     stop('margins must be specified as c(left margin, right margin)')
   }
@@ -36,6 +36,11 @@ margin <- function(x){
 line.breaks <- function(x = c(TRUE, FALSE)){
   x <- match.arg(x)
   latex_cache$line.breaks <- x
+}
+
+orient <- function(x = c('portrait', 'landscape')){
+  x <- match.arg(x)
+  latex_cache$orient <- x
 }
 
 papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'ledger')){
@@ -63,30 +68,53 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
       'landscape' = c(17.0, 11.0)
     )
   )
-
+  latex_cache$pagewidth <- size
+  latex_cache$papersize <- x
 }
 
 #' Global options to set for mrggt that effect the latex rendering
 #' @param ... args passed on to assign function. possible values to assign are:
-#' - **margin**: numeric vector in inches with format ```c(left margin, right margin)```; default is ```c(1, 1)```
+#' - **pagemargin**: numeric vector in inches with format ```c(left margin, right margin)```; default is ```c(1, 1)```
 #' - **column.sep**: numeric value in pt; default is 3pt.
 #' - **line.breaks**: logical; allow line breaks in table; default is ```TRUE``` (recommended)
-#' - **papersize**: numeric value in inches; default 8.5 - standard letter
-#' - **orient**:
+#' - **papersize**: character; default ```'letter'```; options:
+#'   - *half letter*: 5.5 x 8.0 in
+#'   - *letter*: 8.5 x 11.0 in
+#'   - *legal*: 8.5 x 14.0 in
+#'   - *junior legal*: 5.0 x 8.0 in
+#'   - *ledger*: 11.0 x 17.0 in
+#' - **orient**: character; ```'portrait'``` or ```'landscape'```; default ```'portrait'```
 #'
 #' @examples
 #' # set left & right margins to 1in & 2in
 #' # no line breaks
 #' # change column separation in table to 2pt.
+#' # change paper to legal
+#' # orient landscape
 #'
 #' mrggtOptions('margin' = c(3, 4),
 #'              'line.breaks' = FALSE,
-#'              'column.sep' = 2)
+#'              'column.sep' = 2,
+#'              'papersize' = 'legal',
+#'              'orient' = 'landscape')
 #'
 #' @export
 mrggtOptions <- function(...){
   opts <- list(...)
-  assign_multiple <- Vectorize(assign, vectorize.args = c('x', 'value'))
-  invisible(assign_multiple(names(opts), opts, envir = latex_cache))
+  avail_set <- c('orient',
+                 'papersize',
+                 'line.breaks',
+                 'column.sep',
+                 'pagemargin')
+
+  if(!length(names(opts)[!names(opts) %in% avail_set]) == 0){
+
+    message(paste0('ignoring unknown options specified: ',
+                   paste(names(opts)[!names(opts) %in% avail_set],
+                         collapse = ', ')))
+  }
+
+  options <- names(opts)[names(opts) %in% avail_set]
+  purrr::walk(options, ~do.call(.x, list(x = opts[[.x]])))
 }
 

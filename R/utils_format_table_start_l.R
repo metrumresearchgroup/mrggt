@@ -244,11 +244,13 @@ construct_sizing_params <- function(data) {
 validate_maxwidth_per_column <- function(max_required_widths) {
   tbl_width <- sum(max_required_widths)
 
-  #if calculated width less than width of page (approx. 17.6 cm)
-  if (tbl_width <= 17.6) {
+  page_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
+  available_width <- page_width - sum(latex_cache$margin)*2.54
+
+  if (tbl_width <= available_width) {
     final_tbl_width <-
       purrr::map_dbl(max_required_widths, function(.x) {
-        .x + (17.6 - tbl_width) / length(max_required_widths)
+        .x + (available_width - tbl_width) / length(max_required_widths)
       })
     return(final_tbl_width)
   }
@@ -316,9 +318,12 @@ get_type_settings <- function(sizing_params) {
 no_settings_found <- function(sizing_params, best_type_settings){
   with(best_type_settings, {
 
+    page_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
+    available_width <- page_width - sum(latex_cache$margin)*2.54
+
     if(is.null(collabels$type_size) && is.null(data_rows$type_size)){
       type_size <- type_setting(5)
-      sizing_columns <- rep(17.6/length(sizing_params$components[[2]]), length(sizing_params$components[[2]]))
+      sizing_columns <- rep(available_width/length(sizing_params$components[[2]]), length(sizing_params$components[[2]]))
 
     } else{
 
@@ -334,7 +339,7 @@ no_settings_found <- function(sizing_params, best_type_settings){
         #if the data is big and collabels are small, just make it smallest font with even spaced columns
       } else {
         type_size <- type_setting(5)
-        sizing_columns <- rep(17.6/length(sizing_params$components[[2]]), length(sizing_params$components[[2]]))
+        sizing_columns <- rep(available_width/length(sizing_params$components[[2]]), length(sizing_params$components[[2]]))
       }
     }
     list(type_size = type_size,
