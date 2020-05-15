@@ -113,6 +113,9 @@ gt_default_options <- list(
 
   register_s3_method("knitr", "knit_print", "gt_tbl")
   register_s3_method("htmltools", "as.tags", "gt_tbl")
+  registerS3method("lscape", "knit_asis", lscape.knit_asis)
+  registerS3method("lscape", "list", lscape.list)
+  registerS3method("+", "knit_asis", '+.knit_asis')
 
   op <- options()
   toset <- !(names(gt_default_options) %in% names(op))
