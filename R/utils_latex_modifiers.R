@@ -94,42 +94,38 @@ latex_scale <- function(latex_code,
   tex_code %>% knitr::asis_output(meta = latex_packages)
 }
 
-retype <- function(x){
-  UseMethod('retype')
+'+.lscape_asis' <- function(a, b){
+  knit_meta <- attributes(a)$knit_meta
+  combined_base <- paste0(attributes(a)$base,
+                          '\n',
+                          attributes(b)$base)
+
+
+  knit_asis <- paste("\\begin{landscape}",
+                   "\\pagestyle{empty}",
+                   combined_base,
+                   "\\end{landscape}",
+                   sep = '\n') %>% knitr::asis_output(meta = knit_meta)
+
+  lscape_asis <- structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
+  attr(lscape_asis, 'base') <- combined_base
+  lscape_asis
 }
 
-retype.knit_asis <- function(x){
-  list(x)
+fmt_orient <- function(data){
+  UseMethod('fmt_orient')
 }
 
-retype.list <- function(x){
-  x
+fmt_orient.default <- function(data){
+  mrggtOptions('orient' = 'portrait')
+  TRUE
 }
 
-'+.knit_asis' <- function(a, b){
-  c(retype(a), retype(b))
+fmt_orient.lscape <- function(data){
+  mrggtOptions('orient' = 'landscape')
+  FALSE
 }
 
-lscape.knit_asis <- function(latex_code){
-  knit_meta <- attributes(latex_code)$knit_meta
-  knit_meta[[4]]$extra_lines <- NULL
-  latex_code <- gsub('longtable',
-                     'lscape-mrggtab',
-                     latex_code %>% as.character(),
-                     fixed = TRUE)
-  latex_code %>% knitr::asis_output(meta = knit_meta)
-}
-
-lscape.list <- function(latex_code){
-  knit_meta <- attributes(latex_code[[1]])$knit_meta
-  knit_meta[[4]]$extra_lines <- NULL
-  grouped_tbls <- paste('\\begin{landscape}',
-                        "\\pagestyle{empty}",
-                        paste(unlist(lapply(latex_code, as.character)), collapse = '\n'),
-                        "\\end{landscape}",
-                        sep = '\n')
-  grouped_tbls %>% knitr::asis_output(meta = knit_meta)
-}
 
 #' Orient a LateX table in landscape
 #'
@@ -146,21 +142,23 @@ lscape.list <- function(latex_code){
 #'
 #' df %>%
 #' gt() %>%
-#' as_latex() %>%
 #' lscape()
+#' as_latex()
 #'
 #' # multiple tables on a single landscape page
 #' tbl <- df %>%
 #'        gt() %>%
+#'        lscape() %>%
 #'        as_latex()
 #'
-#' (tbl + tbl + tbl) %>% lscape()
+#' tbl + tbl + tbl
 #'
-#'  #      -- or --
-#'
-#' list(tbl, tbl, tbl) %>% lscape()
 #'
 #' @export
 lscape <- function(latex_code){
   UseMethod('lscape')
+}
+
+lscape.gt_tbl <- function(x){
+  x <- structure(x, class = c(class(x), 'lscape'))
 }

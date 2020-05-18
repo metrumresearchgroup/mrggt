@@ -14,7 +14,7 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
     lapply(latex_packages(), rmarkdown::latex_dependency)
 
   if(!shrink){
-    latex_packages[[4]]$extra_lines <- c('\\setlength\\LTleft{-.75cm}',
+    latex_packages[[4]]$extra_lines <- c('\\setlength{\\LTright}{\\LTleft}',
                                          '\\setlength\\LTright{0pt plus 1fill minus 1fill}',
                                          '\\setlength\\LTcapwidth{18cm}')
   }
@@ -32,20 +32,7 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
                                         '\\else\\setlength{\\vfoot}{\\evensidemargin}\\fi%',
                                         '\\addtolength{\\vfoot}{\\textheight}%',
                                         '\\addtolength{\\vfoot}{\\footskip}%',
-                                        '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}',
-                                        '\\newenvironment{lscape-mrggtab}[2][1.5pt]',
-                                        '{',
-                                        '\\begin{landscape}',
-                                        "\\pagestyle{empty}",
-                                        #"\\setlength\\LTleft{-.75cm}",
-                                        #"\\setlength\\LTright{0pt plus 1fill minus 1fill}",
-                                        #"\\setlength\\LTcapwidth{18cm}",
-                                        '\\begin{longtable}{#2}',
-                                        '}',
-                                        '{',
-                                        '\\end{longtable}',
-                                        '\\end{landscape}',
-                                        '}')
+                                        '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}')
 
 } else {
   latex_packages <- NULL

@@ -73,28 +73,23 @@ test_that("latex landscape mode", {
   # add landscape orientation
   tbl_gt <-
     gt(data = mtcars_short) %>%
-    as_latex() %>%
-    lscape()
+    lscape() %>%
+    as_latex()
 
   # Expect a characteristic pattern
   # table should now be in a `lscape-mrggtab` environment
-  expect_true(grepl("\\\\begin\\{lscape-mrggtab\\}", tbl_gt))
-  expect_true(grepl("\\\\end\\{lscape-mrggtab\\}", tbl_gt))
-
-  # Expect a characteristic pattern
-  # table should not be in a longtable environment
-  expect_false(grepl("\\\\begin\\{longtable\\}", tbl_gt))
-  expect_false(grepl("\\\\end\\{longtable\\}", tbl_gt))
+  expect_true(grepl("\\\\begin\\{landscape\\}", tbl_gt))
+  expect_true(grepl("\\\\end\\{landscape\\}", tbl_gt))
 
   # Extract the knit meta from the knit_asis object
   # retrieve the extra lines for the last latex dep
   knit_meta <- attributes(tbl_gt)$knit_meta
-  lscape_def <- knit_meta[[length(knit_meta)]]$extra_lines
+  lscape_settings <- knit_meta[[length(knit_meta)]]$extra_lines
 
   # Expect fixed value
   # lscape-mrggtab environment is created & defined under last package dep
   expect_equal(
-    lscape_def,
+    lscape_settings,
     c(
       '\\newlength{\\hfoot}',
       '\\newlength{\\vfoot}',
@@ -107,80 +102,65 @@ test_that("latex landscape mode", {
       '\\else\\setlength{\\vfoot}{\\evensidemargin}\\fi%',
       '\\addtolength{\\vfoot}{\\textheight}%',
       '\\addtolength{\\vfoot}{\\footskip}%',
-      '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}',
-      '\\newenvironment{lscape-mrggtab}[2][1.5pt]',
-      '{',
-      '\\begin{landscape}',
-      "\\pagestyle{empty}",
-      #"\\setlength\\LTleft{-.75cm}",
-      #"\\setlength\\LTright{0pt plus 1fill minus 1fill}",
-      #"\\setlength\\LTcapwidth{18cm}",
-      '\\begin{longtable}{#2}',
-      '}',
-      '{',
-      '\\end{longtable}',
-      '\\end{landscape}',
-      '}'
-    )
-  )
+      '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}'
+  ))
 
 
   # Create a `tbl_latex` object with `gt()`;
-  # add table header 'Table 1'
+  # add table header 'Table 1', place in landscape mode
   tbl_gt <-
     gt(data = mtcars_short) %>%
+    lscape() %>%
     tab_header(title = 'Table 1') %>%
     as_latex()
 
   # Create a `tbl_latex` object with `gt()`;
-  # add table header 'Table 2'
+  # add table header 'Table 2', place in landscape mode
   tbl_gt2 <-
       gt(data = mtcars_short) %>%
+      lscape() %>%
       tab_header(title = 'Table 2') %>%
       as_latex()
 
   # Create a `tbl_latex` object with `gt()`;
-  # add table header 'Table 3'
+  # add table header 'Table 3', place in landscape mode
   tbl_gt3 <-
     gt(data = mtcars_short) %>%
+    lscape() %>%
     tab_header(title = 'Table 3') %>%
     as_latex()
 
   # combine objects using s3 binary operator
   tbls <- tbl_gt + tbl_gt2 + tbl_gt3
 
-  # Expect fixed class
-  # combining knit_asis using '+' should return a list
-  expect_true(class(tbls) == 'list')
+  # Expect fixed classes
+  # combining knit_asis; lscape_asis should return lscape_asis; knit_asis
+  expect_true('knit_asis' %in% class(tbls))
+  expect_true('lscape_asis' %in% class(tbls))
+  expect_equal(length(class(tbls)), 2)
 
-  # Expect a fixed value
-  # combining 3 knit_asis should return a list of length 3
-  expect_equal(length(tbls), 3)
+  # Expect a fixed attribute
+  # combined tbls should have base attribute
+  expect_true('base' %in% names(attributes(tbls)))
 
-  # Expect a characteristic pattern
-  # first element of list should contain 'Table 1'
-  expect_true(grepl('Table 1', tbls[[1]]))
-
-  # Expect a characteristic pattern
-  # second element of list should contain 'Table 2'
-  expect_true(grepl('Table 2', tbls[[2]]))
 
   # Expect a characteristic pattern
-  # third element of list should contain 'Table 3'
-  expect_true(grepl('Table 3', tbls[[3]]))
+  # latex string should contain 'Table 1'
+  expect_true(grepl('Table 1', tbls))
 
-  # put the combined tables in landscape mode
-  lscape_tbls <- tbls %>% lscape()
+  # Expect a characteristic pattern
+  # latex string should contain 'Table 2'
+  expect_true(grepl('Table 2', tbls))
 
-  # Expect fixed class
-  # lscape should collapse list and return knit_asis
-  expect_true(class(lscape_tbls) == 'knit_asis')
+  # Expect a characteristic pattern
+  # latex string should contain 'Table 3'
+  expect_true(grepl('Table 3', tbls))
 
   # extract the positions of the longtable environ declarations
-  ltbegin_pos <- gregexpr('\\\\begin\\{longtable\\}', lscape_tbls)[[1]]
+  ltbegin_pos <- gregexpr('\\\\begin\\{longtable\\}', tbls)[[1]]
 
   # extract the position of the landscape environ declaration
-  lsbegin_pos <- gregexpr('\\\\begin\\{landscape\\}', lscape_tbls)[[1]]
+  lsbegin_pos <- gregexpr('\\\\begin\\{landscape\\}', tbls)[[1]]
 
   # Expect a fixed value
   # longtable environment appears three times
@@ -195,10 +175,10 @@ test_that("latex landscape mode", {
   expect_true(min(lsbegin_pos) < min(ltbegin_pos))
 
   # extract the positions of the longtable environ endings
-  ltend_pos <- gregexpr('\\\\end\\{longtable\\}', lscape_tbls)[[1]]
+  ltend_pos <- gregexpr('\\\\end\\{longtable\\}', tbls)[[1]]
 
   # extract the position of the landscape environ ending
-  lsend_pos <- gregexpr('\\\\end\\{landscape\\}', lscape_tbls)[[1]]
+  lsend_pos <- gregexpr('\\\\end\\{landscape\\}', tbls)[[1]]
 
   # Expect a fixed value
   # longtable environment end appears three times

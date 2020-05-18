@@ -83,26 +83,22 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
 #'   - *legal*: 8.5 x 14.0 in
 #'   - *junior legal*: 5.0 x 8.0 in
 #'   - *ledger*: 11.0 x 17.0 in
-#' - **orient**: character; ```'portrait'``` or ```'landscape'```; default ```'portrait'```
 #'
 #' @examples
 #' # set left & right margins to 1in & 2in
 #' # no line breaks
 #' # change column separation in table to 2pt.
 #' # change paper to legal
-#' # orient landscape
 #'
-#' mrggtOptions('margin' = c(3, 4),
+#' mrggtOptions('pagemargin' = c(3, 4),
 #'              'line.breaks' = FALSE,
 #'              'column.sep' = 2,
-#'              'papersize' = 'legal',
-#'              'orient' = 'landscape')
+#'              'papersize' = 'legal')
 #'
 #' @export
 mrggtOptions <- function(...){
   opts <- list(...)
-  avail_set <- c('orient',
-                 'papersize',
+  avail_set <- c('papersize',
                  'line.breaks',
                  'column.sep',
                  'pagemargin')
