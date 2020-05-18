@@ -86,9 +86,8 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
 #'   - *ledger*: 11.0 x 17.0 in
 #'
 #' @examples
-#' # set left & right margins to 1in & 2in
+#' # set left & right margins to 3in & 4in
 #' # no line breaks
-#' # change column separation in table to 2pt.
 #' # change paper to legal
 #'
 #' mrggtOptions('pagemargin' = c(3, 4),
