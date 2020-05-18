@@ -64,9 +64,10 @@ test_that("the calculation of column widths works correctly", {
   # Expect the first value to be greater than the second and third values
   expect_true(col_widths[1] > col_widths[2] && col_widths[1] > col_widths[3])
 
-  # Expect that the sum of the column widths is equal to 17.6 cm
-  # 17.6 determined to be width of page
-  expect_equal(sum(col_widths), 17.6)
+  # Expect that the sum of the column widths is equal to available width of the page
+  page_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
+  available_width <- page_width - sum(latex_cache$margin)*2.54
+  expect_equal(sum(col_widths), available_width)
 
   # Ensure that appropriate font sizing is being selected per length of table text
   # Create two tables, one with short text and another with long text

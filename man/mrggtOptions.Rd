@@ -9,9 +9,16 @@ mrggtOptions(...)
 \arguments{
 \item{...}{args passed on to assign function. possible values to assign are:
 \itemize{
-\item \strong{margin}: numeric vector with values in inches in format \verb{c(left margin, right margin)}; default is \code{c(1, 1)}
-\item \strong{column.sep}: numeric value in pt; default is 3pt.
+\item \strong{pagemargin}: numeric vector in inches with format \verb{c(left margin, right margin)}; default is \code{c(1, 1)}
 \item \strong{line.breaks}: logical; allow line breaks in table; default is \code{TRUE} (recommended)
+\item \strong{papersize}: character; default \code{'letter'}; options:
+\itemize{
+\item \emph{half letter}: 5.5 x 8.0 in
+\item \emph{letter}: 8.5 x 11.0 in
+\item \emph{legal}: 8.5 x 14.0 in
+\item \emph{junior legal}: 5.0 x 8.0 in
+\item \emph{ledger}: 11.0 x 17.0 in
+}
 }}
 }
 \description{
@@ -21,9 +28,10 @@ Global options to set for mrggt that effect the latex rendering
 # set left & right margins to 1in & 2in
 # no line breaks
 # change column separation in table to 2pt.
+# change paper to legal
 
-mrggtOptions('margin' = c(3, 4),
+mrggtOptions('pagemargin' = c(3, 4),
              'line.breaks' = FALSE,
-             'column.sep' = 2)
+             'papersize' = 'legal')
 
 }

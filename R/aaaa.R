@@ -33,8 +33,10 @@ pagemargin <- function(x){
   latex_cache$margin <- x
 }
 
-line.breaks <- function(x = c(TRUE, FALSE)){
-  x <- match.arg(x)
+line.breaks <- function(x){
+  if(!is.logical(x)){
+    stop('line.breaks must be specified as either TRUE/FALSE')
+  }
   latex_cache$line.breaks <- x
 }
 
@@ -68,14 +70,13 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
       'landscape' = c(17.0, 11.0)
     )
   )
-  latex_cache$pagewidth <- size
+  latex_cache$pagewidth <- sizing
   latex_cache$papersize <- x
 }
 
 #' Global options to set for mrggt that effect the latex rendering
 #' @param ... args passed on to assign function. possible values to assign are:
 #' - **pagemargin**: numeric vector in inches with format ```c(left margin, right margin)```; default is ```c(1, 1)```
-#' - **column.sep**: numeric value in pt; default is 3pt.
 #' - **line.breaks**: logical; allow line breaks in table; default is ```TRUE``` (recommended)
 #' - **papersize**: character; default ```'letter'```; options:
 #'   - *half letter*: 5.5 x 8.0 in
@@ -92,7 +93,6 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
 #'
 #' mrggtOptions('pagemargin' = c(3, 4),
 #'              'line.breaks' = FALSE,
-#'              'column.sep' = 2,
 #'              'papersize' = 'legal')
 #'
 #' @export
@@ -100,8 +100,8 @@ mrggtOptions <- function(...){
   opts <- list(...)
   avail_set <- c('papersize',
                  'line.breaks',
-                 'column.sep',
-                 'pagemargin')
+                 'pagemargin',
+                 'orient')
 
   if(!length(names(opts)[!names(opts) %in% avail_set]) == 0){
 

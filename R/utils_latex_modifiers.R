@@ -142,7 +142,7 @@ fmt_orient.lscape <- function(data){
 #'
 #' df %>%
 #' gt() %>%
-#' lscape()
+#' lscape() %>%
 #' as_latex()
 #'
 #' # multiple tables on a single landscape page

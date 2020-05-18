@@ -52,18 +52,18 @@ test_that("latex scaling table and individual columns", {
 
   # Expect fixed values
   # scale factors for columns 1 & 2 should equal 0.5 & 0.3.
-  expect_equal(scale_factors12[1:2], c(0.5, 0.3))
+  expect_equal(round(scale_factors12[1:2], 1), c(0.5, 0.3))
 
   # Expect a fixed value
   # scale factors for other columns should be equal to 1 (unchanged)
-  expect_equal(tail(scale_factors12, -2), rep(1, length(scale_factors12) -2))
+  expect_equal(round(tail(scale_factors12, -2), 0), rep(1, length(scale_factors12) -2))
 
   # calculate scale factors for column widths to go from table 1 to table 3
   scale_factors13 <- lengths3/lengths
 
   # Expect a fixed value
   # scale factors for all columns should be equal to 0.4
-  expect_equal(scale_factors13, rep(0.4, length(scale_factors13)))
+  expect_equal(round(scale_factors13,1), rep(0.4, length(scale_factors13)))
 }
 )
 
