@@ -14,12 +14,12 @@ gsub_multiple <- function(x, substitues) {
 }
 
 #' @noRd
-sanitizeTeX <- function (x) {
-  UseMethod("sanitizeTeX", x)
+sanitize_tex <- function (x) {
+  UseMethod("sanitize_tex", x)
 }
 
 #' @noRd
-sanitizeTeX.default <- function(x) {
+sanitize_tex.default <- function(x) {
   sanitize <- list(c('%', '\\%'),
                    c('CHECKMARK', '\\checkmark'),
                    c('>', '$>$'),
@@ -29,7 +29,7 @@ sanitizeTeX.default <- function(x) {
 }
 
 #' @noRd
-sanitizeTeX.math <- function(x) {
+sanitize_tex.math <- function(x) {
   vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract = TRUE))
   sanitize <- list(
     c('!@', ''),
@@ -64,7 +64,7 @@ as.tex_math <- function (x) {
 
 #' @noRd
 as.tex_math.default <- function(x) {
-  x <- sanitizeTeX(x)
+  x <- sanitize_tex(x)
 
   structure(
     list(
@@ -78,7 +78,7 @@ as.tex_math.default <- function(x) {
 
 #' @noRd
 as.tex_math.math <- function(x){
-  x <- sanitizeTeX(x)
+  x <- sanitize_tex(x)
 
   structure(
     list(
@@ -114,7 +114,7 @@ extract.data.frame <- function(x, y){
 
 #' @noRd
 extract.default <- function(x, y){
-  x %>% purrr::pluck(y)
+  purrr::pluck(x, y)
 }
 
 #' @noRd

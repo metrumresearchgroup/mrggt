@@ -194,7 +194,7 @@ test_that("latex landscape mode", {
 }
 )
 
-test_that("latex mrggtOptions", {
+test_that("latex mrggt_options", {
 
   # Expect fixed values
   # mrggt has default margins of left 1 in and right 1 in
@@ -210,7 +210,7 @@ test_that("latex mrggtOptions", {
 
 
   # change the margin size to 2 in right, 2 in left
-  mrggtOptions('pagemargin' = c(2, 2))
+  mrggt_options('pagemargin' = c(2, 2))
 
   # Expect a fixed pattern
   # cache margin should now be 2 in, 2 in
@@ -218,10 +218,10 @@ test_that("latex mrggtOptions", {
 
   # Expect error
   # try to specify more than 2 margin settings
-  expect_error(mrggtOptions('pagemargin' = c(2, 2, 2)))
+  expect_error(mrggt_options('pagemargin' = c(2, 2, 2)))
 
   # change the papersize to legal
-  mrggtOptions('papersize' = 'legal')
+  mrggt_options('papersize' = 'legal')
 
   # Expect fixed value
   # mrggt page size should be legal
@@ -237,7 +237,7 @@ test_that("latex mrggtOptions", {
   # Expect a fixed value
   # pagewidth cannot be changed by the user (must be set by page size)
   # passing in a parameter for pagewidth should leave the pagewidth in cache unchanged
-  suppressMessages(mrggtOptions('pagewidth' = 'test'))
+  suppressMessages(mrggt_options('pagewidth' = 'test'))
   expect_equal(latex_cache$pagewidth, list(
     'portrait' = c(8.5, 14.0),
     'landscape' = c(14.0, 8.5)
@@ -245,11 +245,11 @@ test_that("latex mrggtOptions", {
 
   # Expect error
   # specifying a page size that does not exist
-  expect_error(mrggtOptions('papersize' = 'Jeff'))
+  expect_error(mrggt_options('papersize' = 'Jeff'))
 
   # reset
-  mrggtOptions('pagemargin' = c(1, 1))
-  mrggtOptions('papersize' = 'letter')
+  mrggt_options('pagemargin' = c(1, 1))
+  mrggt_options('papersize' = 'letter')
 }
 )
 

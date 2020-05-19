@@ -117,12 +117,12 @@ fmt_orient <- function(data){
 }
 
 fmt_orient.default <- function(data){
-  mrggtOptions('orient' = 'portrait')
+  mrggt_options('orient' = 'portrait')
   TRUE
 }
 
 fmt_orient.lscape <- function(data){
-  mrggtOptions('orient' = 'landscape')
+  mrggt_options('orient' = 'landscape')
   FALSE
 }
 

@@ -89,12 +89,12 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
 #' # no line breaks
 #' # change paper to legal
 #'
-#' mrggtOptions('pagemargin' = c(3, 4),
+#' mrggt_options('pagemargin' = c(3, 4),
 #'              'line.breaks' = FALSE,
 #'              'papersize' = 'legal')
 #'
 #' @export
-mrggtOptions <- function(...){
+mrggt_options <- function(...){
   opts <- list(...)
   avail_set <- c('papersize',
                  'line.breaks',
