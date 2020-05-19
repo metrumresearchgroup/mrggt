@@ -487,9 +487,9 @@ order_functions <- function(function.list){
 
 #' @noRd
 latex_style_it <- function(.Label, styles, math_env2exp, colnum = NULL, math_env = NULL) {
-  funclist <- get_latex_function_styles(styles)
-  funclist <- append(order_functions(funclist),
-                     math_env2exp)
+  funclist <- append(get_latex_function_styles(styles),
+                     list('math_env2exp '= math_env2exp))
+  funclist <- order_functions(funclist)
 
    purrr::reduce(funclist, function(.x, .y){
      rlang::eval_tidy(.y, list(x = .x))
