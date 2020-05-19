@@ -397,7 +397,7 @@ as_latex <- function(data) {
 
   latex_packages <- create_knit_meta()
 
-  reset_latex_cache()
+  reset_tbl_cache()
   # Compose the LaTeX table
   tex <- paste0(
     color_def,
@@ -405,9 +405,9 @@ as_latex <- function(data) {
     heading_component,
     columns_component,
     body_component,
+    table_end,
     footnotes_component,
     source_notes_component,
-    table_end,
     collapse = ""
   )
 

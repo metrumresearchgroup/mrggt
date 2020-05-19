@@ -26,7 +26,9 @@ tbl_gt <-
   gt(data = tbl_colored) %>%
   lscape() %>%
   tab_style(
-    style = cell_fill(color = "#ffcccb"),
+    style = list(cell_text(color = "#ffcccb",
+                           weight = 'bold'),
+                 cell_fill(color = "#ffffed")),
     locations = cells_body(
       columns = everything(),
       rows = startsWith(grpname, 'a')
@@ -67,6 +69,7 @@ tbl_gt <-
                     'Source code: /integration_table_tests/lscape_demo.tex')) %>%
   as_latex()
 
+readr::write_file(tbl_gt, 'test.tex')
 tbl_gt
 ```
 

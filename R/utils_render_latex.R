@@ -16,7 +16,7 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
   if(!shrink){
     latex_packages[[4]]$extra_lines <- c('\\setlength{\\LTright}{\\LTleft}',
                                          '\\setlength\\LTright{0pt plus 1fill minus 1fill}',
-                                         '\\setlength\\LTcapwidth{18cm}')
+                                         paste0("\\setlength\\LTcapwidth{", tbl_cache$tbl_width, "cm}"))
   }
 
   latex_packages[[3]]$options <- c('singlelinecheck=off')
@@ -96,34 +96,11 @@ create_table_start_l <- function(data){
   }
   paste0(
     header$type_size,
-  #  '\\setlength\\LTleft{-2.5cm}\n',
-  #  '\\setlength\\LTright{0pt plus 1fill minus 1fill}\n',
-  #  '\\setlength\\LTcapwidth{18cm}\n',
     separation,
     '\\captionsetup[table]{labelformat=empty,skip=0pt}\n',
     header$header
   )
 }
-# create_table_start_l <- function(data) {
-#
-#   col_alignment <-
-#     dt_boxhead_get(data = data) %>%
-#     dplyr::filter(type == "default") %>%
-#     dplyr::pull(column_align)
-#
-#   # TODO: ensure that number of alignment tabs is correct
-#   if (dt_stub_df_exists(data = data)) {
-#     col_alignment <- c("left", col_alignment)
-#   }
-#
-#   paste0(
-#     "\\captionsetup[table]{labelformat=empty,skip=1pt}\n",
-#     "\\begin{longtable}{",
-#     col_alignment %>% substr(1, 1) %>% paste(collapse = ""),
-#     "}\n",
-#     collapse = ""
-#   )
-# }
 
 #' Create the columns component of a table
 #'
@@ -193,14 +170,6 @@ create_columns_component_l <- function(data) {
 
     multicol <- c()
     cmidrule <- c()
-
-    # spanners_lengths$values <- purrr::map_chr(spanners_lengths$values, function(.){
-    #   if(is.na(.)){
-    #     ''
-    #   } else {
-    #     latex_style_spanners(fmt_latex_math(gsub("\\", "", ., fixed=TRUE)), styles_df = styles_tbl)
-    #   }
-    # })
 
     for (i in seq(spanners_lengths$lengths)) {
 
@@ -383,26 +352,28 @@ create_footnotes_component_l <- function(data) {
     tidy_gsub("<br\\s*?(/|)>", "\\newline") %>%
     tidy_gsub("&nbsp;", " ")
 
-  # Create the footnotes block
-  if(latex_cache$footnotes.align == 'c'){
-    align <- '\\centering\n'
-  } else {
-    align <- ''
-  }
 
-  paste0(
-    "\\\\ \n",
-    "\\vspace{-5mm}\n",
-    "\\begin{minipage}{18cm}\n",
-    align,
-    paste0(
-      footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
-      footnotes_tbl[["footnotes"]] %>%
-        unescape_html() %>%
-        markdown_to_latex(), " \\\\ \n", collapse = ""),
-    "\\end{minipage}\n",
-    collapse = ""
-  )
+  footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
+                       footnotes_tbl[["footnotes"]] %>%
+                         unescape_html() %>%
+                         markdown_to_latex())
+
+  footnote_size <- round(max(purrr::map_dbl(footnotes,
+                                            find_chr_length,
+                                            fontsize = tbl_cache$font_size)), 2)
+
+  minip <- paste0("\\begin{minipage}[t]{",
+                  footnote_size,
+                  "cm}\n")
+
+  vspace <- "\\vspace{2mm}\n"
+
+  footnotes <- paste(paste0(footnotes, " \\\\ \n"),
+                     collapse = '')
+  paste0(minip,
+         vspace,
+         footnotes,
+         "\\end{minipage}\n")
 }
 
 #' @noRd
@@ -416,22 +387,28 @@ create_source_note_component_l <- function(data) {
     return("")
   }
 
-  #keep vector of source notes and just stack on top of eachother in final
-  #source_note <- source_note[[1]]
-  if(latex_cache$sourcenotes.align == 'c'){
-    align <- '\\centering\n'
-  } else {
-    align <- ''
-  }
+  srcnote_size <- round(max(purrr::map_dbl(source_note,
+                                            find_chr_length,
+                                            fontsize = tbl_cache$font_size)), 2)
+
+
+
+  srcnotes <- paste(paste0(source_note, ' \\\\ \n'),
+                    collapse = '')
 
   # Create the source notes block
-  source_note_component <-
-    paste0(
-      "\\\\ \n \\begin{minipage}{18cm}\n",
-      align,
-      paste0(
-        source_note %>% as.character(), "\\\\ \n", collapse = ""),
-      "\\end{minipage}\n", collapse = "")
+  minip <- paste0("\\begin{minipage}[t]{", srcnote_size, "cm}\n")
 
+  vspace <- "\\vspace{2mm}\n"
+
+  align <- '\\centering\n'
+
+  minipend <- "\\end{minipage}\n"
+
+  source_note_component <- paste0(minip,
+                                  vspace,
+                                  align,
+                                  srcnotes,
+                                  minipend)
   source_note_component
 }

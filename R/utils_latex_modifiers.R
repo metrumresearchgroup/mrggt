@@ -78,10 +78,10 @@ latex_scale <- function(latex_code,
   tex_split[loc]  <- paste0(header_align, col_lengths_str, "}")
 
   #resize footnotes/title
-  loc <- grepl('\\w?\\\\begin\\{minipage\\}', tex_split)
-  tex_split[loc] <- paste0('\\begin{minipage}{',
-                           sum(col_lengths),
-                           'cm}')
+  #loc <- grepl('\\w?\\\\begin\\{minipage\\}', tex_split)
+  #tex_split[loc] <- paste0('\\begin{minipage}{',
+  #                         sum(col_lengths),
+  #                         'cm}')
 
   #reize the caption width
   loc <- startsWith(tex_split, '\\setlength\\LTcapwidth')

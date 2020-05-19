@@ -7,8 +7,7 @@
 ## stub
 ## row_groups
 
-## row_groups
-
+#' @noRd
 resolve_styles_latex <- function(data){
   styles_tbl <- dt_styles_get(data = data)
   boxh <- dt_boxhead_get(data = data)
@@ -47,7 +46,9 @@ resolve_styles_latex <- function(data){
   data <- dt_groups_rows_set(data, groups_rows_df)
 
   stub <- data$`_stub_df`
-  data$`_stub_df`$rowname <- purrr::map_chr(seq(dim(stub)[1]), ~latex_style_stub(stub[.x, ], styles_tbl))
+  data$`_stub_df`$rowname <- purrr::map_chr(seq(dim(stub)[1]),
+                                            ~latex_style_stub(stub[.x, ],
+                                                              styles_tbl))
 
   body <- dt_body_get(data = data)
   body <- style_data_latex(body, styles_tbl)
@@ -163,9 +164,7 @@ style_data_latex <- function(body, styles_df){
   .init = element)
 }
 
-### Font Size Helper Functions
 
-#predefined gt fontsize values
 #' @noRd
 latex_size_preset_values <- function(stringv){
   sizes <-
@@ -273,10 +272,9 @@ latex_format_condensed_size <- function(string){
   func
 }
 
-### Highlight/Text Color Helper Functions
-
-cell_text.size <-  function(cell_text){
-  stripped <- gsub('px', '', cell_text$size, fixed=TRUE)
+#' @noRd
+cell_text.size <-  function(value){
+  stripped <- gsub('px', '', value, fixed=TRUE)
   dblv <- suppressWarnings(as.double(stripped))
 
   if(is.na(dblv)){
@@ -292,32 +290,62 @@ cell_text.size <-  function(cell_text){
   func
 }
 
-cell_text.weight <- function(cell_text){
-  value <- cell_text$weight
+#' @noRd
+cell_text.weight <- function(value){
   options <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
                   bolder = rlang::quo(paste0('\\textbf{', x, '}')))
-  return(options[[value]])
+
+  if(value %in% names(options)){
+
+    return(options[[value]])
+
+  } else{
+
+    return(rlang::quo(x))
+
+  }
 }
 
-cell_text.style <- function(cell_text){
-  value <- cell_text$style
+#' @noRd
+cell_text.style <- function(value){
   options <- list(italic = rlang::quo(paste0('\\textit{', x, '}')),
                   center = rlang::quo(x),
                   normal = rlang::quo(x),
                   oblique = rlang::quo(paste0('\\textls{', x, '}')),
   )
-  return(options[[value]])
+
+  if(value %in% names(options)){
+
+    return(options[[value]])
+
+  } else{
+
+    return(rlang::quo(x))
+
+  }
 }
 
-cell_text.transform <- function(cell_text){
+#' @noRd
+cell_text.transform <- function(value){
   options <- list(uppercase = rlang::quo(toupper(x)),
                   lowercase = rlang::quo(tolower(x)),
                   capitalize = rlang::quo(stringr::str_to_title(x)))
-  return(options[[cell_text$transform]])
+
+  if(value %in% names(options)){
+
+    return(options[[value]])
+
+  } else{
+
+    return(rlang::quo(x))
+
+  }
 }
 
-cell_text.color <- function(cell_text){
-  color <- cell_text$color
+
+#' @noRd
+cell_text.color <- function(value){
+  color <- value
 
   if(startsWith(color, '#')){
     color <- gsub('#', '', color)
@@ -327,8 +355,8 @@ cell_text.color <- function(cell_text){
   return(rlang::quo(paste0(expl, x, '}')))
 }
 
-cell_text.align <- function(cell_text){
-  value <- cell_text$align
+#' @noRd
+cell_text.align <- function(value){
   options <- list(
     center = rlang::quo(paste0('\\multicolumn{1}{c}{',
                                x,
@@ -340,21 +368,42 @@ cell_text.align <- function(cell_text){
                               x,
                               '}'))
   )
-  options[[value]]
+
+  if(value %in% names(options)){
+
+    return(options[[value]])
+
+  } else{
+
+    return(rlang::quo(x))
+
+  }
 }
 
-cell_text.decorate <- function(cell_text){
-  value <- gsub('-', '', cell_text$decorate)
+
+#' @noRd
+cell_text.decorate <- function(value){
+  value <- gsub('-', '', value)
   options <- list(
     overline = rlang::quo(paste0('\\overline{', x, '}')),
     linethrough = rlang::quo(paste0('\\sout{', x, '}')),
     underline = rlang::quo(paste0('\\underline{', x, '}'))
   )
-  options[[value]]
+
+  if(value %in% names(options)){
+
+    return(options[[value]])
+
+  } else{
+
+    return(rlang::quo(x))
+
+  }
 }
 
-cell_fill.color <- function(cell_fill){
-  color <- cell_fill$color
+#' @noRd
+cell_fill.color <- function(value){
+  color <- value
 
   if(startsWith(color, '#')){
     color <- gsub('#', '', color)
@@ -370,7 +419,7 @@ cell_fill.color <- function(cell_fill){
 #' @noRd
 create_color_definition <- function(color){
   s <- grDevices::col2rgb(color)
-  latex_cache$color <- c(gsub('#', '', color), latex_cache$color)
+  tbl_cache$color <- c(gsub('#', '', color), tbl_cache$color)
   paste0(
     "\\definecolor{",
     gsub('#', '', color),
@@ -404,13 +453,15 @@ define_colors_latex <- function(styles_df) {
   }
 }
 
+#' @noRd
 get_latex_function_styles <- function(styles_list){
-  styling_functions <- purrr::map(names(unlist(styles_list)),
-                                  R.utils::doCall,
-                                  args = styles_list,
-                                  .ignoreUnusedArgs = TRUE)
+  to_apply <- unlist(styles_list)
+  func_names <- names(to_apply)
+  styling_functions <- purrr::map(func_names,
+                                  ~ do.call(.x,
+                                            args = list(value = to_apply[[.x]])))
 
-  names(styling_functions) <- names(unlist(styles_list))
+  names(styling_functions) <- func_names
   styling_functions
 }
 
@@ -434,19 +485,14 @@ order_functions <- function(function.list){
 
 }
 
-
 #' @noRd
 latex_style_it <- function(.Label, styles, math_env2exp, colnum = NULL, math_env = NULL) {
   funclist <- get_latex_function_styles(styles)
-  funclist <- order_functions(funclist)
-  val <- list(x = .Label)
+  funclist <- append(order_functions(funclist),
+                     math_env2exp)
 
-  for(function.name in names(funclist)){
-    function.evaluated <- rlang::eval_tidy(funclist[[function.name]], val)
-    val['x'] <- function.evaluated
-  }
-
-  val['x'] <- rlang::eval_tidy(math_env2exp, val)
-
-  val[['x']]
+   purrr::reduce(funclist, function(.x, .y){
+     rlang::eval_tidy(.y, list(x = .x))
+     },
+    .init = .Label)
 }

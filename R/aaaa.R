@@ -1,24 +1,23 @@
+### settings for the global knit doc
 latex_cache <- new.env(parent = emptyenv())
-latex_cache$shrink <- NULL
 latex_cache$line.breaks <- TRUE
-latex_cache$column.sep <- NULL
-latex_cache$footnotes.align <- 'l'
-latex_cache$sourcenotes.align <- 'l'
 latex_cache$margin <- c(1, 1)
 latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
                               'landscape' = c(11.0, 8.5))
 latex_cache$papersize <- 'letter'
 latex_cache$orient <- 'portrait'
-latex_cache$color <- c()
 
+### settings per table- reset every time as_latex is run
+tbl_cache <- new.env(parent = emptyenv())
+tbl_cache$color <- c()
+tbl_cache$font_size <- 0
+tbl_cache$tbl_width <- 0
 
-# Clear cache for test chart and package info
-reset_latex_cache <- function() {
-  latex_cache$shrink <- NULL
-  latex_cache$line.breaks <- TRUE
-  latex_cache$column.sep <- NULL
-  latex_cache$footnotes.align <- 'l'
-  latex_cache$sourcenotes.align <- 'l'
+# reset tbl_cache
+reset_tbl_cache <- function() {
+  tbl_cache$color <- c()
+  tbl_cache$font_size <- 0
+  tbl_cache$tbl_width <- 0
 }
 
 orient <- function(x = c('portrait', 'landscape')){

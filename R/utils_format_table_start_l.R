@@ -49,19 +49,19 @@ get_collabels_l <- function(data) {
 }
 
 sanitizeTikz <- function(latex_str){
-  if(length(latex_cache$color) == 0){
-    return(latex_str)
+
+  sanitize_list <- list(c("\\multicolumn{1}{l}", ''),
+                        c("\\multicolumn{1}{c}", ''),
+                        c("\\multicolumn{1}{r}", ''))
+
+  if(length(tbl_cache$color) != 0){
+
+    color_list <- append(purrr::map(tbl_cache$color, ~ c(paste0('\\cellcolor{',.x, '}'), '')),
+                         purrr::map(tbl_cache$color, ~ c(paste0('\\textcolor{',.x, '}'), '')))
+
+    sanitize_list <- append(sanitize_list,
+                            color_list)
   }
-
-  color_list <- append(purrr::map(latex_cache$color, ~ c(paste0('\\cellcolor{',.x, '}'), '')),
-                       purrr::map(latex_cache$color, ~ c(paste0('\\textcolor{',.x, '}'), '')))
-
-  align_list <- list(c("\\multicolumn{1}{l}", ''),
-                     c("\\multicolumn{1}{c}", ''),
-                     c("\\multicolumn{1}{r}", ''))
-
-  sanitize_list <- append(color_list,
-                          align_list)
 
   sanitize_list <- append(sanitize_list,
                           list(c('\\checkmark', 'V')))
@@ -235,12 +235,14 @@ calculate_best <- function(data_rows, collabels){
   if(length(best) > 1){
     best <- best[purrr::map_dbl(best, ~.x$pt) == max(purrr::map_dbl(best, ~.x$pt))]
   }
+
+  tbl_cache$font_size <- best[[1]]$pt
   list(type_size = type_setting(best[[1]]$pt),
        header = fmt_header_latex(best[[1]]$optimized))
 }
 
 fmt_header_latex <- function(sizing_columns){
-
+ tbl_cache$tbl_width <- sum(sizing_columns)
  paste0('\\begin{longtable}{',
         paste(sprintf("p{%.2fcm}", sizing_columns), collapse = ''),
         '} \n')

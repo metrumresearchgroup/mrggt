@@ -131,16 +131,6 @@
 \addtolength{\vfoot}{\textheight}%
 \addtolength{\vfoot}{\footskip}%
 \raisebox{\hfoot}[0pt][0pt]{\rlap{\hspace{\vfoot}\rotatebox[origin=cB]{90}{\thepage}}}\fi}
-\newenvironment{lscape-mrggtab}[2][1.5pt]
-{
-\begin{landscape}
-\pagestyle{empty}
-\begin{longtable}{#2}
-}
-{
-\end{longtable}
-\end{landscape}
-}
 
 \title{Landscape Table Demo}
 \author{}
@@ -155,7 +145,9 @@
 \StringTok{  }\KeywordTok{gt}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ tbl_colored) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{lscape}\NormalTok{() }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{tab_style}\NormalTok{(}
-    \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#ffcccb"}\NormalTok{),}
+    \DataTypeTok{style =} \KeywordTok{list}\NormalTok{(}\KeywordTok{cell_text}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#ffcccb"}\NormalTok{,}
+                           \DataTypeTok{weight =} \StringTok{'bold'}\NormalTok{),}
+                 \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#ffffed"}\NormalTok{)),}
     \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
       \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
       \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'a'}\NormalTok{)}
@@ -202,29 +194,30 @@
 
 \begin{landscape}
 \pagestyle{empty}
-\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{ffcccb}{rgb}{1,0.8,0.796078431372549} 
 \definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
 \definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
 \definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
 \definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
 \setlength{\tabcolsep}{3pt}
 \captionsetup[table]{labelformat=empty,skip=0pt}
-\begin{longtable}{p{7.82666666666667cm}p{7.30666666666667cm}p{7.72666666666667cm}} 
+\begin{longtable}{p{1.12cm}p{1.12cm}p{1.12cm}} 
 \toprule
 Fruit & Total & Color \\ 
 \midrule
-\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{apple}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{1}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{red}}} \\ 
 \cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
 \cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
 \cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
 \cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
 \bottomrule
-\\ 
- \begin{minipage}{18cm}
-Source code: /integration\_table\_tests/lscape\_demo.R\\ 
-Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
-\end{minipage}
 \end{longtable}
+\begin{minipage}{8.75cm}
+\vspace{2mm}
+\centering
+Source code: /integration\_table\_tests/lscape\_demo.R \\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex \\ 
+\end{minipage}
 
 \end{landscape}
 
@@ -240,53 +233,55 @@ Page}\label{multiple-tables-on-single-landscape-page}}
 
 \begin{landscape}
 \pagestyle{empty}
-\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{ffcccb}{rgb}{1,0.8,0.796078431372549} 
 \definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
 \definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
 \definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
 \definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
 \setlength{\tabcolsep}{3pt}
 \captionsetup[table]{labelformat=empty,skip=0pt}
-\begin{longtable}{p{7.82666666666667cm}p{7.30666666666667cm}p{7.72666666666667cm}} 
+\begin{longtable}{p{1.12cm}p{1.12cm}p{1.12cm}} 
 \toprule
 Fruit & Total & Color \\ 
 \midrule
-\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{apple}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{1}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{red}}} \\ 
 \cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
 \cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
 \cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
 \cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
 \bottomrule
-\\ 
- \begin{minipage}{18cm}
-Source code: /integration\_table\_tests/lscape\_demo.R\\ 
-Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
-\end{minipage}
 \end{longtable}
+\begin{minipage}{8.75cm}
+\vspace{2mm}
+\centering
+Source code: /integration\_table\_tests/lscape\_demo.R \\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex \\ 
+\end{minipage}
 
-\definecolor{FFCCCB}{rgb}{1,0.8,0.796078431372549} 
+\definecolor{ffcccb}{rgb}{1,0.8,0.796078431372549} 
 \definecolor{FFFFED}{rgb}{1,1,0.929411764705882} 
 \definecolor{B19CD9}{rgb}{0.694117647058824,0.611764705882353,0.850980392156863} 
 \definecolor{90EE90}{rgb}{0.564705882352941,0.933333333333333,0.564705882352941} 
 \definecolor{FED8B1}{rgb}{0.996078431372549,0.847058823529412,0.694117647058824} 
 \setlength{\tabcolsep}{3pt}
 \captionsetup[table]{labelformat=empty,skip=0pt}
-\begin{longtable}{p{7.82666666666667cm}p{7.30666666666667cm}p{7.72666666666667cm}} 
+\begin{longtable}{p{1.12cm}p{1.12cm}p{1.12cm}} 
 \toprule
 Fruit & Total & Color \\ 
 \midrule
-\cellcolor{FFCCCB}{apple} & \cellcolor{FFCCCB}{1} & \cellcolor{FFCCCB}{red} \\ 
+\cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{apple}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{1}}} & \cellcolor{FFFFED}{\textbf{\textcolor{ffcccb}{red}}} \\ 
 \cellcolor{FFFFED}{banana} & \cellcolor{FFFFED}{2} & \cellcolor{FFFFED}{yellow} \\ 
 \cellcolor{B19CD9}{grape} & \cellcolor{B19CD9}{3} & \cellcolor{B19CD9}{purple} \\ 
 \cellcolor{90EE90}{pear} & \cellcolor{90EE90}{4} & \cellcolor{90EE90}{green} \\ 
 \cellcolor{FED8B1}{orange} & \cellcolor{FED8B1}{5} & \cellcolor{FED8B1}{orange} \\ 
 \bottomrule
-\\ 
- \begin{minipage}{18cm}
-Source code: /integration\_table\_tests/lscape\_demo.R\\ 
-Source code: /integration\_table\_tests/lscape\_demo.tex\\ 
-\end{minipage}
 \end{longtable}
+\begin{minipage}{8.75cm}
+\vspace{2mm}
+\centering
+Source code: /integration\_table\_tests/lscape\_demo.R \\ 
+Source code: /integration\_table\_tests/lscape\_demo.tex \\ 
+\end{minipage}
 
 \end{landscape}
 
