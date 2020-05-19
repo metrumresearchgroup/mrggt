@@ -43,6 +43,9 @@ Imports:
     matrixStats (>= 0.55.0),
     qdapRegex (>= 0.7.2),
     stringdist (>= 0.9.5.5),
+    tikzDevice(>= 0.12.3),
+    nloptr(>= 1.2.2.1),
+    R.utils(>= 2.9.2),
     grDevices,
     stats,
     cli

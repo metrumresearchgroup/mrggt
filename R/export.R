@@ -365,6 +365,9 @@ as_latex <- function(data) {
   # Build all table data objects through a common pipeline
   data <- data %>% build_data(context = "latex")
 
+  #Apply the styling
+  data <- data %>% resolve_styles_latex()
+
   # Composition of LaTeX ----------------------------------------------------
 
   #Create a LaTeX fragment that defines the possible colors being used in table

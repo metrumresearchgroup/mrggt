@@ -23,18 +23,16 @@ df <- dplyr::tribble(
 
 df \%>\%
 gt() \%>\%
-as_latex() \%>\%
-lscape()
+lscape() \%>\%
+as_latex()
 
 # multiple tables on a single landscape page
 tbl <- df \%>\%
        gt() \%>\%
+       lscape() \%>\%
        as_latex()
 
-(tbl + tbl + tbl) \%>\% lscape()
+tbl + tbl + tbl
 
- #      -- or --
-
-list(tbl, tbl, tbl) \%>\% lscape()
 
 }

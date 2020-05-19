@@ -8,111 +8,159 @@
 ## row_groups
 
 ## row_groups
+
+resolve_styles_latex <- function(data){
+  styles_tbl <- dt_styles_get(data = data)
+  boxh <- dt_boxhead_get(data = data)
+  stub_available <- dt_stub_df_exists(data = data)
+  spanners_present <- dt_spanners_exists(data = data)
+
+  headings_vars <- data$`_boxhead`$var
+  headings_labels <- data$`_boxhead`$column_label
+  headings_labels <- purrr::map2(headings_vars,
+                                 headings_labels,
+                                 latex_style_headings,
+                                  styles_df = styles_tbl)
+
+  data$`_boxhead`$column_label <- headings_labels
+
+  stubh <- dt_stubhead_get(data = data)
+
+  if (isTRUE(stub_available) && length(stubh$label) > 0){
+    stubh$label <- style_stubhead_l(styles_tbl, stubh$label)
+    data <- dt_stubhead_set(data, stubh)
+  }
+
+  if (spanners_present){
+    spanners <- dt_spanners_get(data)
+    spanners$spanner_label <- purrr::map(spanners$spanner_label,
+                                          latex_style_spanners,
+                                          styles_tbl = styles_tbl)
+    data <- dt_spanners_set(data, spanners)
+  }
+
+  groups_rows_df <- dt_groups_rows_get(data = data)
+  groups_rows_df$group_label <- purrr::map_chr(groups_rows_df$group_label,
+                                               style_group_rows_latex,
+                                               styles_df = styles_tbl)
+
+  data <- dt_groups_rows_set(data, groups_rows_df)
+
+  stub <- data$`_stub_df`
+  data$`_stub_df`$rowname <- purrr::map_chr(seq(dim(stub)[1]), ~latex_style_stub(stub[.x, ], styles_tbl))
+
+  body <- dt_body_get(data = data)
+  body <- style_data_latex(body, styles_tbl)
+  data <- dt_body_set(data, body)
+  data
+}
+
+## row_groups
 #' @noRd
 style_group_rows_latex <- function(group_name, styles_df){
   to_style <- styles_df[styles_df$locname == 'row_groups',]
+  gn.metadata <- fmt_latex_math(group_name)
+  element <- gn.metadata %>% extract('math_env')
 
   if(group_name %in% to_style$grpname){
-
-    styles <- to_style[to_style$grpname == group_name, ]$styles[[1]]
-    group_name <-  latex_style_it(group_name, styles)
-
+    gn.metadata$styles <- to_style[to_style$grpname == group_name, ]$styles[[1]]
+    element <-  do.call(gn.metadata, latex_style_it)
   }
 
-  group_name
+  element
 }
 
 ## stubhead
 #' @noRd
 style_stubhead_l <- function(style_df, stubhead) {
   to_style <- style_df[style_df$locname == 'stubhead', ]
+  sh.metadata <- fmt_latex_math(stubhead)
+  element <- sh.metadata %>% extract('math_env')
 
   if(dim(to_style)[1] > 0){
 
-    styles <- to_style$styles[[1]]
-    stubhead <- latex_style_it(stubhead, styles)
+    sh.metadata$styles <- to_style$styles[[1]]
+    element <- do.call(latex_style_it, sh.metadata)
 
   }
 
-  stubhead
+  element
 }
 
 ## columns_columns
 #' @noRd
-latex_style_headings <- function(label, styles_df, key) {
+latex_style_headings <- function(headings_var, headings_label, styles_df) {
   to_style <- styles_df[styles_df$locname == 'columns_columns', ]
-  changed_label <- key[[label]]
+  hl.metadata <- fmt_latex_math(headings_label)
+  element <- hl.metadata %>% extract('math_env')
 
-  if(label %in% to_style$colname){
-
-    styles <- to_style[to_style$colname == label, ]$styles[[1]]
-    changed_label <- latex_style_it(changed_label, styles)
-
+  if(headings_var %in% to_style$colname){
+    hl.metadata$styles <- to_style[to_style$colname == headings_var, ]$styles[[1]]
+    hl.metadata$colnum <- to_style[to_style$colname == headings_var, ]$colnum
+    element <- do.call(latex_style_it, hl.metadata)
   }
 
-  changed_label
+  element
+}
+
+## sub
+#' @noRd
+latex_style_stub <- function(stub, styles_tbl) {
+  to_style <- styles_tbl[styles_tbl$locname == 'stub', ]
+  stb.metadata <- fmt_latex_math(stub$rowname)
+  element <- stb.metadata %>% extract('math_env')
+
+  if(stub$rownum_i %in% to_style$rownum){
+    stb.metadata$styles <- to_style[to_style$rownum == stub$rownum_i, ]$styles[[1]]
+    element <- do.call(latex_style_it, stb.metadata)
+  }
+
+  element
 }
 
 ## columns_groups
 #' @noRd
-latex_style_spanners <- function(label, styles_df) {
-  to_style <- styles_df[styles_df$locname == 'columns_groups', ]
-
-  if(label %in% to_style$grpname){
-
-    styles <- to_style[to_style$grpname == label, ]$styles[[1]]
-    label <- latex_style_it(label, styles)
-
+latex_style_spanners <- function(label, styles_tbl) {
+  to_style <- styles_tbl[styles_tbl$locname == 'columns_groups', ]
+  if(is.na(label)){
+    sp.metadata <- list(.Label = '',
+                        math_env = '',
+                        math_env2exp = rlang::quo(paste(x)))
   } else {
-
-    if(is.na(label)){
-
-      label <- NA
-
-    } else{
-
-      label <- label
-
-    }
+    sp.metadata <- fmt_latex_math(label)
   }
 
-  label
+  element <- sp.metadata %>% extract('math_env')
+
+  if(label %in% to_style$grpname){
+    sp.metadata$styles <- to_style[to_style$grpname == label, ]$styles[[1]]
+    element <- do.call(latex_style_it, sp.metadata)
+  }
+
+  element
 }
 
 ## data & stub
 #' @noRd
-style_data_latex <- function(row_splits, styles_df){
+style_data_latex <- function(body, styles_df){
   to_style <- styles_df[styles_df$locname == 'data',]
+  body.metadata <- fmt_latex_math(body)
+  element <- body.metadata %>% extract('math_env')
 
-  if(dim(to_style)[1] > 0){
-
-    for (i in 1:dim(to_style)[1]) {
-
-      styles <- to_style[i, ]$styles[[1]]
-      colnum <- to_style[i, ]$colnum
-      rownum <- as.character(to_style[i, ]$rownum)
-      row <- row_splits[[rownum]]
-      element <- row[colnum]
-      row_splits[[rownum]][colnum] <- latex_style_it(element, styles)
-
-    }
+  if(!dim(to_style)[1] > 0){
+    return(element)
   }
 
-  to_style <- styles_df[styles_df$locname == 'stub',]
-
-  if(dim(to_style)[1] > 0){
-
-    for (i in 1:dim(to_style)[1]) {
-
-      styles <- to_style[i, ]$styles[[1]]
-      row <- to_style[i, ]$rownum
-      row_splits[[as.character(row)]][[1]] <-
-        latex_style_it(row_splits[[as.character(row)]][[1]], styles)
-
-    }
-  }
-
-  row_splits
+  purrr::reduce(to_style %>% purrr::transpose(), function(.x, .y){
+    with(.y, {
+      cell.metadata <- body.metadata[[rownum, colnum]]
+      cell.metadata$styles <- styles
+      cell.metadata$colnum <- colnum
+      .x[[rownum, colnum]] <- do.call(latex_style_it, cell.metadata)
+      .x
+    })
+  },
+  .init = element)
 }
 
 ### Font Size Helper Functions
@@ -227,34 +275,94 @@ latex_format_condensed_size <- function(string){
 
 ### Highlight/Text Color Helper Functions
 
-#determine wanting text colored or cell colored
-#' @noRd
-latex_style_color <- function(color, cell_type){
+cell_text.size <-  function(cell_text){
+  stripped <- gsub('px', '', cell_text$size, fixed=TRUE)
+  dblv <- suppressWarnings(as.double(stripped))
 
-  if(cell_type == 'cell_text'){
+  if(is.na(dblv)){
 
-    if(startsWith(color, '#')){
-
-      color <- gsub('#', '', color)
-
-    }
-
-    expl <- paste0('\\textcolor{', color, '}{')
-
-    return(rlang::quo(paste0(expl, x, '}')))
+    func <- latex_size_preset_values(stripped)
 
   } else {
 
-    if(startsWith(color, '#')){
+    func <- latex_size_custom_values(dblv)
 
-      color <- gsub('#', '', color)
-
-    }
-
-    expl <- paste0('\\cellcolor{', color, '}{')
-
-    return(rlang::quo(paste0(expl, x, '}')))
   }
+
+  func
+}
+
+cell_text.weight <- function(cell_text){
+  value <- cell_text$weight
+  options <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
+                  bolder = rlang::quo(paste0('\\textbf{', x, '}')))
+  return(options[[value]])
+}
+
+cell_text.style <- function(cell_text){
+  value <- cell_text$style
+  options <- list(italic = rlang::quo(paste0('\\textit{', x, '}')),
+                  center = rlang::quo(x),
+                  normal = rlang::quo(x),
+                  oblique = rlang::quo(paste0('\\textls{', x, '}')),
+  )
+  return(options[[value]])
+}
+
+cell_text.transform <- function(cell_text){
+  options <- list(uppercase = rlang::quo(toupper(x)),
+                  lowercase = rlang::quo(tolower(x)),
+                  capitalize = rlang::quo(stringr::str_to_title(x)))
+  return(options[[cell_text$transform]])
+}
+
+cell_text.color <- function(cell_text){
+  color <- cell_text$color
+
+  if(startsWith(color, '#')){
+    color <- gsub('#', '', color)
+  }
+
+  expl <- paste0('\\textcolor{', color, '}{')
+  return(rlang::quo(paste0(expl, x, '}')))
+}
+
+cell_text.align <- function(cell_text){
+  value <- cell_text$align
+  options <- list(
+    center = rlang::quo(paste0('\\multicolumn{1}{c}{',
+                               x,
+                               '}')),
+    left = rlang::quo(paste0('\\multicolumn{1}{l}{',
+                             x,
+                             '}')),
+    right = rlang::quo(paste0('\\multicolumn{1}{r}{',
+                              x,
+                              '}'))
+  )
+  options[[value]]
+}
+
+cell_text.decorate <- function(cell_text){
+  value <- gsub('-', '', cell_text$decorate)
+  options <- list(
+    overline = rlang::quo(paste0('\\overline{', x, '}')),
+    linethrough = rlang::quo(paste0('\\sout{', x, '}')),
+    underline = rlang::quo(paste0('\\underline{', x, '}'))
+  )
+  options[[value]]
+}
+
+cell_fill.color <- function(cell_fill){
+  color <- cell_fill$color
+
+  if(startsWith(color, '#')){
+    color <- gsub('#', '', color)
+  }
+
+  expl <- paste0('\\cellcolor{', color, '}{')
+
+  return(rlang::quo(paste0(expl, x, '}')))
 }
 
 #construct the color definition latex code lines (required)
@@ -262,6 +370,7 @@ latex_style_color <- function(color, cell_type){
 #' @noRd
 create_color_definition <- function(color){
   s <- grDevices::col2rgb(color)
+  latex_cache$color <- c(gsub('#', '', color), latex_cache$color)
   paste0(
     "\\definecolor{",
     gsub('#', '', color),
@@ -295,87 +404,49 @@ define_colors_latex <- function(styles_df) {
   }
 }
 
-#### LaTeX main Style Functions
+get_latex_function_styles <- function(styles_list){
+  styling_functions <- purrr::map(names(unlist(styles_list)),
+                                  R.utils::doCall,
+                                  args = styles_list,
+                                  .ignoreUnusedArgs = TRUE)
 
-#' @noRd
-latex_style_function_list <- function() {
-  weight <- list(bold = rlang::quo(paste0('\\textbf{', x, '}')),
-                 bolder = rlang::quo(paste0('\\textbf{', x, '}')))
-
-  style = list(
-    italic = rlang::quo(paste0('\\textit{', x, '}')),
-    center = NA,
-    normal = NA,
-    oblique = NA
-  )
-
-  align = list(center = NA,
-               left = NA,
-               right = NA)
-
-  indent = as.list(rep(NA, 1001))
-  names(indent) <- glue::glue('{0:1000}', 'px')
-
-  cell_text <- list(
-    weight = weight,
-    style = style,
-    align = align
-  )
-
-  cell_borders <- list()
-  cell_styling <- list(cell_text = cell_text,
-                       cell_borders = cell_borders)
-  cell_styling
+  names(styling_functions) <- names(unlist(styles_list))
+  styling_functions
 }
 
-#loop through the styles table and resolve all the styling specified
 #' @noRd
-get_latex_function_styles <- function(styles_list) {
-  cell_styling <- latex_style_function_list()
-  operation_vec <- list(NA)
+order_functions <- function(function.list){
 
-  for (nm in names(styles_list)) {
+  new_function_list <-
+    function.list[!names(function.list) %in% c('cell_text.align', 'cell_text.transform')]
 
-    for (nm2 in names(styles_list[[nm]])) {
-
-      if(nm2 == 'size'){
-
-        operation <- latex_format_text_size(styles_list[[nm]][[nm2]])
-
-      } else {
-
-        if(nm2 == 'color'){
-          operation <- latex_style_color(styles_list[[nm]][[nm2]], nm)
-
-        } else {
-
-          if(nm2 == 'stretch'){
-            operation <- latex_format_condensed_size(styles_list[[nm]][[nm2]])
-
-          } else {
-
-            operation <- cell_styling[[nm]][[nm2]][[styles_list[[nm]][[nm2]]]]
-
-          }
-        }
-      }
-      operation_vec <- append(operation_vec, operation)
-    }
+  # must be done last
+  if('cell_text.align' %in% names(function.list)){
+    new_function_list <- append(new_function_list, function.list['cell_text.align'])
   }
-  operation_vec
+
+  #must be done first
+  if('cell_text.transform' %in% names(function.list)){
+    new_function_list <- append(function.list['cell_text.transform'], new_function_list)
+  }
+
+  new_function_list
+
 }
 
+
 #' @noRd
-latex_style_it <- function(value, styles) {
+latex_style_it <- function(.Label, styles, math_env2exp, colnum = NULL, math_env = NULL) {
   funclist <- get_latex_function_styles(styles)
-  funclist <- funclist[!is.na(funclist)]
-  val <- list(x = value)
+  funclist <- order_functions(funclist)
+  val <- list(x = .Label)
 
-  for (i in funclist) {
-
-    val['x'] <- rlang::eval_tidy(i, val)
-
+  for(function.name in names(funclist)){
+    function.evaluated <- rlang::eval_tidy(funclist[[function.name]], val)
+    val['x'] <- function.evaluated
   }
+
+  val['x'] <- rlang::eval_tidy(math_env2exp, val)
 
   val[['x']]
 }

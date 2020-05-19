@@ -9,7 +9,7 @@ latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
                               'landscape' = c(11.0, 8.5))
 latex_cache$papersize <- 'letter'
 latex_cache$orient <- 'portrait'
-latex_cache$env <- rlang::caller_env()
+latex_cache$color <- c()
 
 
 # Clear cache for test chart and package info

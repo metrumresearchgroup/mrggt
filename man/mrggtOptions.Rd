@@ -25,9 +25,8 @@ mrggtOptions(...)
 Global options to set for mrggt that effect the latex rendering
 }
 \examples{
-# set left & right margins to 1in & 2in
+# set left & right margins to 3in & 4in
 # no line breaks
-# change column separation in table to 2pt.
 # change paper to legal
 
 mrggtOptions('pagemargin' = c(3, 4),

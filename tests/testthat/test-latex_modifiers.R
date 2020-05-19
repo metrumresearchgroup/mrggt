@@ -208,18 +208,6 @@ test_that("latex mrggtOptions", {
   # mrggt has default line breaks set to TRUE
   expect_true(latex_cache$line.breaks)
 
-  # create a gt table under default margins and paper size
-  tbl_gt <-
-    gt(data = mtcars_short) %>%
-    as_latex()
-
-  # extract the column lengths
-  lengths <- gsub("^p\\{|cm\\}",
-                  "",
-                  stringr::str_extract_all(tbl_gt,
-                                           'p\\{\\d*\\.?\\d*cm\\}')[[1]]) %>%
-    as.double()
-
 
   # change the margin size to 2 in right, 2 in left
   mrggtOptions('pagemargin' = c(2, 2))
@@ -227,22 +215,6 @@ test_that("latex mrggtOptions", {
   # Expect a fixed pattern
   # cache margin should now be 2 in, 2 in
   expect_equal(latex_cache$margin, c(2, 2))
-
-  # create a gt table with default paper size and 2 in margins
-  tbl_gt2 <-
-    gt(data = mtcars_short) %>%
-    as_latex()
-
-  # extract the column lengths
-  lengths2 <- gsub("^p\\{|cm\\}",
-                  "",
-                  stringr::str_extract_all(tbl_gt2,
-                                           'p\\{\\d*\\.?\\d*cm\\}')[[1]]) %>%
-    as.double()
-
-  # Expect characteristic condition
-  # sum(column lengths) should be less for table with larger margins
-  expect_true(sum(lengths2) < sum(lengths))
 
   # Expect error
   # try to specify more than 2 margin settings

@@ -141,11 +141,11 @@ create_columns_component_l <- function(data) {
 
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
-  headings_labels <- purrr::map_chr(headings_labels, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
+  #headings_labels <- purrr::map_chr(headings_labels, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
 
-  key <- as.list(headings_labels)
-  names(key) <- headings_vars
-  headings_labels <- lapply(headings_vars, latex_style_headings, styles_df = styles_tbl, key = key)  %>% unlist(use.names = FALSE)
+  #key <- as.list(headings_labels)
+  #names(key) <- headings_vars
+  #headings_labels <- lapply(headings_vars, latex_style_headings, styles_df = styles_tbl, key = key)  %>% unlist(use.names = FALSE)
 
   # TODO: Implement hidden boxhead in LaTeX
   # # Should the column labels be hidden?
@@ -160,10 +160,10 @@ create_columns_component_l <- function(data) {
   # label or nothing
   if (isTRUE(stub_available) && length(stubh$label) > 0) {
 
-    stubl <- fmt_latex_math(gsub("\\", "", stubh$label, fixed=TRUE))
-    stublabel <- style_stubhead_l(styles_tbl, stubl)
+    #stubl <- fmt_latex_math(gsub("\\", "", stubh$label, fixed=TRUE))
+    #stublabel <- style_stubhead_l(styles_tbl, stubl)
 
-    headings_labels <- prepend_vec(headings_labels, stublabel)
+    headings_labels <- prepend_vec(headings_labels, stubh$label)
     headings_vars <- prepend_vec(headings_vars, "::stub")
 
   } else if (isTRUE(stub_available)) {
@@ -194,13 +194,13 @@ create_columns_component_l <- function(data) {
     multicol <- c()
     cmidrule <- c()
 
-    spanners_lengths$values <- purrr::map_chr(spanners_lengths$values, function(.){
-      if(is.na(.)){
-        ''
-      } else {
-        latex_style_spanners(fmt_latex_math(gsub("\\", "", ., fixed=TRUE)), styles_df = styles_tbl)
-      }
-    })
+    # spanners_lengths$values <- purrr::map_chr(spanners_lengths$values, function(.){
+    #   if(is.na(.)){
+    #     ''
+    #   } else {
+    #     latex_style_spanners(fmt_latex_math(gsub("\\", "", ., fixed=TRUE)), styles_df = styles_tbl)
+    #   }
+    # })
 
     for (i in seq(spanners_lengths$lengths)) {
 
@@ -309,7 +309,7 @@ create_body_component_l <- function(data) {
         group_label = gsub("^NA", "\\textemdash", group_label))
   }
 
-  groups_rows_df$group_label <- purrr::map_chr(groups_rows_df$group_label, function(.){style_group_rows_latex(fmt_latex_math(.),  styles_tbl)})
+  #groups_rows_df$group_label <- purrr::map_chr(groups_rows_df$group_label, function(.){style_group_rows_latex(fmt_latex_math(.),  styles_tbl)})
   group_rows <- create_group_rows(n_rows, groups_rows_df, context = "latex", n_cols = n_cols)
 
   if (stub_available) {
@@ -325,9 +325,9 @@ create_body_component_l <- function(data) {
 
   # Split `body_content` by slices of rows and create data rows
   body_content <- as.vector(t(body[, default_vars]))
-  body_content <- purrr::map_chr(body_content, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
+  #body_content <- purrr::map_chr(body_content, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
   row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
-  row_splits <- style_data_latex(row_splits, styles_tbl)
+  #row_splits <- style_data_latex(row_splits, styles_tbl)
   data_rows <- create_data_rows(n_rows, row_splits, context = "latex")
 
 
@@ -342,7 +342,7 @@ create_body_component_l <- function(data) {
       context = "latex"
     )
 
-  summary_rows <- purrr::map_chr(summary_rows, fmt_latex_math)
+  #summary_rows <- purrr::map_chr(summary_rows, fmt_latex_math)
   paste0(paste(collapse = "", paste0(group_rows, data_rows, summary_rows)), "\\bottomrule\n")
 }
 
