@@ -359,8 +359,14 @@ as_latex <- function(data) {
   # Perform input object validation
   stop_if_not_gt(data = data)
 
+  # Set the page orientation
+  orient_portrait <- fmt_orient(data = data)
+
   # Build all table data objects through a common pipeline
   data <- data %>% build_data(context = "latex")
+
+  #Apply the styling
+  data <- data %>% resolve_styles_latex()
 
   # Composition of LaTeX ----------------------------------------------------
 
@@ -391,20 +397,34 @@ as_latex <- function(data) {
 
   latex_packages <- create_knit_meta()
 
-  reset_latex_cache()
+  reset_tbl_cache()
   # Compose the LaTeX table
-  paste0(
+  tex <- paste0(
     color_def,
     table_start,
     heading_component,
     columns_component,
     body_component,
+    table_end,
     footnotes_component,
     source_notes_component,
-    table_end,
     collapse = ""
-  ) %>%
-    knitr::asis_output(meta = latex_packages)
+  )
+
+  if(!orient_portrait){
+    knit_asis <- paste("\\begin{landscape}",
+                 "\\pagestyle{empty}",
+                 tex,
+                "\\end{landscape}",
+                sep = '\n') %>%
+      knitr::asis_output(meta = latex_packages)
+
+    knit_asis <- structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
+    attr(knit_asis, 'base') <- tex
+  } else {
+    knit_asis <- tex %>% knitr::asis_output(meta = latex_packages)
+  }
+  knit_asis
 }
 
 #' Output a **gt** object as RTF

@@ -1,6 +1,6 @@
 Type: Package
 Package: mrggt
-Version: 0.2.0
+Version: 0.3.0
 Title: Easily Create Presentation-Ready Display Tables
 Description: Build display tables from tabular data using with an easy-to-use
     API. With its progressive approach, we can construct display tables with a
@@ -21,7 +21,7 @@ BugReports: https://github.com/rstudio/gt/issues
 Encoding: UTF-8
 LazyData: true
 ByteCompile: true
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
 Depends:
     R (>= 3.2.0)
 Imports: 
@@ -43,6 +43,8 @@ Imports:
     matrixStats (>= 0.55.0),
     qdapRegex (>= 0.7.2),
     stringdist (>= 0.9.5.5),
+    tikzDevice(>= 0.12.3),
+    nloptr(>= 1.2.2.1),
     grDevices,
     stats,
     cli

@@ -8,7 +8,7 @@ test_that("the `fmt_header_latex()` function works correctly", {
   header <- fmt_header_latex(col_widths)
 
   # Expect a fixed pattern representing the table header
-  expect_true(grepl("\\begin{longtable}{p{1cm}p{2cm}p{3cm}p{4cm}p{5cm}p{6cm}} \n", header, fixed = TRUE))
+  expect_true(grepl("\\begin{longtable}{p{1.00cm}p{2.00cm}p{3.00cm}p{4.00cm}p{5.00cm}p{6.00cm}} \n", header, fixed = TRUE))
 })
 
 test_that("the `type_setting()` function works correctly", {
@@ -44,7 +44,7 @@ test_that("the calculation of column widths works correctly", {
   expect_equal(length(unique(col_widths)), 1)
 
 
-  # Create a table where the first column width would need to be wider than the other columns
+  # Create a short table that does not exceed page width
   tbl <- dplyr::tribble(~fjaldjfslaf, ~hot, ~hut,
                         'dfjlajdfkl', 1, 1,
                         'jfldsjalfk', 2, 2)
@@ -61,12 +61,9 @@ test_that("the calculation of column widths works correctly", {
   # Convert to dbl
   col_widths <- purrr::map_dbl(col_widths, as.numeric)
 
-  # Expect the first value to be greater than the second and third values
-  expect_true(col_widths[1] > col_widths[2] && col_widths[1] > col_widths[3])
+  # Expect all the values of the column are equal
+  expect_true(col_widths[1] == col_widths[2] && col_widths[1] == col_widths[3])
 
-  # Expect that the sum of the column widths is equal to 17.6 cm
-  # 17.6 determined to be width of page
-  expect_equal(sum(col_widths), 17.6)
 
   # Ensure that appropriate font sizing is being selected per length of table text
   # Create two tables, one with short text and another with long text
@@ -75,9 +72,9 @@ test_that("the calculation of column widths works correctly", {
                              'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji',
                              'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji')
 
-  short_tbl <- dplyr::tribble(~ababababababababababa, ~cdcdcdcdcdcdcdcdcdcdcdc, ~efefefefefefefefefe, ~ghghghghghghghghg, ~ijijijijijijijiji,
-                              'ababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdc', 'efefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji',
-                              'ababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdc', 'efefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji')
+  short_tbl <- dplyr::tribble(~ababababababababababababa, ~cdcdcdcdcdcdcdcdcdcdcdcdcdcdcd, ~efefefefefefefefefefefe, ~ghghghghghghghghg, ~ijijijijijijijiji,
+                              'ababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji',
+                              'ababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji')
 
   # Convert to gt tables
   long_tbl_gt <- long_tbl %>% gt()

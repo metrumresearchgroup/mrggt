@@ -1,53 +1,169 @@
-###  LaTeX Math
+#' @noRd
+gsub_multiple <- function(x, substitues) {
+  subs <- purrr::map(substitues, ~ list(
+    pattern = .x[1],
+    replacement = .x[2],
+    fixed = TRUE
+  ))
+
+  purrr::reduce(subs,
+                ~ do.call(gsub,
+                          append(.y,
+                                 list(x = .x))),
+                .init = x)
+}
 
 #' @noRd
-fmt_latex_symbols <- function(x){
-  if(grepl('%', x)){
-    x <- gsub('%', '\\%', x, fixed = TRUE)
+sanitize_tex <- function (x) {
+  UseMethod("sanitize_tex", x)
+}
+
+#' @noRd
+sanitize_tex.default <- function(x) {
+  sanitize <- list(c('%', '\\%'),
+                   c('CHECKMARK', '\\checkmark'),
+                   c('>', '$>$'),
+                   c('<', '$<$'))
+
+  gsub_multiple(x, sanitize)
+}
+
+#' @noRd
+sanitize_tex.math <- function(x) {
+  vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract = TRUE))
+  sanitize <- list(
+    c('!@', ''),
+    c('*', '\\'),
+    c('\\_', '_'),
+    c('\\{', '{'),
+    c('\\}', '}'),
+    c('CHECKMARK',
+      '\\text{\\checkmark}'),
+    c('%', '\\%'),
+    c('|', '\\vert')
+  )
+
+  vect <- vect[!is.na(vect)]
+  if (length(vect) > 0) {
+    sanitize <- append(sanitize,
+                       mapply(
+                         c,
+                         paste0('<', vect, '>'),
+                         paste0('\\text{', vect, '}'),
+                         SIMPLIFY = F,
+                         USE.NAMES = FALSE
+                       ))
   }
-  if(grepl('CHECKMARK', x)){
-    x <- gsub('CHECKMARK', '\\checkmark', x, fixed = TRUE)
+  gsub_multiple(x, sanitize)
+}
+
+#' @noRd
+as.tex_math <- function (x) {
+  UseMethod("as.tex_math", x)
+}
+
+#' @noRd
+as.tex_math.default <- function(x) {
+  x <- sanitize_tex(x)
+
+  structure(
+    list(
+      .Label = x,
+      math_env = x,
+      math_env2exp = rlang::quo(paste0(x))
+    ),
+    class = c('tex_math')
+  )
+}
+
+#' @noRd
+as.tex_math.math <- function(x){
+  x <- sanitize_tex(x)
+
+  structure(
+    list(
+      .Label = x,
+      math_env = paste0('$', x, '$'),
+      math_env2exp = rlang::quo(paste0('$', x, '$'))
+    ),
+    class = c('tex_math')
+  )
+}
+
+#' @noRd
+as.list.tex_math <- function(x){
+  list(.Label = x$.Label,
+       math_env = x$math_env,
+       math_env2exp = x$math_env2exp)
+}
+
+extract <- function(x, y){
+  UseMethod('extract')
+}
+
+extract.list <- function(x, y){
+  purrr::map_chr(x, extract, y)
+}
+
+extract.data.frame <- function(x, y){
+  dfbase <- purrr::map(x, extract, y)
+  as.data.frame(dfbase,
+                row.names = rownames(x),
+                stringsAsFactors = FALSE)
+}
+
+#' @noRd
+extract.default <- function(x, y){
+  purrr::pluck(x, y)
+}
+
+#' @noRd
+print.tex_math <- function(x){
+  print(x$.Label)
+}
+
+#' @noRd
+c.tex_math <- function(...){
+  structure(list(...),
+            class = c('tex_math'))
+}
+
+#' @noRd
+tex_math <- function(x){
+  if(grepl('!@', x)){
+    x <- structure(x,
+                   class = c(class(x), 'math'))
   }
-  if(grepl('>', x)){
-    x <- gsub('>', '$>$', x, fixed = TRUE)
-  }
-  if(grepl('<', x)){
-    x <- gsub('<', '$<$', x, fixed = TRUE)
-  }
-  if(grepl('textsuperscript{', x, fixed=TRUE)){
-    x <- gsub('textsuperscript{', '\\textsuperscript{', x, fixed = TRUE)
+  x %>% as.tex_math()
+}
+
+#' @noRd
+fmt_latex_math <- function (x, ...) {
+  UseMethod("fmt_latex_math", x)
+}
+
+
+#' @noRd
+fmt_latex_math.default <- function(x){
+  vtex_math <- Vectorize(tex_math,
+                         vectorize.args = c('x'),
+                         USE.NAMES = FALSE,
+                         SIMPLIFY = FALSE)
+  x <- vtex_math(x)
+  if(length(x) == 1){
+    x <- x[[1]]
   }
   x
 }
 
 #' @noRd
-fmt_latex_math <- function(x){
-  if(grepl('!@', x)){
-    vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract=TRUE))
-    swap <- list('!@' = '',
-                 '*' = '\\',
-                 'CHECKMARK' = '\\text{\\checkmark}',
-                 'textsuperscript{' = '\\textsuperscript{',
-                 '%' = '\\%',
-                 '|' = '\\vert')
-
-    if(length(vect[!is.na(vect)]) > 0){
-
-      text_vect <- purrr::map_chr(vect, function(.){paste0('\\text{', ., '}')})
-      with_indicator <- purrr::map_chr(vect, function(.){paste0('<', ., '>')})
-      names(text_vect) <- with_indicator
-      swap <- append(text_vect, swap)
-
-    }
-
-    for(i in names(swap)){
-
-      x <- gsub(i, swap[[i]], x, fixed = TRUE)
-
-    }
-
-    return(paste0('$', x, '$'))
-  }
-
-  fmt_latex_symbols(x)
+fmt_latex_math.data.frame <- function(x){
+  dfbase <- rapply(x, fmt_latex_math, how = 'list')
+  structure(dfbase,
+            row.names = rownames(x),
+            class = c('data.frame',
+                      'data.frame.tex_math'))
 }
+
+#' @noRd
+fmt_latex_math.matrix <- function(x) apply(x, c(1, 2), fmt_latex_math)

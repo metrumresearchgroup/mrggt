@@ -1,38 +1,114 @@
+### settings for the global knit doc
 latex_cache <- new.env(parent = emptyenv())
-latex_cache$shrink <- NULL
 latex_cache$line.breaks <- TRUE
-latex_cache$column.sep <- NULL
-latex_cache$footnotes.align <- 'l'
-latex_cache$sourcenotes.align <- 'l'
-latex_cache$env <- rlang::caller_env()
+latex_cache$margin <- c(1, 1)
+latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
+                              'landscape' = c(11.0, 8.5))
+latex_cache$papersize <- 'letter'
+latex_cache$orient <- 'portrait'
 
+### settings per table- reset every time as_latex is run
+tbl_cache <- new.env(parent = emptyenv())
+tbl_cache$color <- c()
+tbl_cache$font_size <- 0
+tbl_cache$tbl_width <- 0
 
-# Clear cache for test chart and package info
-reset_latex_cache <- function() {
-  latex_cache$shrink <- NULL
-  latex_cache$line.breaks <- TRUE
-  latex_cache$column.sep <- NULL
-  latex_cache$footnotes.align <- 'l'
-  latex_cache$sourcenotes.align <- 'l'
+# reset tbl_cache
+reset_tbl_cache <- function() {
+  tbl_cache$color <- c()
+  tbl_cache$font_size <- 0
+  tbl_cache$tbl_width <- 0
 }
 
-#' Additional formatting options for as_latex()
-#' @param shrink The percentage to shrink the width by. Accepts a value < 1. Default is to stretch the table to full width of the page.
-#' @param line.breaks Allow/do not allow line breaks in the table. Default is to allow for line breaks under two circumstances: 1.) When the text of the table at the smallest point size (5pt) cannot fit to the width of the page. 2.) A minimal number of line breaks are required to make point size larger. In the first condition, setting this parameter to FALSE will not affect the output. In the second, the font size will be scaled down to remove the minimal breaks.
-#' @param column.sep set the column separator
-#' @param footnotes.align direction to align footnotes
-#' @param sourcenotes.align direction to align footnotes
-#' @export
+orient <- function(x = c('portrait', 'landscape')){
+  x <- match.arg(x)
+  latex_cache$orient <- x
+}
+
+pagemargin <- function(x){
+  if(!length(x) == 2){
+    stop('margins must be specified as c(left margin, right margin)')
+  }
+  latex_cache$margin <- x
+}
+
+line.breaks <- function(x){
+  if(!is.logical(x)){
+    stop('line.breaks must be specified as either TRUE/FALSE')
+  }
+  latex_cache$line.breaks <- x
+}
+
+orient <- function(x = c('portrait', 'landscape')){
+  x <- match.arg(x)
+  latex_cache$orient <- x
+}
+
+papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'ledger')){
+  x <- match.arg(x)
+  sizing <- switch(
+    x,
+    'half letter' = list(
+      'portrait' = c(5.5, 8.5),
+      'landscape' = c(8.5, 5.5)
+    ),
+    'letter' = list(
+      'portrait' = c(8.5, 11.0),
+      'landscape' = c(11.0, 8.5)
+    ),
+    'legal' = list(
+      'portrait' = c(8.5, 14.0),
+      'landscape' = c(14.0, 8.5)
+    ),
+    'junior legal' = list(
+      'portrait' = c(5.0, 8.0),
+      'landscape' = c(8.0, 5.0)
+    ),
+    'ledger' = list(
+      'portrait' = c(11.0, 17.0),
+      'landscape' = c(17.0, 11.0)
+    )
+  )
+  latex_cache$pagewidth <- sizing
+  latex_cache$papersize <- x
+}
+
+#' Global options to set for mrggt that effect the latex rendering
+#' @param ... args passed on to assign function. possible values to assign are:
+#' - **pagemargin**: numeric vector in inches with format ```c(left margin, right margin)```; default is ```c(1, 1)```
+#' - **line.breaks**: logical; allow line breaks in table; default is ```TRUE``` (recommended)
+#' - **papersize**: character; default ```'letter'```; options:
+#'   - *half letter*: 5.5 x 8.0 in
+#'   - *letter*: 8.5 x 11.0 in
+#'   - *legal*: 8.5 x 14.0 in
+#'   - *junior legal*: 5.0 x 8.0 in
+#'   - *ledger*: 11.0 x 17.0 in
 #'
-latex_tab.options <- function(shrink = NULL,
-                              line.breaks = TRUE,
-                              column.sep = NULL,
-                              footnotes.align = 'l',
-                              sourcenotes.align = 'l'){
+#' @examples
+#' # set left & right margins to 3in & 4in
+#' # no line breaks
+#' # change paper to legal
+#'
+#' mrggt_options('pagemargin' = c(3, 4),
+#'              'line.breaks' = FALSE,
+#'              'papersize' = 'legal')
+#'
+#' @export
+mrggt_options <- function(...){
+  opts <- list(...)
+  avail_set <- c('papersize',
+                 'line.breaks',
+                 'pagemargin',
+                 'orient')
 
-  latex_cache$shrink <- shrink
-  latex_cache$line.breaks <- line.breaks
-  latex_cache$column.sep <- column.sep
-  latex_cache$footnotes.align <- footnotes.align
-  latex_cache$sourcenotes.align <- sourcenotes.align
+  if(!length(names(opts)[!names(opts) %in% avail_set]) == 0){
+
+    message(paste0('ignoring unknown options specified: ',
+                   paste(names(opts)[!names(opts) %in% avail_set],
+                         collapse = ', ')))
+  }
+
+  options <- names(opts)[names(opts) %in% avail_set]
+  purrr::walk(options, ~do.call(.x, list(x = opts[[.x]])))
 }
+
