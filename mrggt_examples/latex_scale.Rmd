@@ -1,8 +1,9 @@
 ---
-title: "Testing Knitr Functionality & LaTeX Shrink"
+title: "LaTeX Shrink Example"
 output: 
-  pdf_document
-geometry: "left=2.54cm,right=2.54cm,top=2.54cm,bottom=2.54cm"
+  pdf_document:
+    keep_tex:
+      true
   
 
 ---
@@ -43,6 +44,7 @@ tbl
 
 ```
 
+# Different Alignments
 ```{r results = 'asis'}
 tbl %>% latex_scale(scale_factor = .4, align = 'c')
 ```
@@ -53,4 +55,10 @@ tbl %>% latex_scale(scale_factor = .4, align = 'l')
 
 ```{r results = 'asis'}
 tbl %>% latex_scale(scale_factor = .4, align = 'r')
+```
+
+# Specify Individual Columns
+
+```{r results = 'asis'}
+tbl %>% latex_scale(scale_factor = list(c(1, 2)), align = 'c')
 ```

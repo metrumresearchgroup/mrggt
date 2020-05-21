@@ -265,23 +265,20 @@ create_heading_component <- function(data,
   if (context == "latex") {
 
     title_row <-
-      paste0(heading$title, footnote_title_marks) %>%
-      paste_left("\\begin{minipage}{18cm} \n \\large \\centering ") %>%
-      paste_right("\\\\ \n \\end{minipage} \\\\ \n")
+      paste0(heading$title, footnote_title_marks)
 
     if (dt_heading_has_subtitle(data = data, context='latex')) {
 
       subtitle_row <-
         paste0(heading$subtitle, footnote_subtitle_marks) %>%
-        paste_left("\\\\ \n \\begin{minipage}{18cm}\n \\small ") %>%
-        paste_right("\n \\end{minipage} \\\\ \n")
+        paste_left(": ")
 
     } else {
       subtitle_row <- ""
     }
 
     heading_component <-
-      paste0(title_row, subtitle_row)
+      paste0("\\caption{", title_row, subtitle_row, "} \\\\\n")
   }
 
   if (context == "rtf") {

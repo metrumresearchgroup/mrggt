@@ -1,0 +1,364 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={LaTeX Shrink Example},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[singlelinecheck=off]{caption}
+\usepackage{longtable}
+\setlength{\LTleft}{0pt plus 1fill minus 1fill}
+\setlength{\LTright}{\LTleft}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{mathptmx}
+\usepackage{tikz}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\usepackage{pdflscape}
+\usepackage{everypage}
+\newlength{\hfoot}
+\newlength{\vfoot}
+\AddEverypageHook{\ifdim\textwidth=\linewidth\relax
+\else\setlength{\hfoot}{-\topmargin}%
+\addtolength{\hfoot}{-\headheight}%
+\addtolength{\hfoot}{-\headsep}%
+\addtolength{\hfoot}{-.5\linewidth}%
+\ifodd\value{page}\setlength{\vfoot}{\oddsidemargin}%
+\else\setlength{\vfoot}{\evensidemargin}\fi%
+\addtolength{\vfoot}{\textheight}%
+\addtolength{\vfoot}{\footskip}%
+\raisebox{\hfoot}[0pt][0pt]{\rlap{\hspace{\vfoot}\rotatebox[origin=cB]{90}{\thepage}}}\fi}
+\usepackage{threeparttablex}
+\def\settotextwidth{\renewcommand\TPTminimum{\textwidth}}
+\usepackage{longtable}
+
+\title{LaTeX Shrink Example}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'tidyverse'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: package 'purrr' was built under R version 3.6.3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'mrggt'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl_fruit <-}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{tribble}\NormalTok{( }\OperatorTok{~}\NormalTok{grpname, }\OperatorTok{~}\NormalTok{count, }\OperatorTok{~}\NormalTok{color,}
+                                              \StringTok{'apple'}\NormalTok{, }\DecValTok{1}\NormalTok{, }\StringTok{'red'}\NormalTok{,}
+                                              \StringTok{'CHECKMARK'}\NormalTok{, }\DecValTok{2}\NormalTok{, }\StringTok{'yellow'}\NormalTok{,}
+                                              \StringTok{'!@ *beta_\{<hi>\}'}\NormalTok{, }\DecValTok{3}\NormalTok{, }\StringTok{'purple'}\NormalTok{,}
+                                              \StringTok{'pear'}\NormalTok{, }\DecValTok{4}\NormalTok{, }\StringTok{'green'}\NormalTok{,}
+                                              \StringTok{'orange'}\NormalTok{, }\DecValTok{5}\NormalTok{, }\StringTok{'orange'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl <-}\StringTok{ }\KeywordTok{gt}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ tbl_fruit) }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{tab_style}\NormalTok{(}
+      \DataTypeTok{style =} \KeywordTok{cell_fill}\NormalTok{(}\DataTypeTok{color =} \StringTok{"#d3d3d3"}\NormalTok{),}
+      \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+        \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+        \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'a'}\NormalTok{)}
+\NormalTok{      )}
+\NormalTok{    ) }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{tab_style}\NormalTok{(}
+      \DataTypeTok{style =} \KeywordTok{cell_text}\NormalTok{(}\DataTypeTok{size =} \StringTok{"x-large"}\NormalTok{),}
+      \DataTypeTok{locations =} \KeywordTok{cells_body}\NormalTok{(}
+        \DataTypeTok{columns =} \KeywordTok{everything}\NormalTok{(),}
+        \DataTypeTok{rows =} \KeywordTok{startsWith}\NormalTok{(grpname, }\StringTok{'p'}\NormalTok{)}
+\NormalTok{      )}
+\NormalTok{    ) }\OperatorTok{%>%}
+\StringTok{    }\KeywordTok{as_latex}\NormalTok{()}
+
+\NormalTok{tbl}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{D3D3D3}{rgb}{0.827450980392157,0.827450980392157,0.827450980392157} 
+\begin{ThreePartTable}
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{1.37cm}p{1.37cm}p{1.37cm}} 
+\toprule
+grpname & count & color \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+\cellcolor{D3D3D3}{apple} & \cellcolor{D3D3D3}{1} & \cellcolor{D3D3D3}{red} \\ 
+\checkmark & 2 & yellow \\ 
+$ \beta_{\text{hi}}$ & 3 & purple \\ 
+{\LARGE pear} & {\LARGE 4} & {\LARGE green} \\ 
+orange & 5 & orange \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{different-alignments}{%
+\section{Different Alignments}\label{different-alignments}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl }\OperatorTok{%>%}\StringTok{ }\KeywordTok{latex_scale}\NormalTok{(}\DataTypeTok{scale_factor =} \FloatTok{.4}\NormalTok{, }\DataTypeTok{align =} \StringTok{'c'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{D3D3D3}{rgb}{0.827450980392157,0.827450980392157,0.827450980392157} 
+\begin{ThreePartTable}
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}[c]{p{0.548cm}p{0.548cm}p{0.548cm}}
+\toprule
+grpname & count & color \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+\cellcolor{D3D3D3}{apple} & \cellcolor{D3D3D3}{1} & \cellcolor{D3D3D3}{red} \\ 
+\checkmark & 2 & yellow \\ 
+$ \beta_{\text{hi}}$ & 3 & purple \\ 
+{\LARGE pear} & {\LARGE 4} & {\LARGE green} \\ 
+orange & 5 & orange \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl }\OperatorTok{%>%}\StringTok{ }\KeywordTok{latex_scale}\NormalTok{(}\DataTypeTok{scale_factor =} \FloatTok{.4}\NormalTok{, }\DataTypeTok{align =} \StringTok{'l'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{D3D3D3}{rgb}{0.827450980392157,0.827450980392157,0.827450980392157} 
+\begin{ThreePartTable}
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}[l]{p{0.548cm}p{0.548cm}p{0.548cm}}
+\toprule
+grpname & count & color \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+\cellcolor{D3D3D3}{apple} & \cellcolor{D3D3D3}{1} & \cellcolor{D3D3D3}{red} \\ 
+\checkmark & 2 & yellow \\ 
+$ \beta_{\text{hi}}$ & 3 & purple \\ 
+{\LARGE pear} & {\LARGE 4} & {\LARGE green} \\ 
+orange & 5 & orange \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl }\OperatorTok{%>%}\StringTok{ }\KeywordTok{latex_scale}\NormalTok{(}\DataTypeTok{scale_factor =} \FloatTok{.4}\NormalTok{, }\DataTypeTok{align =} \StringTok{'r'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{D3D3D3}{rgb}{0.827450980392157,0.827450980392157,0.827450980392157} 
+\begin{ThreePartTable}
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}[r]{p{0.548cm}p{0.548cm}p{0.548cm}}
+\toprule
+grpname & count & color \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+\cellcolor{D3D3D3}{apple} & \cellcolor{D3D3D3}{1} & \cellcolor{D3D3D3}{red} \\ 
+\checkmark & 2 & yellow \\ 
+$ \beta_{\text{hi}}$ & 3 & purple \\ 
+{\LARGE pear} & {\LARGE 4} & {\LARGE green} \\ 
+orange & 5 & orange \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{specify-individual-columns}{%
+\section{Specify Individual Columns}\label{specify-individual-columns}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl }\OperatorTok{%>%}\StringTok{ }\KeywordTok{latex_scale}\NormalTok{(}\DataTypeTok{scale_factor =} \KeywordTok{list}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)), }\DataTypeTok{align =} \StringTok{'c'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\definecolor{D3D3D3}{rgb}{0.827450980392157,0.827450980392157,0.827450980392157} 
+\begin{ThreePartTable}
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}[c]{p{2.740cm}p{1.370cm}p{1.370cm}}
+\toprule
+grpname & count & color \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+\cellcolor{D3D3D3}{apple} & \cellcolor{D3D3D3}{1} & \cellcolor{D3D3D3}{red} \\ 
+\checkmark & 2 & yellow \\ 
+$ \beta_{\text{hi}}$ & 3 & purple \\ 
+{\LARGE pear} & {\LARGE 4} & {\LARGE green} \\ 
+orange & 5 & orange \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\end{document}

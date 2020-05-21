@@ -1,0 +1,54 @@
+---
+title: "Auto Table Width Calculation"
+output:
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+library(mrggt)
+library(tidyverse)
+```
+
+
+```{r}
+  wide_tbl <- dplyr::tribble(~ababababababababababababababababa, ~cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd, ~efefefefefefefefefefefefefefefefefefefe, ~ghghghghghghghghghghghghghghghghgh, ~ijijijijijijijijijijijijijijijiji,
+                             'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji',
+                             'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji')
+
+  short_tbl <- dplyr::tribble(~ababababababababababababa, ~cdcdcdcdcdcdcdcdcdcdcdcdcdcd, ~efefefefefefefefefefefe, ~ghghghghghghghghg, ~ijijijijijijijiji,
+                              'ababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji',
+                              'ababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefe', 'ghghghghghghghghg', 'ijijijijijijijiji')
+```
+
+# Portrait Functionality
+
+## wide table will be scaled down
+```{r}
+wide_tbl %>%
+  gt() %>%
+  as_latex()
+```
+
+## shorter table will not be scaled
+```{r}
+short_tbl %>%
+  gt() %>%
+  as_latex()
+```
+
+# Landscape Functionality
+
+```{r}
+tbl1 <- wide_tbl %>%
+  gt() %>%
+  lscape() %>%
+  as_latex()
+
+tbl2 <- short_tbl %>%
+  gt() %>%
+  lscape() %>%
+  as_latex()
+
+tbl1 + tbl2
+```

@@ -6,10 +6,14 @@
 ## data
 ## stub
 ## row_groups
+## title
 
 #' @noRd
 resolve_styles_latex <- function(data){
   styles_tbl <- dt_styles_get(data = data)
+  data$`_heading`$title <- style_title_latex(data$`_heading`$title, styles_tbl)
+  data$`_heading`$subtitle <- style_subtitle_latex(data$`_heading`$subtitle, styles_tbl)
+
   boxh <- dt_boxhead_get(data = data)
   stub_available <- dt_stub_df_exists(data = data)
   spanners_present <- dt_spanners_exists(data = data)
@@ -65,7 +69,35 @@ style_group_rows_latex <- function(group_name, styles_df){
 
   if(group_name %in% to_style$grpname){
     gn.metadata$styles <- to_style[to_style$grpname == group_name, ]$styles[[1]]
-    element <-  do.call(gn.metadata, latex_style_it)
+    element <-  do.call(latex_style_it, gn.metadata)
+  }
+
+  element
+}
+
+## title
+#' @noRd
+style_title_latex <- function(title, styles_df){
+  title.metadata <- fmt_latex_math(title)
+  element <- title.metadata %>% extract('math_env')
+
+  if('title' %in% styles_df$locname){
+    title.metadata$styles <- styles_df[styles_df$locname == 'title',]$styles[[1]]
+    element <-  do.call(latex_style_it, title.metadata)
+  }
+
+  element
+}
+
+## subtitle
+#' @noRd
+style_subtitle_latex <- function(subtitle, styles_df){
+  st.metadata <- fmt_latex_math(subtitle)
+  element <- st.metadata %>% extract('math_env')
+
+  if('subtitle' %in% styles_df$locname){
+    st.metadata$styles <- styles_df[styles_df$locname == 'subtitle',]$styles[[1]]
+    element <-  do.call(latex_style_it, st.metadata)
   }
 
   element
@@ -311,7 +343,7 @@ cell_text.style <- function(value){
   options <- list(italic = rlang::quo(paste0('\\textit{', x, '}')),
                   center = rlang::quo(x),
                   normal = rlang::quo(x),
-                  oblique = rlang::quo(paste0('\\textls{', x, '}')),
+                  oblique = rlang::quo(paste0('\\textls{', x, '}'))
   )
 
   if(value %in% names(options)){

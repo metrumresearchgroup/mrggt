@@ -387,10 +387,11 @@ as_latex <- function(data) {
   body_component <- create_body_component_l(data = data)
 
   # Create the source notes component
-  source_notes_component <- create_source_note_component_l(data = data)
+  #source_notes_component <- create_source_note_component_l(data = data)
+  src_foot_component <- create_source_foot_note_component_l(data = data)
 
   # Create the footnotes component
-  footnotes_component <- create_footnotes_component_l(data = data)
+  #footnotes_component <- create_footnotes_component_l(data = data)
 
   # Create a LaTeX fragment for the ending tabular statement
   table_end <- create_table_end_l()
@@ -401,13 +402,12 @@ as_latex <- function(data) {
   # Compose the LaTeX table
   tex <- paste0(
     color_def,
+    src_foot_component,
     table_start,
     heading_component,
     columns_component,
     body_component,
     table_end,
-    footnotes_component,
-    source_notes_component,
     collapse = ""
   )
 

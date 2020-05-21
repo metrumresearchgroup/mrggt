@@ -1,0 +1,305 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Auto Table Width Calculation},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[singlelinecheck=off]{caption}
+\usepackage{longtable}
+\setlength{\LTleft}{0pt plus 1fill minus 1fill}
+\setlength{\LTright}{\LTleft}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{mathptmx}
+\usepackage{tikz}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\usepackage{pdflscape}
+\usepackage{everypage}
+\newlength{\hfoot}
+\newlength{\vfoot}
+\AddEverypageHook{\ifdim\textwidth=\linewidth\relax
+\else\setlength{\hfoot}{-\topmargin}%
+\addtolength{\hfoot}{-\headheight}%
+\addtolength{\hfoot}{-\headsep}%
+\addtolength{\hfoot}{-.5\linewidth}%
+\ifodd\value{page}\setlength{\vfoot}{\oddsidemargin}%
+\else\setlength{\vfoot}{\evensidemargin}\fi%
+\addtolength{\vfoot}{\textheight}%
+\addtolength{\vfoot}{\footskip}%
+\raisebox{\hfoot}[0pt][0pt]{\rlap{\hspace{\vfoot}\rotatebox[origin=cB]{90}{\thepage}}}\fi}
+\usepackage{threeparttablex}
+\def\settotextwidth{\renewcommand\TPTminimum{\textwidth}}
+
+\title{Auto Table Width Calculation}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{  wide_tbl <-}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{tribble}\NormalTok{(}\OperatorTok{~}\NormalTok{ababababababababababababababababa, }\OperatorTok{~}\NormalTok{cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd, }\OperatorTok{~}\NormalTok{efefefefefefefefefefefefefefefefefefefe, }\OperatorTok{~}\NormalTok{ghghghghghghghghghghghghghghghghgh, }\OperatorTok{~}\NormalTok{ijijijijijijijijijijijijijijijiji,}
+                             \StringTok{'ababababababababababababababababa'}\NormalTok{, }\StringTok{'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd'}\NormalTok{, }\StringTok{'efefefefefefefefefefefefefefefefefefefe'}\NormalTok{, }\StringTok{'ghghghghghghghghghghghghghghghghgh'}\NormalTok{, }\StringTok{'ijijijijijijijijijijijijijijijiji'}\NormalTok{,}
+                             \StringTok{'ababababababababababababababababa'}\NormalTok{, }\StringTok{'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd'}\NormalTok{, }\StringTok{'efefefefefefefefefefefefefefefefefefefe'}\NormalTok{, }\StringTok{'ghghghghghghghghghghghghghghghghgh'}\NormalTok{, }\StringTok{'ijijijijijijijijijijijijijijijiji'}\NormalTok{)}
+
+\NormalTok{  short_tbl <-}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{tribble}\NormalTok{(}\OperatorTok{~}\NormalTok{ababababababababababababa, }\OperatorTok{~}\NormalTok{cdcdcdcdcdcdcdcdcdcdcdcdcdcd, }\OperatorTok{~}\NormalTok{efefefefefefefefefefefe, }\OperatorTok{~}\NormalTok{ghghghghghghghghg, }\OperatorTok{~}\NormalTok{ijijijijijijijiji,}
+                              \StringTok{'ababababababababababababa'}\NormalTok{, }\StringTok{'cdcdcdcdcdcdcdcdcdcdcdcdcdcd'}\NormalTok{, }\StringTok{'efefefefefefefefefefefe'}\NormalTok{, }\StringTok{'ghghghghghghghghg'}\NormalTok{, }\StringTok{'ijijijijijijijiji'}\NormalTok{,}
+                              \StringTok{'ababababababababababababa'}\NormalTok{, }\StringTok{'cdcdcdcdcdcdcdcdcdcdcdcdcdcd'}\NormalTok{, }\StringTok{'efefefefefefefefefefefe'}\NormalTok{, }\StringTok{'ghghghghghghghghg'}\NormalTok{, }\StringTok{'ijijijijijijijiji'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{portrait-functionality}{%
+\section{Portrait Functionality}\label{portrait-functionality}}
+
+\hypertarget{wide-table-will-be-scaled-down}{%
+\subsection{wide table will be scaled
+down}\label{wide-table-will-be-scaled-down}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{wide_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+\tiny 
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{3.20cm}p{3.88cm}p{3.13cm}p{3.50cm}p{2.27cm}} 
+\toprule
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{shorter-table-will-not-be-scaled}{%
+\subsection{shorter table will not be
+scaled}\label{shorter-table-will-not-be-scaled}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{short_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+\small 
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{3.81cm}p{4.27cm}p{2.91cm}p{2.75cm}p{2.24cm}} 
+\toprule
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{landscape-functionality}{%
+\section{Landscape Functionality}\label{landscape-functionality}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{tbl1 <-}\StringTok{ }\NormalTok{wide_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{lscape}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+
+\NormalTok{tbl2 <-}\StringTok{ }\NormalTok{short_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{lscape}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+
+\NormalTok{tbl1 }\OperatorTok{+}\StringTok{ }\NormalTok{tbl2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{landscape}
+\pagestyle{empty}
+\begin{ThreePartTable}
+\footnotesize 
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{4.57cm}p{5.55cm}p{4.47cm}p{5.00cm}p{2.75cm}} 
+\toprule
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+ababababababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefefefefefefefefefe & ghghghghghghghghghghghghghghghghgh & ijijijijijijijijijijijijijijijiji \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\begin{ThreePartTable}
+
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{4.42cm}p{4.66cm}p{4.42cm}p{4.42cm}p{4.42cm}} 
+\toprule
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+ababababababababababababa & cdcdcdcdcdcdcdcdcdcdcdcdcdcd & efefefefefefefefefefefe & ghghghghghghghghg & ijijijijijijijiji \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\end{landscape}
+
+\end{document}

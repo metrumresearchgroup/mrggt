@@ -84,7 +84,7 @@ test_that("latex landscape mode", {
   # Extract the knit meta from the knit_asis object
   # retrieve the extra lines for the last latex dep
   knit_meta <- attributes(tbl_gt)$knit_meta
-  lscape_settings <- knit_meta[[length(knit_meta)]]$extra_lines
+  lscape_settings <- knit_meta[[13]]$extra_lines
 
   # Expect fixed value
   # lscape-mrggtab environment is created & defined under last package dep
