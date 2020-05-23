@@ -1,0 +1,77 @@
+---
+title: "Latex Cell Align Example"
+output:
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+library(mrggt)
+library(tidyverse)
+```
+
+# Full Column Align
+```{r}
+tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
+                             'apple', 1, 'red',
+                             'banana', 2, 'yellow',
+                             'grape', 3, 'purple',
+                             'pear', 4, 'green',
+                             'orange', 5, 'orange',
+                             'tomato', 6, 'red',
+                             'kiwi', 7, 'brown')
+
+
+gt(data = tbl_fruit) %>%
+  cols_label(.list = list(
+    grpname = 'Fruit',
+    count = 'Total',
+    color = 'Color'
+  )) %>%
+  
+  tab_style(style = cell_text(align = 'left'),
+            locations = cells_body(columns = vars('grpname'),
+                                   rows = everything())) %>%
+  
+  tab_style(style = cell_text(align = 'center'),
+            locations = cells_body(columns = vars('count'),
+                                   rows = everything())) %>%
+  
+  tab_style(style = cell_text(align = 'right'),
+            locations = cells_body(columns = vars('color'),
+                                   rows = everything())) %>%
+  
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  as_latex()
+```
+
+# Individual Cell Align
+```{r}
+gt(data = tbl_fruit) %>%
+  cols_label(.list = list(
+    grpname = 'Fruit',
+    count = 'Total',
+    color = 'Color'
+  )) %>%
+  
+  tab_style(style = cell_text(align = 'right'),
+            locations = cells_body(columns = vars('grpname'),
+                                   rows = c(1))) %>%
+  
+  tab_style(style = cell_text(align = 'center'),
+            locations = cells_body(columns = vars('count'),
+                                   rows = c(2))) %>%
+  
+  tab_style(style = cell_text(align = 'right'),
+            locations = cells_body(columns = vars('color'),
+                                   rows = c(3))) %>%
+  
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  as_latex()
+```

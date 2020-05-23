@@ -20,7 +20,7 @@ test_that("the `type_setting()` function works correctly", {
   fs_tex <- paste(purrr::map_chr(fs_pt, type_setting), collapse = ' ')
 
   # Expect a fixed pattern representing all present options
-  expect_true(grepl("\\tiny \n \\tiny \n \\tiny \n \\scriptsize \n \\scriptsize \n \\footnotesize \n \\small \n NA", fs_tex, fixed = TRUE))
+  expect_true(grepl("\\tiny \n \\tiny \n \\tiny \n \\scriptsize \n \\scriptsize \n \\footnotesize \n \\small \n", fs_tex, fixed = TRUE))
 })
 
 
@@ -85,11 +85,11 @@ test_that("the calculation of column widths works correctly", {
   short_tbl_tex <- short_tbl_gt %>% as_latex() %>% as.character()
 
   # sizes smallest to largest
-  sizing_options <- c('tiny', 'scriptsize', 'footnotesize', 'small')
+  sizing_options <- c('tiny', 'scriptsize', 'footnotesize', 'small', '')
 
-  # grab the first element of the character string (fontsize setting)
-  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[1]
-  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[1]
+  # grab the second element of the character string (fontsize setting)
+  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[2]
+  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[2]
 
   # strip the leading \\ on the fontsize and trailing whitespace
   long_fs <- gsub('\\', '', trimws(long_fs), fixed = TRUE)

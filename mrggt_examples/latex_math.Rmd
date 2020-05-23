@@ -1,12 +1,22 @@
+---
+title: "Latex Math Example"
+output: 
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
 library('tidyverse')
 library('mrggt')
+```
+
+
+```{r}
 summary_single_table <- tribble( ~grpname, ~ NOAE, ~g_1, ~g_2, ~g_3, ~ g_4, ~g_5,
                                  '!@ something_{<something>} CHECKMARK', 39, 5, 7, 1, 1, 1,
                                  '!@ VENUS_{<something>} | VENUS_{<something>} ', 9, 3, 0, 2, 0, 0,
                                  'PLUTO', 38, 0, 6, 0, 1, 2,
                                  'NEP', 11, 0, 3, 1, 0, 0)
-
-
 
 percents_table <-
   summary_single_table %>%
@@ -28,9 +38,11 @@ rename_col <- function(){
   names(v) <- col_nm
   v
 }
+```
 
-latex_tab.options(sourcenotes.align = 'c')
-gt_table <- df  %>%
+```{r}
+
+df  %>%
   gt(rowname_col = 'grpname') %>%
   tab_stubhead(label = "TESTING") %>%
   cols_move_to_start(
@@ -74,9 +86,12 @@ gt_table <- df  %>%
       columns = starts_with('g_'))
   ) %>%
   cols_label(.list = rename_col()) %>%
-  tab_source_note(c('Source code: /file...', 'Source code: /file...'))
+  tab_source_note(
+    c(
+      paste0('Script code: ', knitr::current_input()),
+      paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+    )
+  ) %>%
+  as_latex()
 
-latex_table <- gt_table %>% as_latex() %>% as.character()
-
-
-readr::write_file(latex_table, 'integration_table_tests/latex_math_footnotes.tex')
+```

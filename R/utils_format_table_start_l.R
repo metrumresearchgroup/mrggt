@@ -72,10 +72,12 @@ sanitizeTikz <- function(latex_str){
 
 find_chr_length <- function(latex_str, fontsize){
   latex_str <- sanitizeTikz(latex_str)
-  cex = fontsize/12
+  cex <- fontsize/12
+  latex_packages <- paste0('\\usepackage{', latex_packages(), '}')
+
   out <- tryCatch(
     {
-    suppressMessages(tikzDevice:: getLatexStrWidth(latex_str, cex = cex)) *0.0352778
+    suppressMessages(tikzDevice::getLatexStrWidth(latex_str, cex = cex, packages = latex_packages)) *0.0352778
   },
   error=function(cond) {
     round(grid::convertWidth(grid::grobWidth(grid::textGrob(
@@ -94,7 +96,7 @@ type_setting <- function(type_size) {
     '9' = '\\scriptsize \n',
     '10' = '\\footnotesize \n',
     '11' = '\\small \n',
-    '12' = NA
+    '12' = "\n"
   )
   #browser()
   sizing_options[[as.character(type_size)]]
@@ -116,52 +118,86 @@ find_lengths <- function(data.element){
                         fontsize = x))
   }
 
+  # find the length of every element when font size = 12 pt and 11 pt
   lengths <-
     list(
       '11pt' = rlang::eval_tidy(func, list(x = 11)),
       '12pt' = rlang::eval_tidy(func, list(x = 12))
     )
 
+  # use 11 pt and 12 calculation to determine how length changes with decreasing pt. for each element
   lengths.slope <- slope(lengths$`11pt`,
                          lengths$`12pt`,
                          11,
                          12)
+
+  # assume linear relationship between pt. and output size.
+  # use d/dx to calculate the 5-10 pt sizes for each element
+  # (faster than using the tikzDevice for every single element at all pt sizes).
 
   lengths.addl <- purrr::map(5:10, ~ .x * lengths.slope)
   names(lengths.addl) <- paste0(5:10, 'pt')
   append(lengths.addl, lengths)
 }
 
+available_width_table <- function(number_columns){
+
+  # available width = page width - (left margin + right margin) - number of columns *column separation
+  # page width inverted for landscape orientation; first dimension is width in inches; 1 in -> 2.54 cm
+  full_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
+
+  # sum(margins in inches)*2.54 -> margin in cm
+  page_width <- full_width - sum(latex_cache$margin)*2.54
+
+  # 3pt col sep per col; 1 pt -> 0.0352778 cm;
+  page_width - 3*0.0352778*number_columns
+}
+
 lengths_tbl_summary <- function(lengths_tbl, pt_size) {
-  per_col.max <- apply(lengths_tbl, 2, max)
+  page_width <- available_width_table(dim(lengths_tbl)[2])
+
   list(
     lengths_tbl = lengths_tbl,
-    max = per_col.max,
-    total_size = sum(per_col.max),
-    fit.page = sum(per_col.max) < 17.6,
+    max = apply(lengths_tbl, 2, max),
+    total_size = sum(apply(lengths_tbl, 2, max)),
+    fit.page = sum(apply(lengths_tbl, 2, max)) < page_width,
     pt = as.numeric(gsub('pt', '', pt_size))
   )
 }
 
 optimize_excess <- function(required_column_widths){
+  ## if table width is less than avail page width
 
-  if(length(required_column_widths) == 1){
+  num_cols <- length(required_column_widths)
+
+  if(num_cols == 1){
     return(list(optimized = required_column_widths,
                 linebreaks = 0))
   }
 
-  full_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
-  page_width <- full_width - sum(latex_cache$margin)*2.54
+  page_width <- available_width_table(num_cols)
 
+  # max width the table needs to prevent line breaks
   table_width <- sum(required_column_widths)
+
+  # how much excess is on the page
   diff <- page_width - table_width
-  x0 <- rep(0, length(required_column_widths))
 
-  ub <- rep(diff, length(required_column_widths))
-  lb <- rep(0, length(required_column_widths))
+  # start with x0 = 0; leave all table widths unchanged
+  x0 <- rep(0, num_cols)
 
+  # the max you can add to any column = page_width - table_width
+  ub <- rep(diff, num_cols)
+
+  # the min you can add is 0 (leave unchanged)
+  lb <- rep(0, num_cols)
+
+  # objective is to minimize the standard deviation between the column widths
   OF <- function(x0,required_column_widths) {stats::sd(x0 + required_column_widths)}
+
+  # constrait sum(what is added to each column width) must be less than or equal to diff
   hin <- function(x0){diff - sum(x0)}
+
   params <- nloptr::slsqp(x0 = x0,
                           OF,
                           hin = hin,
@@ -170,23 +206,26 @@ optimize_excess <- function(required_column_widths){
                           required_column_widths = required_column_widths,
                           control = list(xtol_rel = 1e-10,
                                          maxeval = 100000))
-  #browser()
+
   list(optimized = params$par + required_column_widths,
        linebreaks = 0)
 }
 
 optimize_difference <- function(required_column_widths){
-  full_width <- latex_cache$pagewidth[[latex_cache$orient]][1]*2.54
-  page_width <- full_width - sum(latex_cache$margin)*2.54
+  ## if table width is greater than avail page width
 
+  num_cols <- length(required_column_widths)
+
+  page_width <- available_width_table(num_cols)
   table_width <- sum(required_column_widths)
+
   diff <- table_width - page_width
-  x0 <- rep(diff/length(required_column_widths), length(required_column_widths))
+  x0 <- rep(diff/num_cols, num_cols)
 
-  ub <- rep(diff, length(required_column_widths))
-  lb <- rep(0, length(required_column_widths))
+  ub <- rep(diff, num_cols)
+  lb <- rep(0, num_cols)
 
-  OF <- function(x0,required_column_widths) {stats::sd(required_column_widths - x0)}
+  OF <- function(x0, required_column_widths) {stats::sd(required_column_widths - x0)}
   heq <- function(x0){sum(x0) - diff}
 
   params <- nloptr::slsqp(x0 = x0,
@@ -237,8 +276,7 @@ calculate_best <- function(data_rows, collabels){
   }
 
   tbl_cache$font_size <- best[[1]]$pt
-  list(type_size = type_setting(best[[1]]$pt),
-       header = fmt_header_latex(best[[1]]$optimized))
+  fmt_header_latex(best[[1]]$optimized)
 }
 
 fmt_header_latex <- function(sizing_columns){

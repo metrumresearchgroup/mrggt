@@ -1,0 +1,59 @@
+---
+title: "Latex Font Color Example"
+output:
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+library('tidyverse')
+library('mrggt')
+```
+
+
+```{r}
+tbl_colored <- dplyr::tribble( ~grpname, ~count, ~color,
+                               'apple', 1, 'red',
+                               'banana', 2, 'yellow',
+                               'grape', 3, 'purple',
+                               'pear', 4, 'green',
+                               'orange', 5, 'orange')
+
+gt(data = tbl_colored) %>%
+  tab_style(
+    style = cell_text(color = "#ffcccb"),
+    locations = cells_body(columns = everything(),
+                           rows = startsWith(grpname, 'a'))
+  ) %>%
+  tab_style(
+    style = cell_text(color = "#ffffed"),
+    locations = cells_body(columns = everything(),
+                           rows = startsWith(grpname, 'b'))
+  ) %>%
+  tab_style(
+    style = cell_text(color = "#b19cd9"),
+    locations = cells_body(columns = everything(),
+                           rows = startsWith(grpname, 'g'))
+  ) %>%
+  tab_style(
+    style = cell_text(color = "#90ee90"),
+    locations = cells_body(columns = everything(),
+                           rows = startsWith(grpname, 'p'))
+  ) %>%
+  tab_style(
+    style = cell_text(color = "#fed8b1"),
+    locations = cells_body(columns = everything(),
+                           rows = startsWith(grpname, 'o'))
+  ) %>%
+  cols_label(.list = list(
+    grpname = 'Fruit',
+    count = 'Total',
+    color = 'Color'
+  )) %>%
+  tab_source_note(
+    c(
+      paste0('Script code: ', knitr::current_input()),
+      paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+    )
+  ) %>%
+  as_latex() 

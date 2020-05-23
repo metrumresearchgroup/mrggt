@@ -199,7 +199,7 @@ test_that("latex preset font sizing", {
 
   #Expect a fixed pattern
   #only fontsize in banana row has been changed
-  expect_equal(length(unlist(gregexpr('\\footnotesize', tbl_gt, fixed = TRUE))), 3)
+  expect_equal(length(unlist(gregexpr('\\footnotesize', tbl_gt, fixed = TRUE))), 4)
 
 
   tbl_gt <-
@@ -347,3 +347,97 @@ test_that("latex colored font styling", {
   expect_false(grepl('\\textcolor{d3d3d3}{yellow}', tbl_gt, fixed = TRUE))
 }
 )
+
+test_that("latex cell_text align", {
+
+  tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
+                               'apple', 1, 'red',
+                               'banana', 2, 'yellow',
+                               'grape', 3, 'purple',
+                               'pear', 4, 'green',
+                               'orange', 5, 'orange')
+
+  # Create a `tbl_latex` object with `gt()`; this table
+  # 'red' under color should be center aligned
+  tbl_gt <-
+    gt(data = tbl_fruit) %>%
+    tab_style(
+      style = cell_text(align = "center"),
+      locations = cells_body(
+        columns = vars(color),
+        rows = c(1)
+      )
+    ) %>%
+    as_latex() %>%
+    as.character()
+
+  #Expect a fixed pattern
+  #'red' should be centered
+  expect_true(grepl('\\multicolumn{1}{c}{red}', tbl_gt, fixed = TRUE))
+
+})
+
+test_that("latex cell_text align", {
+
+  tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
+                               'apple', 1, 'red',
+                               'banana', 2, 'yellow',
+                               'grape', 3, 'purple',
+                               'pear', 4, 'green',
+                               'orange', 5, 'orange')
+
+  # Create a `tbl_latex` object with `gt()`; this table
+  # 'red' should be center aligned
+  tbl_gt <-
+    gt(data = tbl_fruit) %>%
+    tab_style(
+      style = cell_text(align = "center"),
+      locations = cells_body(
+        columns = vars(color),
+        rows = c(1)
+      )
+    ) %>%
+    as_latex() %>%
+    as.character()
+
+  #Expect a fixed pattern
+  #'red' should be centered
+  expect_true(grepl('\\multicolumn{1}{c}{red}', tbl_gt, fixed = TRUE))
+
+  # Create a `tbl_latex` object with `gt()`; this table
+  # 'yellow' should be left aligned
+  tbl_gt <-
+    gt(data = tbl_fruit) %>%
+    tab_style(
+      style = cell_text(align = "left"),
+      locations = cells_body(
+        columns = vars(color),
+        rows = c(2)
+      )
+    ) %>%
+    as_latex() %>%
+    as.character()
+
+  #Expect a fixed pattern
+  #'red' should be centered
+  expect_true(grepl('\\multicolumn{1}{l}{yellow}', tbl_gt, fixed = TRUE))
+
+  # Create a `tbl_latex` object with `gt()`; this table
+  # 'purple' should be right aligned
+  tbl_gt <-
+    gt(data = tbl_fruit) %>%
+    tab_style(
+      style = cell_text(align = "right"),
+      locations = cells_body(
+        columns = vars(color),
+        rows = c(3)
+      )
+    ) %>%
+    as_latex() %>%
+    as.character()
+
+  #Expect a fixed pattern
+  #'red' should be centered
+  expect_true(grepl('\\multicolumn{1}{r}{purple}', tbl_gt, fixed = TRUE))
+
+})

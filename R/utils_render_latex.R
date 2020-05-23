@@ -1,7 +1,7 @@
 
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
-  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage" )
+  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage", 'threeparttablex')
 }
 
 # If the `rmarkdown` package is available, use the
@@ -14,9 +14,8 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
     lapply(latex_packages(), rmarkdown::latex_dependency)
 
   if(!shrink){
-    latex_packages[[4]]$extra_lines <- c('\\setlength{\\LTright}{\\LTleft}',
-                                         '\\setlength\\LTright{0pt plus 1fill minus 1fill}',
-                                         paste0("\\setlength\\LTcapwidth{", tbl_cache$tbl_width, "cm}"))
+    latex_packages[[4]]$extra_lines <- c("\\setlength{\\LTleft}{0pt plus 1fill minus 1fill}",
+                                         "\\setlength{\\LTright}{\\LTleft}")
   }
 
   latex_packages[[3]]$options <- c('singlelinecheck=off')
@@ -33,6 +32,7 @@ if (requireNamespace("rmarkdown", quietly = TRUE)) {
                                         '\\addtolength{\\vfoot}{\\textheight}%',
                                         '\\addtolength{\\vfoot}{\\footskip}%',
                                         '\\raisebox{\\hfoot}[0pt][0pt]{\\rlap{\\hspace{\\vfoot}\\rotatebox[origin=cB]{90}{\\thepage}}}\\fi}')
+  latex_packages[[14]]$extra_lines <- c('\\def\\settotextwidth{\\renewcommand\\TPTminimum{\\textwidth}}')
 
 } else {
   latex_packages <- NULL
@@ -67,6 +67,12 @@ latex_heading_row <- function(content) {
 
   paste0(
     paste(paste(content, collapse = " & "), "\\\\ \n"),
+    "\\endfirsthead\n",
+    "\\endhead\n",
+    "\\bottomrule\n",
+    "\\addlinespace\n",
+    "\\insertTableNotes\n",
+    "\\endlastfoot\n",
     "\\midrule\n",
     collapse = "")
 }
@@ -89,16 +95,11 @@ latex_group_row <- function(group_name,
 #' @noRd
 create_table_start_l <- function(data){
   header <- calc_column_width_l(data = data)
-  separation <- '\\setlength{\\tabcolsep}{2pt}\n'
-  if(is.na(header$type_size)){
-    separation <- '\\setlength{\\tabcolsep}{3pt}\n'
-    header$type_size <- ''
-  }
+  separation <- '\\setlength{\\tabcolsep}{3pt}\n'
   paste0(
-    header$type_size,
     separation,
-    '\\captionsetup[table]{labelformat=empty,skip=0pt}\n',
-    header$header
+    '\\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\\textwidth}\n',
+    header
   )
 }
 
@@ -320,7 +321,7 @@ create_table_end_l <- function() {
 
   paste0(
     "\\end{longtable}\n",
-    collapse = "")
+    "\\end{ThreePartTable}\n")
 }
 
 #' @noRd
@@ -377,38 +378,77 @@ create_footnotes_component_l <- function(data) {
 }
 
 #' @noRd
-create_source_note_component_l <- function(data) {
+create_source_foot_note_component_l <- function(data) {
 
-  source_note <- dt_source_notes_get(data = data)
+  footnotes_tbl <- dt_footnotes_get(data = data)
+  opts_df <- dt_options_get(data = data)
 
   # If the `footnotes_resolved` object has no
   # rows, then return an empty footnotes component
-  if (length(source_note) == 0) {
-    return("")
+  if (nrow(footnotes_tbl) != 0) {
+
+  footnotes_tbl <-
+    footnotes_tbl %>%
+    dplyr::select(fs_id, footnotes) %>%
+    dplyr::distinct()
+
+  # Get the separator option from `opts_df`
+  separator <-
+    opts_df %>%
+    dplyr::filter(parameter == "footnotes_sep") %>%
+    dplyr::pull(value)
+
+  # Convert an HTML break tag to a Latex line break
+  separator <-
+    separator %>%
+    tidy_gsub("<br\\s*?(/|)>", "\\newline") %>%
+    tidy_gsub("&nbsp;", " ")
+
+  footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
+                       footnotes_tbl[["footnotes"]] %>%
+                         unescape_html() %>%
+                         markdown_to_latex())
+
+  footnotes <- paste(paste0('\\item ',
+                      footnotes,
+                      '\n'),
+                     collapse = '')
+  } else {
+
+    footnotes <- NULL
+
   }
 
-  srcnote_size <- round(max(purrr::map_dbl(source_note,
-                                            find_chr_length,
-                                            fontsize = tbl_cache$font_size)), 2)
+  source_note <- dt_source_notes_get(data = data)
 
 
+  # If the `footnotes_resolved` object has no
+  # rows, then return an empty footnotes component
+  if (length(source_note) != 0) {
 
-  srcnotes <- paste(paste0(source_note, ' \\\\ \n'),
-                    collapse = '')
+    source_note <- paste(paste0('\\item ',
+                              source_note,
+                              '\n'),
+                       collapse = '')
+  } else {
 
-  # Create the source notes block
-  minip <- paste0("\\begin{minipage}[t]{", srcnote_size, "cm}\n")
+    source_note <- NULL
 
-  vspace <- "\\vspace{2mm}\n"
+  }
 
-  align <- '\\centering\n'
+  size <- type_setting(tbl_cache$font_size)
+  full_cap <-  paste0(
+      '\\begin{ThreePartTable}\n',
+      size,
+      '\\settotextwidth',
+      '\\begin{TableNotes}\n',
+      '\\centering\n',
+      '\\footnotesize\n',
+      footnotes,
+      '\\item\n',
+      source_note,
+      '\\end{TableNotes}\n'
+    )
 
-  minipend <- "\\end{minipage}\n"
-
-  source_note_component <- paste0(minip,
-                                  vspace,
-                                  align,
-                                  srcnotes,
-                                  minipend)
-  source_note_component
+  return(full_cap)
 }
