@@ -3,6 +3,7 @@
 ^pkgdown$
 ^\.github$
 ^\.travis\.yml$
+^\.drone\.yml$
 ^_pkgdown\.yml$
 ^appveyor\.yml$
 ^codecov\.yml$
