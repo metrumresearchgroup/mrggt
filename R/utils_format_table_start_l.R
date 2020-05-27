@@ -31,7 +31,7 @@ get_data_rows_l <- function(data) {
     split(body_content, ceiling(seq_along(body_content) / n_cols))
   data_rows <-
     do.call(rbind, lapply(row_splits, function(x)
-      as.data.frame(t(x))))
+      as.matrix(t(x))))
   data_rows
 }
 
@@ -48,43 +48,12 @@ get_collabels_l <- function(data) {
   collabels
 }
 
-sanitizeTikz <- function(latex_str){
-
-  sanitize_list <- list(c("\\multicolumn{1}{l}", ''),
-                        c("\\multicolumn{1}{c}", ''),
-                        c("\\multicolumn{1}{r}", ''))
-
-  if(length(tbl_cache$color) != 0){
-
-    color_list <- append(purrr::map(tbl_cache$color, ~ c(paste0('\\cellcolor{',.x, '}'), '')),
-                         purrr::map(tbl_cache$color, ~ c(paste0('\\textcolor{',.x, '}'), '')))
-
-    sanitize_list <- append(sanitize_list,
-                            color_list)
-  }
-
-  sanitize_list <- append(sanitize_list,
-                          list(c('\\checkmark', 'V')))
-
-  gsub_multiple(latex_str, sanitize_list)
-
-}
-
-find_chr_length <- function(latex_str, fontsize){
-  latex_str <- sanitizeTikz(latex_str)
-  cex <- fontsize/12
-  latex_packages <- paste0('\\usepackage{', latex_packages(), '}')
-
-  out <- tryCatch(
-    {
-    suppressMessages(tikzDevice::getLatexStrWidth(latex_str, cex = cex, packages = latex_packages)) *0.0352778
-  },
-  error=function(cond) {
-    round(grid::convertWidth(grid::grobWidth(grid::textGrob(
-      latex_str, gp = grid::gpar(fontsize = fontsize))), 'cm'), 2) %>% as.double()
-  }
-    )
- out
+sanitize_for_sizing <- function(tbl_matrix){
+  rgx <- "(^\\\\multicolumn\\{\\d{1}\\}\\{(?:l|r|c)\\}{1}\\{)"
+  rgx2 <- "((?:\\}$|\\}\\s+$))"
+  has_mulitcolumn <- tbl_matrix[grepl(rgx, tbl_matrix)]
+  tbl_matrix[grepl(rgx, tbl_matrix)] <- gsub(rgx2, '', gsub(rgx, '', has_mulitcolumn))
+  tbl_matrix
 }
 
 type_setting <- function(type_size) {
@@ -106,24 +75,68 @@ slope <- function(y2, y1, x2, x1){
   (y2-y1)/(x2-x1)
 }
 
-find_lengths <- function(data.element){
-  func <- quote(purrr::map_dbl(data.element,
-                               find_chr_length,
-                               fontsize = x))
 
-  if(!is.null(dim(data.element))){
-    func <- quote(apply(data.element,
-                        c(1, 2),
-                        find_chr_length,
-                        fontsize = x))
-  }
+create_log_file <- function(tex_str){
+  tmp <- tempfile(fileext = '.tex')
+  readr::write_file(tex_str, tmp)
+  withr::with_dir(dirname(tmp), {
+    tmp_rendered <- tinytex::latexmk(basename(tmp), engine = 'pdflatex', clean = FALSE)
+    log_file <- normalizePath(paste0(tools::file_path_sans_ext(tmp_rendered), '.log'))
+  })
+  log_file
+}
+
+create_tex_width_file <- function(tbl_matrix){
+  elements <- as.vector(tbl_matrix)
+  keys <- paste0("\\", stringi::stri_rand_strings(length(elements),
+                                                  7,
+                                                  pattern = "[A-Za-z]"))
+
+  vars_summary <- list(var_declarations = paste0("\\newlength{", keys, "} \n"),
+                       var_assignments = paste0("\\settowidth{", keys, "}{", elements, "} \n"),
+                       var_output =  paste0("\\message{^^J\\the", keys, "} \n"))
+
+  vars_summary <- purrr::map(vars_summary,
+                             paste,
+                             collapse = '')
+
+  vars_summary$color_declarations <- tbl_cache$color_def
+  create_log_file(whisker::whisker.render(latex_cache$calc_template,
+                                          vars_summary))
+}
+
+
+parse_tex <- function(tbl_matrix){
+  log_file <- create_tex_width_file(tbl_matrix)
+  tex_lines <- readr::read_lines(log_file)
+
+  rangev <- mapply(`:`,
+                   which(grepl('BEGINWIDTHS=', tex_lines)),
+                   which(grepl('ENDWIDTHS=', tex_lines)),
+                   SIMPLIFY = FALSE)
+
+  nrows <- dim(tbl_matrix)[1]
+  sizes <- lapply(rangev, function(x){
+    # perfect latex this looks like:
+    size <-
+      unlist(stringr::str_extract_all(
+        paste(tex_lines[x], collapse = ' '),
+        "([+-]?(?:\\d*\\.)?\\d+\\w?pt)"
+      ))
+
+    matrix(as.numeric(gsub('pt', '', size))*0.0352778,
+           nrow = nrows)
+  })
+
+  names(sizes) <- c('11pt', '12pt')
+  sizes
+}
+
+find_lengths <- function(tbl_matrix){
+  tbl_matrix_clean <- sanitize_for_sizing(tbl_matrix)
 
   # find the length of every element when font size = 12 pt and 11 pt
-  lengths <-
-    list(
-      '11pt' = rlang::eval_tidy(func, list(x = 11)),
-      '12pt' = rlang::eval_tidy(func, list(x = 12))
-    )
+  lengths <- parse_tex(tbl_matrix_clean)
 
   # use 11 pt and 12 calculation to determine how length changes with decreasing pt. for each element
   lengths.slope <- slope(lengths$`11pt`,
@@ -260,15 +273,17 @@ rank_options <- function(option){
     rank_pt <- rank_pt - 2
   }
   option$rank <- rank_pt - option$linebreaks
+  if(option$linebreaks == 0){
+    option$rank = option$rank + 1
+  }
   option
 }
 
 calculate_best <- function(data_rows, collabels){
-  length.labels <- find_lengths(collabels)
-  length.data <- find_lengths(data_rows)
-  length.full <- purrr::map2(length.labels, length.data, ~ rbind(.x, .y))
-  length.summary <- purrr::map2(length.full, names(length.full), lengths_tbl_summary)
-  optimized_lengths <- purrr::map(length.summary, optimize_options)
+  tbl_matrix <- rbind(collabels, data_rows)
+  tbl_matrix_lengths <- find_lengths(tbl_matrix)
+  length_summary <- purrr::map2(tbl_matrix_lengths, names(tbl_matrix_lengths), lengths_tbl_summary)
+  optimized_lengths <- purrr::map(length_summary, optimize_options)
   ranked <- purrr::map(optimized_lengths, rank_options)
   best <- ranked[purrr::map_dbl(ranked, ~.x$rank) == max(purrr::map_dbl(ranked, ~.x$rank))]
   if(length(best) > 1){
