@@ -14,9 +14,6 @@ prices in USD; the \code{close} price is adjusted for splits}
 \item{adj_close}{The close price adjusted for both dividends and splits}
 }
 }
-\source{
-Data collected from \url{https://finance.yahoo.com/quote/\\\\\%5EGSPC/history/}.
-}
 \usage{
 sp500
 }
@@ -27,7 +24,7 @@ companies and captures about 80\\% coverage of available market capitalization.
 }
 \section{Function ID}{
 
-10-4
+11-4
 }
 
 \examples{

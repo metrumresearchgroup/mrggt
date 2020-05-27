@@ -100,7 +100,7 @@ argument. See the Arguments section for more information on this.
 }
 \section{Figures}{
 
-\if{html}{\figure{man_fmt_percent_1.svg}{options: width=100\%}}
+\if{html}{\figure{man_fmt_percent_1.png}{options: width=100\%}}
 }
 
 \section{Function ID}{
@@ -116,7 +116,7 @@ tab_1 <-
   pizzaplace \%>\%
   dplyr::mutate(month = as.numeric(substr(date, 6, 7))) \%>\%
   dplyr::group_by(month) \%>\%
-  dplyr::summarize(pizzas_sold = n()) \%>\%
+  dplyr::summarize(pizzas_sold = dplyr::n()) \%>\%
   dplyr::ungroup() \%>\%
   dplyr::mutate(frac_of_quota = pizzas_sold / 4000) \%>\%
   gt(rowname_col = "month") \%>\%

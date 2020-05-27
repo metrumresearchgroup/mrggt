@@ -25,5 +25,6 @@ gt(data = iris) %>%
     subtitle = md("[All about *Iris setosa*, *versicolor*, and *virginica*]")
   ) %>%
   tab_source_note(
-    source_note = md("The data were collected by *Anderson* (1935)."))
+    source_note = md("The data were collected by *Anderson* (1935).")
+  )
 ```
