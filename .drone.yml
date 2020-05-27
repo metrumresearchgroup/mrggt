@@ -3,7 +3,7 @@ type: docker
 name: mrggt
 
 steps:
-- name: Pull mpn container from ECR
+- name: container-pull
   image: omerxx/drone-ecr-auth
   volumes:
   - name: docker.sock
@@ -21,7 +21,8 @@ steps:
   - /opt/R/3.6.3/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/3.6.3/bin/R -e "devtools::test()"
   - /opt/R/3.6.3/bin/R -e "devtools::check()"
-
+  depends_on:
+  - container-pull
 
 - name: R40
   image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
@@ -32,6 +33,8 @@ steps:
   - /opt/R/4.0.0/bin/R -e "devtools::install_deps(upgrade = 'never')"
   - /opt/R/4.0.0/bin/R -e "devtools::test()"
   - /opt/R/4.0.0/bin/R -e "devtools::check()"
+  depends_on:
+  - container-pull
 
 - name: release
   when:
