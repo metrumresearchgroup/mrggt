@@ -6,9 +6,11 @@ latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
                               'landscape' = c(11.0, 8.5))
 latex_cache$papersize <- 'letter'
 latex_cache$orient <- 'portrait'
+latex_cache$calc_template <- "\\documentclass[12pt]{article}\n\\usepackage{calc}\n\\usepackage{amsmath}\n\\usepackage{booktabs}\n\\usepackage{caption}[singlelinecheck=off]\n\\usepackage{longtable}\n\\usepackage{xcolor}\n\\usepackage{amssymb}\n\\usepackage{color}\n\\usepackage{colortbl}\n\\usepackage{array}\n\\usepackage{mathptmx}\n\\usepackage{tikz}\n\n\\begin{document}\n\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n\\newlinechar=`\\^^J\n\n{{color_declarations}}\n\n\\newenvironment{localsize}[1]\n{%\n  \\clearpage\n  \\let\\orignewcommand\\newcommand\n  \\let\\newcommand\\renewcommand\n  \\makeatletter\n  \\input{size#1.clo}%\n  \\makeatother\n  \\let\\newcommand\\orignewcommand\n}\n{%\n  \\clearpage\n}\n\n{{var_declarations}}\n\n\\begin{localsize}{11}\n{{var_assignments}}\n\\message{^^JBEGINWIDTHS=11PT}\n{{var_output}}\n\\message{^^JENDWIDTHS=11PT^^J}\n\\end{localsize}\n\n\n\\begin{localsize}{12}\n{{var_assignments}}\n\\message{^^JBEGINWIDTHS=12PT}\n{{var_output}}\n\\message{^^JENDWIDTHS=12PT^^J}\n\\end{localsize}\n\n\\end{document}\n"
 
 ### settings per table- reset every time as_latex is run
 tbl_cache <- new.env(parent = emptyenv())
+tbl_cache$color_def <- NULL
 tbl_cache$color <- c()
 tbl_cache$font_size <- 0
 tbl_cache$tbl_width <- 0
@@ -16,6 +18,7 @@ tbl_cache$tbl_width <- 0
 # reset tbl_cache
 reset_tbl_cache <- function() {
   tbl_cache$color <- c()
+  tbl_cache$color_def <- NULL
   tbl_cache$font_size <- 0
   tbl_cache$tbl_width <- 0
 }

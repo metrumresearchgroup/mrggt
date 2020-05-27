@@ -372,7 +372,7 @@ as_latex <- function(data) {
 
   #Create a LaTeX fragment that defines the possible colors being used in table
   styles_tbl <- dt_styles_get(data = data)
-  color_def <- define_colors_latex(styles_tbl)
+  tbl_cache$color_def <- define_colors_latex(styles_tbl)
 
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
@@ -398,10 +398,9 @@ as_latex <- function(data) {
 
   latex_packages <- create_knit_meta()
 
-  reset_tbl_cache()
   # Compose the LaTeX table
   tex <- paste0(
-    color_def,
+    tbl_cache$color_def,
     src_foot_component,
     table_start,
     heading_component,
@@ -424,6 +423,8 @@ as_latex <- function(data) {
   } else {
     knit_asis <- tex %>% knitr::asis_output(meta = latex_packages)
   }
+
+  reset_tbl_cache()
   knit_asis
 }
 

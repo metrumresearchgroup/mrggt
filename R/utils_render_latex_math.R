@@ -23,7 +23,8 @@ sanitize_tex.default <- function(x) {
   sanitize <- list(c('%', '\\%'),
                    c('CHECKMARK', '\\checkmark'),
                    c('>', '$>$'),
-                   c('<', '$<$'))
+                   c('<', '$<$'),
+                   c('\u00B1', '$\\pm$'))
 
   gsub_multiple(x, sanitize)
 }
@@ -40,7 +41,8 @@ sanitize_tex.math <- function(x) {
     c('CHECKMARK',
       '\\text{\\checkmark}'),
     c('%', '\\%'),
-    c('|', '\\vert')
+    c('|', '\\vert'),
+    c('\u00B1', '$\\pm$')
   )
 
   vect <- vect[!is.na(vect)]
