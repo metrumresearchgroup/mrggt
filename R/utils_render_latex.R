@@ -1,10 +1,10 @@
 
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
-  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage", 'threeparttablex')
+  c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage", "threeparttablex")
 }
 
-# If the `rmarkdown` package is available, use the
+# If the rmarkdown package is available, use the
 # `latex_dependency()` function to load latex packages
 # without requiring the user to do so
 create_knit_meta <- function(shrink = FALSE){
@@ -318,64 +318,11 @@ create_body_component_l <- function(data) {
 
 #' @noRd
 create_table_end_l <- function() {
-
   paste0(
     "\\end{longtable}\n",
     "\\end{ThreePartTable}\n")
 }
 
-#' #' @noRd
-#' create_footnotes_component_l <- function(data) {
-#'
-#'   footnotes_tbl <- dt_footnotes_get(data = data)
-#'   opts_df <- dt_options_get(data = data)
-#'
-#'   # If the `footnotes_resolved` object has no
-#'   # rows, then return an empty footnotes component
-#'   if (nrow(footnotes_tbl) == 0) {
-#'     return("")
-#'   }
-#'
-#'   footnotes_tbl <-
-#'     footnotes_tbl %>%
-#'     dplyr::select(fs_id, footnotes) %>%
-#'     dplyr::distinct()
-#'
-#'   # Get the separator option from `opts_df`
-#'   separator <-
-#'     opts_df %>%
-#'     dplyr::filter(parameter == "footnotes_sep") %>%
-#'     dplyr::pull(value)
-#'
-#'   # Convert an HTML break tag to a Latex line break
-#'   separator <-
-#'     separator %>%
-#'     tidy_gsub("<br\\s*?(/|)>", "\\newline") %>%
-#'     tidy_gsub("&nbsp;", " ")
-#'
-#'
-#'   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
-#'                        footnotes_tbl[["footnotes"]] %>%
-#'                          unescape_html() %>%
-#'                          markdown_to_latex())
-#'
-#'   footnote_size <- round(max(purrr::map_dbl(footnotes,
-#'                                             find_chr_length,
-#'                                             fontsize = tbl_cache$font_size)), 2)
-#'
-#'   minip <- paste0("\\begin{minipage}[t]{",
-#'                   footnote_size,
-#'                   "cm}\n")
-#'
-#'   vspace <- "\\vspace{2mm}\n"
-#'
-#'   footnotes <- paste(paste0(footnotes, " \\\\ \n"),
-#'                      collapse = '')
-#'   paste0(minip,
-#'          vspace,
-#'          footnotes,
-#'          "\\end{minipage}\n")
-#' }
 
 #' @noRd
 create_source_foot_note_component_l <- function(data) {
