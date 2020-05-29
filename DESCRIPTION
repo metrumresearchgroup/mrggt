@@ -129,4 +129,5 @@ Collate:
     'utils_render_latex.R'
     'utils_render_latex_math.R'
     'utils_render_rtf.R'
+    'utils_save_latex.R'
     'zzz.R'

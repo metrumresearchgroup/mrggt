@@ -2,8 +2,7 @@
 gsub_multiple <- function(x, substitues) {
   subs <- purrr::map(substitues, ~ list(
     pattern = .x[1],
-    replacement = .x[2],
-    fixed = TRUE
+    replacement = .x[2]
   ))
 
   purrr::reduce(subs,
@@ -20,11 +19,11 @@ sanitize_tex <- function (x) {
 
 #' @noRd
 sanitize_tex.default <- function(x) {
-  sanitize <- list(c('%', '\\%'),
-                   c('CHECKMARK', '\\checkmark'),
-                   c('>', '$>$'),
-                   c('<', '$<$'),
-                   c('\u00B1', '$\\pm$'))
+  sanitize <- list(c("(\\\\+%)", "\\\\%"),
+                   c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
+                   c('>', '\\$>\\$'),
+                   c('<', '\\$<\\$'),
+                   c('\u00B1', '\\$\\\\pm\\$'))
 
   gsub_multiple(x, sanitize)
 }
@@ -32,18 +31,15 @@ sanitize_tex.default <- function(x) {
 #' @noRd
 sanitize_tex.math <- function(x) {
   vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract = TRUE))
-  sanitize <- list(
-    c('!@', ''),
-    c('*', '\\'),
-    c('\\_', '_'),
-    c('\\{', '{'),
-    c('\\}', '}'),
-    c('CHECKMARK',
-      '\\text{\\checkmark}'),
-    c('%', '\\%'),
-    c('|', '\\vert'),
-    c('\u00B1', '$\\pm$')
-  )
+  sanitize <- list(c("(\\\\+%)", "\\\\%"),
+                   c('!@', ''),
+                   c('\\*', '\\\\'),
+                   c("(\\\\_)", '\\_'),
+                   c("(\\\\+\\{)", '\\{'),
+                   c("(\\\\+\\})", '\\}'),
+                   c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
+                   c("\\|", '\\\\vert'),
+                   c('\u00B1', '\\$\\\\pm\\$'))
 
   vect <- vect[!is.na(vect)]
   if (length(vect) > 0) {
@@ -51,7 +47,7 @@ sanitize_tex.math <- function(x) {
                        mapply(
                          c,
                          paste0('<', vect, '>'),
-                         paste0('\\text{', vect, '}'),
+                         paste0('\\\\text\\{', vect, '\\}'),
                          SIMPLIFY = F,
                          USE.NAMES = FALSE
                        ))

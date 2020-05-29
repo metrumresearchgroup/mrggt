@@ -134,6 +134,10 @@ utf8_aware_sub <- NULL
   registerS3method("as.tex_math", "default", "as.tex_math.default")
   registerS3method("as.tex_math", "math", "as.tex_math.math")
   registerS3method("as.list", "math", "as.tex_math.math")
+  registerS3method("preamble", "knit_asis", "preamble.knit_asis")
+  registerS3method("save_latex", "knit_asis", "save_latex.knit_asis")
+  registerS3method("save_latex", "preamble", "save_latex.preamble")
+
 
   op <- options()
   toset <- !(names(gt_default_options) %in% names(op))
