@@ -188,6 +188,11 @@ test_that("a gt table can use UTF-8 chars in any system locale", {
       "C", "POSIX"
     )
 
+  # Intersect the vector of available locales (on a given test system)
+  # with the `system_locales` vector
+  available_locales <- system("locale -a", intern = TRUE)
+  system_locales <- intersect(system_locales, available_locales)
+
   names_df <-
     data.frame(
       first = c("\u6625", "Fred"),
@@ -487,6 +492,20 @@ test_that("The `gt()` groupname_col arg will override any grouped data", {
     )
 })
 
+test_that("The `gt()` `id` arg will only accept specific inputs", {
+
+  # Expect no errors with valid inputs to `id`
+  expect_error(regexp = NA, exibble %>% gt())
+  expect_error(regexp = NA, exibble %>% gt(id = NULL))
+  expect_error(regexp = NA, exibble %>% gt(id = "sldfjlds"))
+  expect_error(regexp = NA, exibble %>% gt(id = "23947294"))
+
+  # Expect errors when `id` isn't a length 1 character vector or is NA
+  expect_error(exibble %>% gt(id = 23))
+  expect_error(exibble %>% gt(id = c("one", "two")))
+  expect_error(exibble %>% gt(id = NA))
+})
+
 test_that("The `gt()` `rowname_col` arg will be overridden by `rownames_to_stub = TRUE`", {
 
   # Create a gt object where rownames will be used as
@@ -622,4 +641,32 @@ test_that("The `rowname` column will be safely included when `rownames_to_stub =
         "2018-01-01 02:22", "49.950", "row_1", "grp_a", "test"
       )
     )
+})
+
+test_that("Any shared names in `rowname_col` and `groupname_col` will be disallowed", {
+
+  # Expect an error if there are any shared names across `rowname_col`
+  # and `groupname_col`
+  expect_error(
+    exibble %>%
+      gt(rowname_col = "row", groupname_col = "row")
+  )
+  expect_error(
+    exibble %>%
+      gt(rowname_col = "group", groupname_col = "group")
+  )
+  expect_error(
+    exibble %>%
+      gt(rowname_col = "rowname", groupname_col = "rowname")
+  )
+  expect_error(
+    exibble %>%
+      dplyr::group_by(group) %>%
+      gt(rowname_col = "group")
+  )
+  expect_error(
+    exibble %>%
+      dplyr::group_by(date, row) %>%
+      gt(rowname_col = "row")
+  )
 })

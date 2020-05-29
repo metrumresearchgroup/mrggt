@@ -83,6 +83,7 @@ globalVariables(
     "rowname",
     "scss",
     "selector",
+    "style",
     "text_col",
     "time",
     "type",
@@ -109,6 +110,12 @@ gt_default_options <- list(
   gt.html_tag_check = TRUE
 )
 
+# R 3.5 and earlier have a bug on Windows where if x is latin1 or unknown and
+# replacement is UTF-8, the UTF-8 bytes are inserted into the result but the
+# result is not marked as UTF-8.
+# Example: gsub("a", "\u00B1", "a", fixed = TRUE)
+utf8_aware_sub <- NULL
+
 .onLoad <- function(libname, pkgname, ...) {
 
   register_s3_method("knitr", "knit_print", "gt_tbl")
@@ -127,10 +134,16 @@ gt_default_options <- list(
   registerS3method("as.tex_math", "default", "as.tex_math.default")
   registerS3method("as.tex_math", "math", "as.tex_math.math")
   registerS3method("as.list", "math", "as.tex_math.math")
+  registerS3method("preamble", "knit_asis", "preamble.knit_asis")
+  registerS3method("save_latex", "knit_asis", "save_latex.knit_asis")
+  registerS3method("save_latex", "preamble", "save_latex.preamble")
+
 
   op <- options()
   toset <- !(names(gt_default_options) %in% names(op))
   if (any(toset)) options(gt_default_options[toset])
+
+  utf8_aware_sub <<- identical("UTF-8", Encoding(sub(".", "\u00B1", ".", fixed = TRUE)))
 
   invisible()
 }

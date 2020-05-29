@@ -40,7 +40,7 @@
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_align_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_align_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -137,8 +137,9 @@ cols_align <- function(data,
 #' # Use `exibble` to create a gt table;
 #' # with named arguments in `...`, we
 #' # can specify the exact widths for
-#' # table columns (using `TRUE` will
-#' # capture all remaining columns)
+#' # table columns (using `everything()`
+#' # or `TRUE` at the end will capture
+#' # all remaining columns)
 #' tab_1 <-
 #'   exibble %>%
 #'   dplyr::select(
@@ -150,11 +151,11 @@ cols_align <- function(data,
 #'     vars(num) ~ px(150),
 #'     ends_with("r") ~ px(100),
 #'     starts_with("date") ~ px(200),
-#'     TRUE ~ px(60)
+#'     everything() ~ px(60)
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_width_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_width_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -305,9 +306,9 @@ cols_width <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_label_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_label_1.png}{options: width=100\%}}
 #'
-#' \if{html}{\figure{man_cols_label_2.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_label_2.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -419,9 +420,9 @@ cols_label <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_move_to_start_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_move_to_start_1.png}{options: width=100\%}}
 #'
-#' \if{html}{\figure{man_cols_move_to_start_2.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_move_to_start_2.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -512,9 +513,9 @@ cols_move_to_start <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_move_to_end_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_move_to_end_1.png}{options: width=100\%}}
 #'
-#' \if{html}{\figure{man_cols_move_to_end_2.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_move_to_end_2.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -598,7 +599,7 @@ cols_move_to_end <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_move_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_move_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -720,9 +721,9 @@ cols_move <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_hide_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_hide_1.png}{options: width=100\%}}
 #'
-#' \if{html}{\figure{man_cols_hide_2.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_hide_2.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -797,6 +798,11 @@ cols_hide <- function(data,
 #' @param col_uncert A single column name that contains the uncertainty values.
 #'   These values will be combined with those in `col_val`. We have the option
 #'   to automatically hide the `col_uncert` column through `autohide`.
+#' @param sep The separator text that contains the uncertainty mark. The
+#'   default value of `" +/- "` indicates that an appropriate plus/minus mark
+#'   will be used depending on the output context. Should you want this special
+#'   symbol to be taken literally, it can be supplied within the base [I()]
+#'   function.
 #' @param autohide An option to automatically hide the column specified as
 #'   `col_uncert`. Any columns with their state changed to hidden will behave
 #'   the same as before, they just won't be displayed in the finalized table.
@@ -828,7 +834,7 @@ cols_hide <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_merge_uncert_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_merge_uncert_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -839,21 +845,37 @@ cols_hide <- function(data,
 cols_merge_uncert <- function(data,
                               col_val,
                               col_uncert,
+                              sep = " +/- ",
                               autohide = TRUE) {
 
   # Perform input object validation
   stop_if_not_gt(data = data)
 
-  # Use a predefined separator
-  sep <- " \u00B1 "
+  resolved <-
+    cols_merge_resolver(
+      data = data,
+      col_begin = col_val,
+      col_end = col_uncert,
+      sep = sep
+    )
 
-  cols_merge_range(
-    data = data,
-    col_begin = col_val,
-    col_end = col_uncert,
-    sep = sep,
-    autohide = autohide
-  )
+  # Create an entry and add it to the `_col_merge` attribute
+  data <-
+    dt_col_merge_add(
+      data = data,
+      col_merge = dt_col_merge_entry(
+        vars = resolved$columns,
+        type = "merge_uncert",
+        pattern = resolved$pattern,
+        sep = sep
+      )
+    )
+
+  if (isTRUE(autohide)) {
+    data <- data %>% cols_hide(columns = col_uncert)
+  }
+
+  data
 }
 
 #' Merge two columns to a value range column
@@ -870,17 +892,19 @@ cols_merge_uncert <- function(data,
 #' handling:
 #'
 #' \enumerate{
-#' \item `NA`s in `col_begin` result in missing values for the merged
-#' column (e.g., `NA` + `20.0` = `NA`)
+#' \item `NA`s in `col_begin` (but not `col_end`) result in a display of only
+#  the `col_end` values only for the merged column
 #' \item `NA`s in `col_end` (but not `col_begin`) result in a display of only
-#' the `col_begin` values only for the merged column
-#' (e.g., `12.0` + `NA` = `12.0`)
+#' the `col_begin` values only for the merged column (this is the converse of
+#' the previous)
 #' \item `NA`s both in `col_begin` and `col_end` result in missing values for
-#' the merged column (e.g., `NA` + `NA` = `NA`)
+#' the merged column
 #' }
 #'
 #' Any resulting `NA` values in the `col_begin` column following the merge
 #' operation can be easily formatted using the [fmt_missing()] function.
+#' Separate calls of [fmt_missing()] can be used for the `col_begin` and
+#' `col_end` columns for finer control of the replacement values.
 #'
 #' This function is part of a set of three column-merging functions. The other
 #' two are the general [cols_merge()] function and the specialized
@@ -891,7 +915,11 @@ cols_merge_uncert <- function(data,
 #' @inheritParams cols_align
 #' @param col_begin A column that contains values for the start of the range.
 #' @param col_end A column that contains values for the end of the range.
-#' @param sep The separator text that indicates the values are ranged.
+#' @param sep The separator text that indicates the values are ranged. The
+#'   default value of `"--"` indicates that an en dash will be used for the
+#'   range separator. Using `"---"` will be taken to mean that an em dash should
+#'   be used. Should you want these special symbols to be taken literally, they
+#'   can be supplied within the base [I()] function.
 #' @param autohide An option to automatically hide the column specified as
 #'   `col_end`. Any columns with their state changed to hidden will behave
 #'   the same as before, they just won't be displayed in the finalized table.
@@ -919,7 +947,7 @@ cols_merge_uncert <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_merge_range_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_merge_range_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:
@@ -936,6 +964,35 @@ cols_merge_range <- function(data,
   # Perform input object validation
   stop_if_not_gt(data = data)
 
+  resolved <-
+    cols_merge_resolver(
+      data = data,
+      col_begin = col_begin,
+      col_end = col_end,
+      sep = sep
+    )
+
+  # Create an entry and add it to the `_col_merge` attribute
+  data <-
+    dt_col_merge_add(
+      data = data,
+      col_merge = dt_col_merge_entry(
+        vars = resolved$columns,
+        type = "merge_range",
+        pattern = resolved$pattern,
+        sep = sep
+      )
+    )
+
+  if (isTRUE(autohide)) {
+    data <- data %>% cols_hide(columns = col_end)
+  }
+
+  data
+}
+
+cols_merge_resolver <- function(data, col_begin, col_end, sep) {
+
   # Set the formatting pattern
   pattern <- "{1}{sep}{2}"
 
@@ -950,23 +1007,10 @@ cols_merge_range <- function(data,
 
   columns <- c(col_begin, col_end)
 
-  # Create an entry and add it to the `_col_merge` attribute
-  data <-
-    dt_col_merge_add(
-      data = data,
-      col_merge = dt_col_merge_entry(
-        vars = columns,
-        type = "merge_range",
-        pattern = pattern,
-        sep = sep
-      )
-    )
-
-  if (isTRUE(autohide)) {
-    data <- data %>% cols_hide(columns = col_end)
-  }
-
-  data
+  list(
+    columns = columns,
+    pattern = pattern
+  )
 }
 
 #' Merge data from two or more columns to a single column
@@ -977,12 +1021,14 @@ cols_merge_range <- function(data,
 #' argument. The string-combining pattern is given in the `pattern` argument.
 #' The first column in the `columns` series operates as the target column (i.e.,
 #' will undergo mutation) whereas all following `columns` will be untouched.
+#' There is the option to hide the non-target columns (i.e., second and
+#' subsequent columns given in `columns`).
 #'
 #' There are two other column-merging functions that offer specialized behavior
 #' that is optimized for common table tasks: [cols_merge_range()] and
 #' [cols_merge_uncert()]. These functions operate similarly, where the
 #' non-target columns can be optionally hidden from the output table through the
-#' `hide_columns` or `autohide` options.
+#' `autohide` option.
 #'
 #' @inheritParams cols_align
 #' @param columns The columns that will participate in the merging process. The
@@ -990,14 +1036,13 @@ cols_merge_range <- function(data,
 #'   mutation) and the other columns will serve to provide input.
 #' @param hide_columns Any column names provided here will have their state
 #'   changed to `hidden` (via internal use of [cols_hide()] if they aren't
-#'   already hidden. This is convenient if the purpose of these specified
-#'   columns are only useful for providing string input to the target column.
+#'   already hidden. This is convenient if the shared purpose of these specified
+#'   columns is only to provide string input to the target column.
 #' @param pattern A formatting pattern that specifies the arrangement of the
-#'   `column` values and any string literals. We can use column names or numbers
-#'   (corresponding to the position of columns provided in `columns`). The
-#'   column names or indices are to be placed in curly braces (e.g., `{price}`
-#'   or `{1}`). All characters outside of braces are taken to be string
-#'   literals.
+#'   `column` values and any string literals. We need to use column numbers
+#'   (corresponding to the position of columns provided in `columns`) within the
+#'   pattern. These indices are to be placed in curly braces (e.g., `{1}`). All
+#'   characters outside of braces are taken to be string literals.
 #'
 #' @return An object of class `gt_tbl`.
 #'
@@ -1028,7 +1073,7 @@ cols_merge_range <- function(data,
 #'   )
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_cols_merge_1.svg}{options: width=100\%}}
+#' \if{html}{\figure{man_cols_merge_1.png}{options: width=100\%}}
 #'
 #' @family Modify Columns
 #' @section Function ID:

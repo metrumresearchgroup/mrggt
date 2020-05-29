@@ -27,9 +27,6 @@ both types (\code{am}), or, direct drive (\code{dd})}
 is headquartered}
 }
 }
-\source{
-Various pages within \url{https://www.edmunds.com}.
-}
 \usage{
 gtcars
 }
@@ -51,7 +48,7 @@ safety.
 }
 \section{Function ID}{
 
-10-3
+11-3
 }
 
 \examples{

@@ -162,3 +162,57 @@ lscape <- function(latex_code){
 lscape.gt_tbl <- function(x){
   x <- structure(x, class = c(class(x), 'lscape'))
 }
+
+
+#' Extract a **gt knit_asis** object's preamble or output a **gt knit_asis** object with preamble included.
+#'
+#' @param tex a knit_asis object that is created using the `as_latex()` function.
+#' @param full_tex output only the preamble or the preamble with tex code (including document declaration); default is TRUE - output tex code + preamble
+#'
+#' @examples
+#' # Use `gtcars` to create a gt table;
+#' # add a header and then export just preamble
+#' # as tex file
+#'
+#'   gtcars %>%
+#'   dplyr::select(mfr, model) %>%
+#'   dplyr::slice(1:2) %>%
+#'   gt() %>%
+#'   tab_header(
+#'     title = md("Data listing from **gtcars**"),
+#'     subtitle = md("`gtcars` is an R dataset")
+#'   ) %>%
+#'   as_latex() %>%
+#'   preamble(full_tex = FALSE)
+#'
+#' @export
+preamble <- function(tex, full_tex = TRUE) {
+  UseMethod('preamble')
+}
+
+preamble.knit_asis <- function(tex, full_tex = TRUE) {
+  return_tex <-
+    unlist(purrr::map(attributes(tex)$knit_meta, function(x) {
+      pkg <- paste0('\\usepackage{', x$name, '}')
+      if (!is.null(x$options)) {
+        pkg <- paste0(pkg, '[', paste(x$options, collapse = ','), ']')
+      }
+      c(pkg, x$extra_lines)
+    }))
+
+  if (full_tex) {
+    return_tex <-
+      c(
+        '\\documentclass[12pt]{article}',
+        return_tex,
+        '\\begin{document}',
+        as.character(tex),
+        '\\end{document}'
+      )
+
+  }
+
+  structure(paste(return_tex, collapse = '\n'),
+            class = c(class(return_tex), 'preamble'))
+}
+
