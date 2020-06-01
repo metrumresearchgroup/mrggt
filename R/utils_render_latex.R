@@ -248,7 +248,8 @@ create_summary_rows_l <- function(data){
 
     }
 
-  summary
+  data.frame(lapply(summary, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
+
 }
 
 #' @noRd

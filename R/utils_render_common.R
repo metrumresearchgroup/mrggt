@@ -373,7 +373,7 @@ create_data_rows <- function(n_rows,
 }
 
 
-merge_summary_rows <- function(body, col_merge){
+merge_summary_rows <- function(body, col_merge, context = 'latex'){
   data_tbl <- body
 
   for (i in seq(col_merge)) {
