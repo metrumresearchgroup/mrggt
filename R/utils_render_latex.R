@@ -225,6 +225,32 @@ create_columns_component_l <- function(data) {
   paste0("\\toprule\n", table_col_spanners, table_col_headings)
 }
 
+create_summary_rows_l <- function(data){
+  list_of_summaries <- dt_summary_df_get(data = data)
+
+  summary <- list_of_summaries$summary_df_display_list$`::GRAND_SUMMARY`
+
+    if("_col_merge" %in% names(data)){
+
+      cols_merge <- data$`_col_merge`
+      summary <- merge_summary_rows(summary, cols_merge)
+
+      if(data$`_boxhead`$var[1] == 'rowname' && data$`_boxhead`$type[1] == 'stub'){
+
+        to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
+
+      } else {
+
+        to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden' | data$`_boxhead`$type == 'stub']
+      }
+
+      summary <- summary %>% dplyr::select(!to_hide)
+
+    }
+
+  summary
+}
+
 #' @noRd
 create_body_component_l <- function(data) {
 
@@ -249,9 +275,16 @@ create_body_component_l <- function(data) {
   # Get the column headings for the visible (e.g., `default`) columns
   default_vars <- dt_boxhead_get_vars_default(data = data)
 
+  # TRUE when no stub and all summary
+  # FALSE when stub and all summary
+  # FALSE when no stub and no all summary
+  # FALSE when stub and all-stub summary <- need
+  # FALSE when stub and no all summary
   if ("rowname" %in% names(body)) {
+
     default_vars <- c("rowname", default_vars)
-  }
+
+    }
 
   # Determine whether the stub is available through analysis
   # of the `stub_components`
@@ -279,10 +312,10 @@ create_body_component_l <- function(data) {
         group_label = gsub("^NA", "\\textemdash", group_label))
   }
 
-  #groups_rows_df$group_label <- purrr::map_chr(groups_rows_df$group_label, function(.){style_group_rows_latex(fmt_latex_math(.),  styles_tbl)})
   group_rows <- create_group_rows(n_rows, groups_rows_df, context = "latex", n_cols = n_cols)
 
-  if (stub_available) {
+  if (stub_available && !("rowname" %in% names(body))) {
+
     default_vars <- c("::rowname", default_vars)
 
     body <-
@@ -290,30 +323,29 @@ create_body_component_l <- function(data) {
       dplyr::select(rowname) %>%
       dplyr::rename(`::rowname` = rowname) %>%
       cbind(body)
+
   }
 
-
   # Split `body_content` by slices of rows and create data rows
-  body_content <- as.vector(t(body[, default_vars]))
+  #body_content <- as.vector(t(body[, default_vars]))
   #body_content <- purrr::map_chr(body_content, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
-  row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
-  #row_splits <- style_data_latex(row_splits, styles_tbl)
+  #row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
+
+  dt_show <- body[, default_vars]
+  row_splits <- purrr::map(seq(dim(dt_show)[1]), ~unlist(dt_show[.x, ], use.names = FALSE))
   data_rows <- create_data_rows(n_rows, row_splits, context = "latex")
 
+  sum_rows <- ''
+  if (summaries_present) {
+    summary_rows <- create_summary_rows_l(data = data)
 
-  summary_rows <-
-    create_summary_rows(
-      n_rows = n_rows,
-      n_cols = n_cols,
-      list_of_summaries = list_of_summaries,
-      groups_rows_df = groups_rows_df,
-      stub_available = stub_available,
-      summaries_present = summaries_present,
-      context = "latex"
-    )
+    sum_rows <- paste(c("\\midrule \n"),
+                      paste0(apply(summary_rows, c(1), paste, collapse = ' & '),
+                             ' \\\\ \n'),
+                      collapse = ' ')
+  }
 
-  #summary_rows <- purrr::map_chr(summary_rows, fmt_latex_math)
-  paste0(paste(collapse = "", paste0(group_rows, data_rows, summary_rows)), "\\bottomrule\n")
+  paste0(paste(collapse = "", paste0(group_rows, data_rows)), sum_rows, "\\bottomrule\n")
 }
 
 #' @noRd

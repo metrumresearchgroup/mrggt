@@ -1,0 +1,115 @@
+---
+title: "Summary Rows Example"
+output: 
+  pdf_document:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+library(mrggt)
+library(tidyverse)
+```
+
+
+```{r}
+df <- structure(list(study = c("rMUXpJp", "lzRBxex", "zjnhztM", "nVtVOTs", 
+"ESGEvuK", "OiBwkPE", "esrrFSc", "ZJstWGR", "hslXaGB", "ftCIqmT", 
+"cDNbzuX", "FUCIrcY", "QQeXChK", "nUcMNSw", "ZdIEAkd", "XypAJWj", 
+"oEmNLBK"), a = c(57L, 37L, 12L, 18L, 28L, 36L, 42L, 68L, 90L, 
+72L, 66L, 14L, 33L, 19L, 27L, 41L, 80L), b = c(1436L, 626L, 252L, 
+171L, 540L, 602L, 848L, 2221L, 4218L, 3600L, 1241L, 230L, 168L, 
+474L, 542L, 292L, 738L), c = c(1130L, 572L, 241L, 171L, 540L, 
+482L, 808L, 1763L, 3657L, 3051L, 1193L, 230L, 168L, 464L, 524L, 
+288L, 550L), d = c(306, 54, 11, 0, 0, 120, 40, 458, 561, 549, 
+48, 0, 0, 10, 18, 4, 188), e = c(21.3, 8.63, 4.37, 0, 0, 19.9, 
+4.72, 20.6, 13.3, 15.2, 3.87, 0, 0, 2.11, 3.32, 1.37, 25.5)), row.names = c(NA, 
+17L), class = "data.frame")
+```
+
+## With rowname column specified (preform summary on everything but rowname)
+
+```{r}
+df %>%
+  gt(rowname_col = 'study') %>% 
+  tab_stubhead('Study') %>% 
+  cols_merge(columns = vars(d, e), 
+             pattern = "{1} [{2}]")%>%
+  cols_label(.list = list(a = 'ID', 
+                          b =  'Total Samples',
+                          c = "Samples Above Limit",
+                          d = 'Samples Below Limit: n[%]'
+  )) %>%
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  summary_rows(columns = vars(a, b, c, d), fns = list(Total = ~sum(.))) %>% 
+  summary_rows(columns = vars(e), fns = list(Total = ~mean(.x))) %>% 
+  as_latex()
+
+```
+
+## Without row name column (perform summary on all columns in frame)
+```{r}
+df %>% 
+  select(-study) %>%
+  gt() %>% 
+  cols_merge(columns = vars(d, e), 
+             pattern = "{1} [{2}]") %>%
+  cols_label(.list = list(a = 'ID', 
+                          b =  'Total Samples',
+                          c = "Samples Above Limit",
+                          d = 'Samples Below Limit: n[%]'
+  )) %>%
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  summary_rows(columns = vars(a, b, c, d), fns = list(Total = ~sum(.))) %>% 
+  summary_rows(columns = vars(e), fns = list(Total = ~mean(.x))) %>% 
+  as_latex()
+
+```
+
+## Only perform on select columns
+```{r}
+df %>% 
+  select(-study) %>%
+  gt() %>% 
+  cols_merge(columns = vars(d, e), 
+             pattern = "{1} [{2}]") %>%
+  cols_label(.list = list(a = 'ID', 
+                          b =  'Total Samples',
+                          c = "Samples Above Limit",
+                          d = 'Samples Below Limit: n[%]'
+  )) %>%
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  summary_rows(columns = vars(a, b, d), fns = list(Total = ~sum(.))) %>% 
+  summary_rows(columns = vars(e), fns = list(Total = ~mean(.x))) %>% 
+  as_latex()
+```
+
+## perform multiple summaries
+```{r}
+df %>% 
+  select(-study) %>%
+  gt() %>% 
+  cols_merge(columns = vars(d, e), 
+             pattern = "{1} [{2}]") %>%
+  cols_label(.list = list(a = 'ID', 
+                          b =  'Total Samples',
+                          c = "Samples Above Limit",
+                          d = 'Samples Below Limit: n[%]'
+  )) %>%
+  tab_source_note(c(
+    paste0('Script code: ', knitr::current_input()),
+    paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+  )) %>%
+  summary_rows(columns = vars(a, b, c, d), fns = list(Total = ~sum(.),
+                                                      Average = ~mean(.))) %>% 
+  summary_rows(columns = vars(e), fns = list(Total = ~mean(.))) %>% 
+  as_latex()
+```

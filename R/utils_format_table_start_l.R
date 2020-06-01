@@ -1,39 +1,3 @@
-get_data_rows_l <- function(data) {
-  body <- dt_body_get(data = data)
-  default_vars <- dt_boxhead_get_vars_default(data = data)
-  n_data_cols <-
-    dt_boxhead_get_vars_default(data = data) %>% length()
-  stub_components <- dt_stub_components(data = data)
-  stub_available <- dt_stub_components_has_rowname(stub_components)
-
-  if (stub_available) {
-    n_cols <- n_data_cols + 1
-  } else {
-    n_cols <- n_data_cols
-  }
-
-  if ("rowname" %in% names(body)) {
-    default_vars <- c("rowname", default_vars)
-  }
-
-  if (stub_available) {
-    default_vars <- c("::rowname", default_vars)
-
-    body <-
-      dt_stub_df_get(data = data) %>%
-      dplyr::select(rowname) %>%
-      dplyr::rename(`::rowname` = rowname) %>%
-      cbind(body)
-  }
-
-  body_content <- as.vector(t(body[, default_vars]))
-  row_splits <-
-    split(body_content, ceiling(seq_along(body_content) / n_cols))
-  data_rows <-
-    do.call(rbind, lapply(row_splits, function(x)
-      as.matrix(t(x))))
-  data_rows
-}
 
 get_collabels_l <- function(data) {
   stubh <- dt_stubhead_get(data = data)
@@ -46,6 +10,26 @@ get_collabels_l <- function(data) {
     collabels <- append('', collabels)
   }
   collabels
+}
+
+get_data_rows_l <- function(data) {
+
+  body <- dt_body_get(data = data)
+  to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
+  body <- body %>% dplyr::select(!to_hide) %>% as.matrix()
+  col_labels <- get_collabels_l(data)
+  full_matrix <- rbind(col_labels, body)
+  dimnames(full_matrix)[[2]] <- NULL
+  summaries_present <- dt_summary_exists(data = data)
+
+  if(summaries_present){
+    sum_rows <- create_summary_rows_l(data = data)
+    sum_rows <- as.matrix(sum_rows)
+    dimnames(sum_rows)[[2]] <- NULL
+    full_matrix <- rbind(full_matrix, sum_rows)
+  }
+
+  full_matrix
 }
 
 sanitize_for_sizing <- function(tbl_matrix){
@@ -67,7 +51,7 @@ type_setting <- function(type_size) {
     '11' = '\\small \n',
     '12' = "\n"
   )
-  #browser()
+
   sizing_options[[as.character(type_size)]]
 }
 
@@ -279,8 +263,7 @@ rank_options <- function(option){
   option
 }
 
-calculate_best <- function(data_rows, collabels){
-  tbl_matrix <- rbind(collabels, data_rows)
+calculate_best <- function(tbl_matrix){
   tbl_matrix_lengths <- find_lengths(tbl_matrix)
   length_summary <- purrr::map2(tbl_matrix_lengths, names(tbl_matrix_lengths), lengths_tbl_summary)
   optimized_lengths <- purrr::map(length_summary, optimize_options)
@@ -303,7 +286,6 @@ fmt_header_latex <- function(sizing_columns){
 }
 
 calc_column_width_l <- function(data) {
-  data_rows <- get_data_rows_l(data)
-  collabels <- get_collabels_l(data)
-  calculate_best(data_rows, collabels)
+  tbl_matrix <- get_data_rows_l(data)
+  calculate_best(tbl_matrix)
 }
