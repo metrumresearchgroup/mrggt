@@ -384,10 +384,15 @@ create_source_foot_note_component_l <- function(data) {
     tidy_gsub("<br\\s*?(/|)>", "\\newline") %>%
     tidy_gsub("&nbsp;", " ")
 
+  footnotes <- footnotes_tbl[["footnotes"]] %>%
+    unescape_html() %>%
+    markdown_to_latex() %>%
+    fmt_latex_math() %>%
+    extract('math_env')
+
   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
-                       footnotes_tbl[["footnotes"]] %>%
-                         unescape_html() %>%
-                         markdown_to_latex())
+                       footnotes)
+
 
   footnotes <- paste(paste0('\\item ',
                       footnotes,
@@ -406,6 +411,7 @@ create_source_foot_note_component_l <- function(data) {
   # rows, then return an empty footnotes component
   if (length(source_note) != 0) {
 
+    source_note <- fmt_latex_math(source_note) %>% extract('math_env')
     source_note <- paste(paste0('\\item ',
                               source_note,
                               '\n'),
