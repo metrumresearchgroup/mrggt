@@ -10,6 +10,12 @@
 
 #' @noRd
 resolve_styles_latex <- function(data){
+
+  font_size <- data$`_options`$value[[which(data$`_options`$parameter == 'table_font_size')]]
+  if(!font_size == '16px'){
+    tbl_cache$font_size = font_size
+  }
+
   styles_tbl <- dt_styles_get(data = data)
   data$`_heading`$title <- style_title_latex(data$`_heading`$title, styles_tbl)
   data$`_heading`$subtitle <- style_subtitle_latex(data$`_heading`$subtitle, styles_tbl)
@@ -451,7 +457,6 @@ cell_fill.color <- function(value){
 #' @noRd
 create_color_definition <- function(color){
   s <- grDevices::col2rgb(color)
-  tbl_cache$color <- c(gsub('#', '', color), tbl_cache$color)
   paste0(
     "\\definecolor{",
     gsub('#', '', color),

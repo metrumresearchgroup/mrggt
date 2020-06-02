@@ -1,27 +1,41 @@
 ### settings for the global knit doc
 latex_cache <- new.env(parent = emptyenv())
-latex_cache$line.breaks <- TRUE
-latex_cache$margin <- c(1, 1)
-latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
-                              'landscape' = c(11.0, 8.5))
-latex_cache$papersize <- 'letter'
-latex_cache$orient <- 'portrait'
-latex_cache$calc_template <- "\\documentclass[12pt]{article}\n\\usepackage{calc}\n\\usepackage{amsmath}\n\\usepackage{booktabs}\n\\usepackage{caption}[singlelinecheck=off]\n\\usepackage{longtable}\n\\usepackage{xcolor}\n\\usepackage{amssymb}\n\\usepackage{color}\n\\usepackage{colortbl}\n\\usepackage{array}\n\\usepackage{mathptmx}\n\\usepackage{tikz}\n\n\\begin{document}\n\\def\\checkmark{\\tikz\\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}\n\\newlinechar=`\\^^J\n\n{{color_declarations}}\n\n\\newenvironment{localsize}[1]\n{%\n  \\clearpage\n  \\let\\orignewcommand\\newcommand\n  \\let\\newcommand\\renewcommand\n  \\makeatletter\n  \\input{size#1.clo}%\n  \\makeatother\n  \\let\\newcommand\\orignewcommand\n}\n{%\n  \\clearpage\n}\n\n{{var_declarations}}\n\n\\begin{localsize}{11}\n{{var_assignments}}\n\\message{^^JBEGINWIDTHS=11PT}\n{{var_output}}\n\\message{^^JENDWIDTHS=11PT^^J}\n\\end{localsize}\n\n\n\\begin{localsize}{12}\n{{var_assignments}}\n\\message{^^JBEGINWIDTHS=12PT}\n{{var_output}}\n\\message{^^JENDWIDTHS=12PT^^J}\n\\end{localsize}\n\n\\end{document}\n"
-
-### settings per table- reset every time as_latex is run
+latex_templates <- new.env(parent = emptyenv())
 tbl_cache <- new.env(parent = emptyenv())
-tbl_cache$color_def <- NULL
-tbl_cache$color <- c()
-tbl_cache$font_size <- 0
-tbl_cache$tbl_width <- 0
 
-# reset tbl_cache
-reset_tbl_cache <- function() {
-  tbl_cache$color <- c()
-  tbl_cache$color_def <- NULL
-  tbl_cache$font_size <- 0
-  tbl_cache$tbl_width <- 0
+initialize_pagecache <-function(){
+  latex_cache$margin <- c(1, 1)
+  latex_cache$pagewidth <- list('portrait' = c(8.5, 11.0),
+                              'landscape' = c(11.0, 8.5))
+  latex_cache$papersize <- 'letter'
+  latex_cache$orient <- 'portrait'
 }
+
+
+initialize_templates <- function(){
+  template <- c('heading_component',
+                'lscape_table',
+                'source_foot_notes',
+                'calc_width',
+                'title',
+                'subtitle',
+                'portrait_table')
+
+  for(tmpl in template){
+    path <- system.file("templates", paste0(tmpl, '.template'), package = "mrggt")
+    latex_templates[[tmpl]] <- readr::read_file(path)
+  }
+
+}
+
+initialize_tbl_cache <- function() {
+  tbl_cache$color_def <- NULL
+  tbl_cache$font_size <- NULL
+}
+
+initialize_templates()
+initialize_pagecache()
+initialize_tbl_cache()
 
 orient <- function(x = c('portrait', 'landscape')){
   x <- match.arg(x)
@@ -35,19 +49,17 @@ pagemargin <- function(x){
   latex_cache$margin <- x
 }
 
-line.breaks <- function(x){
-  if(!is.logical(x)){
-    stop('line.breaks must be specified as either TRUE/FALSE')
-  }
-  latex_cache$line.breaks <- x
-}
 
 orient <- function(x = c('portrait', 'landscape')){
   x <- match.arg(x)
   latex_cache$orient <- x
 }
 
-papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'ledger')){
+papersize <- function(x = c('half letter',
+                            'letter',
+                            'legal',
+                            'junior legal',
+                            'ledger')){
   x <- match.arg(x)
   sizing <- switch(
     x,
@@ -76,10 +88,10 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
   latex_cache$papersize <- x
 }
 
+
 #' Global options to set for mrggt that effect the latex rendering
 #' @param ... args passed on to assign function. possible values to assign are:
 #' - **pagemargin**: numeric vector in inches with format ```c(left margin, right margin)```; default is ```c(1, 1)```
-#' - **line.breaks**: logical; allow line breaks in table; default is ```TRUE``` (recommended)
 #' - **papersize**: character; default ```'letter'```; options:
 #'   - *half letter*: 5.5 x 8.0 in
 #'   - *letter*: 8.5 x 11.0 in
@@ -93,14 +105,12 @@ papersize <- function(x = c('half letter', 'letter', 'legal', 'junior legal', 'l
 #' # change paper to legal
 #'
 #' mrggt_options('pagemargin' = c(3, 4),
-#'              'line.breaks' = FALSE,
 #'              'papersize' = 'legal')
 #'
 #' @export
 mrggt_options <- function(...){
   opts <- list(...)
   avail_set <- c('papersize',
-                 'line.breaks',
                  'pagemargin',
                  'orient')
 

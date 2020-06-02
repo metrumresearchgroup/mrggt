@@ -1241,6 +1241,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param grand_summary_row.border.style,grand_summary_row.border.width,grand_summary_row.border.color
 #'   The style, width, and color properties for the top borders of the
 #'   `grand_summary_row` location.
+#' @param footnotes.align alignment for the footnotes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param footnotes.border.bottom.style,footnotes.border.bottom.width,footnotes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `footnotes` location.
@@ -1260,6 +1261,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   `"LETTERS"`. There is the option for using a traditional symbol set where
 #'   `"standard"` provides four symbols, and, `"extended"` adds two more
 #'   symbols, making six.
+#' @param source_notes.align alignment for the source notes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param source_notes.border.bottom.style,source_notes.border.bottom.width,source_notes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `source_notes` location.
@@ -1273,6 +1275,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param row.striping.include_table_body An option for whether to include the
 #'   table body when striping rows.
 #'
+#' @details Currently only `footnotes.align` and `source_notes.align` are implemented in `LaTeX`. These parameters are not implemented in `HTML` or `RTF`.
 #' @return An object of class `gt_tbl`.
 #'
 #' @examples
@@ -1475,6 +1478,7 @@ tab_options <- function(data,
                         grand_summary_row.border.style = NULL,
                         grand_summary_row.border.width = NULL,
                         grand_summary_row.border.color = NULL,
+                        footnotes.align = NULL,
                         footnotes.background.color = NULL,
                         footnotes.font.size = NULL,
                         footnotes.padding = NULL,
@@ -1486,6 +1490,7 @@ tab_options <- function(data,
                         footnotes.border.lr.color = NULL,
                         footnotes.sep = NULL,
                         footnotes.marks = NULL,
+                        source_notes.align = NULL,
                         source_notes.background.color = NULL,
                         source_notes.font.size = NULL,
                         source_notes.padding = NULL,

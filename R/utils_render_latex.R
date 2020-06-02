@@ -1,4 +1,4 @@
-
+# needs to be implemented: \caption{\thelongtablecaption}\\[\bigskipamount]
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
   c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage", "threeparttablex")
@@ -65,16 +65,8 @@ latex_body_row <- function(content,
 #' @noRd
 latex_heading_row <- function(content) {
 
-  paste0(
-    paste(paste(content, collapse = " & "), "\\\\ \n"),
-    "\\endfirsthead\n",
-    "\\endhead\n",
-    "\\bottomrule\n",
-    "\\addlinespace\n",
-    "\\insertTableNotes\n",
-    "\\endlastfoot\n",
-    "\\midrule\n",
-    collapse = "")
+  paste0(paste(content, collapse = " & "), "\\\\ \n")
+
 }
 
 #' @noRd
@@ -94,13 +86,7 @@ latex_group_row <- function(group_name,
 
 #' @noRd
 create_table_start_l <- function(data){
-  header <- calc_column_width_l(data = data)
-  separation <- '\\setlength{\\tabcolsep}{3pt}\n'
-  paste0(
-    separation,
-    '\\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\\textwidth}\n',
-    header
-  )
+  calc_column_width_l(data = data)
 }
 
 #' Create the columns component of a table
@@ -119,11 +105,6 @@ create_columns_component_l <- function(data) {
 
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
-  #headings_labels <- purrr::map_chr(headings_labels, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
-
-  #key <- as.list(headings_labels)
-  #names(key) <- headings_vars
-  #headings_labels <- lapply(headings_vars, latex_style_headings, styles_df = styles_tbl, key = key)  %>% unlist(use.names = FALSE)
 
   # TODO: Implement hidden boxhead in LaTeX
   # # Should the column labels be hidden?
@@ -222,7 +203,7 @@ create_columns_component_l <- function(data) {
     table_col_spanners <- ""
   }
 
-  paste0("\\toprule\n", table_col_spanners, table_col_headings)
+  paste0(table_col_spanners, table_col_headings)
 }
 
 create_summary_rows_l <- function(data){
@@ -254,7 +235,6 @@ create_summary_rows_l <- function(data){
 
 #' @noRd
 create_body_component_l <- function(data) {
-
   boxh <- dt_boxhead_get(data = data)
   styles_tbl <- dt_styles_get(data = data)
   body <- dt_body_get(data = data)
@@ -346,7 +326,7 @@ create_body_component_l <- function(data) {
                       collapse = ' ')
   }
 
-  paste0(paste(collapse = "", paste0(group_rows, data_rows)), sum_rows, "\\bottomrule\n")
+  paste0(paste(collapse = "", paste0(group_rows, data_rows)), sum_rows)
 }
 
 #' @noRd
@@ -422,19 +402,28 @@ create_source_foot_note_component_l <- function(data) {
 
   }
 
-  size <- type_setting(tbl_cache$font_size)
-  full_cap <-  paste0(
-      '\\begin{ThreePartTable}\n',
-      size,
-      '\\settotextwidth',
-      '\\begin{TableNotes}\n',
-      '\\centering\n',
-      '\\footnotesize\n',
-      footnotes,
-      '\\item\n',
-      source_note,
-      '\\end{TableNotes}\n'
-    )
+  footnote_align <- dt_options_get_value(data, 'footnotes_align')
+  sourcenote_align <- dt_options_get_value(data, 'source_notes_align')
+  align <- function(setting){
 
-  return(full_cap)
+    if(is.na(setting)){
+      return('\\arraybackslash\\raggedright\n')
+    }
+
+    switch(setting,
+           left = '\\arraybackslash\\raggedright\n',
+           right = '\\arraybackslash\\raggedleft\n',
+           center = '\\centering')
+  }
+
+  footnotes_align <- align(footnote_align)
+  sourcenotes_align <- align(sourcenote_align)
+  inputs <- list(size = '\\footnotesize',
+                 footnotes = footnotes,
+                 sourcenotes = source_note,
+                 footnotes_align = footnotes_align,
+                 sourcenotes_align = sourcenotes_align)
+
+  whisker::whisker.render(latex_templates$source_foot_notes, inputs)
+
 }

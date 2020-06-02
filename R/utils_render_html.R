@@ -263,22 +263,23 @@ create_heading_component <- function(data,
   }
 
   if (context == "latex") {
-
-    title_row <-
-      paste0(heading$title, footnote_title_marks)
+    inputs <- list(
+      title = whisker::whisker.render(latex_templates$title,
+                                      list(title = paste0(heading$title,
+                                                          footnote_title_marks)))
+      )
 
     if (dt_heading_has_subtitle(data = data, context='latex')) {
 
-      subtitle_row <-
-        paste0(heading$subtitle, footnote_subtitle_marks) %>%
-        paste_left(": ")
-
+      inputs$subtitle <- whisker::whisker.render(latex_templates$subtitle,
+                                                 list(subtitle = paste0(heading$subtitle,
+                                                                        footnote_subtitle_marks)))
     } else {
-      subtitle_row <- ""
+      inputs$subtitle <- ""
     }
 
-    heading_component <-
-      paste0("\\caption{", title_row, subtitle_row, "} \\\\\n")
+    heading_component <- whisker::whisker.render(latex_templates$heading_component,
+                                                 inputs)
   }
 
   if (context == "rtf") {

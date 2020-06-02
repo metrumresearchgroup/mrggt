@@ -12,7 +12,7 @@
 print.gt_tbl <- function(x, ..., view = interactive()) {
 
   html_tbl <- as.tags.gt_tbl(x, ...)
-
+  #browser()
   # Use `print()` to print to the console
   print(html_tbl, browse = view, ...)
 }
@@ -79,10 +79,11 @@ as.tags.gt_tbl <- function(x, ...) {
   container_overflow_y <- dt_options_get_value(x, option = "container_overflow_y")
   container_width <- dt_options_get_value(x, option = "container_width")
   container_height <- dt_options_get_value(x, option = "container_height")
-
-  # Attach the dependency to the HTML table
   html_tbl <-
     htmltools::tagList(
+      htmltools::HTML('<head><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>'),
+      htmltools::HTML('<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script></head>'),
+      htmltools::tags$script(htmltools::HTML('id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"')),
       htmltools::tags$style(htmltools::HTML(css)),
       htmltools::tags$div(
         id = id,

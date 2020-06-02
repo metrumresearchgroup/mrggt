@@ -108,6 +108,7 @@ tab_options(
   grand_summary_row.border.style = NULL,
   grand_summary_row.border.width = NULL,
   grand_summary_row.border.color = NULL,
+  footnotes.align = NULL,
   footnotes.background.color = NULL,
   footnotes.font.size = NULL,
   footnotes.padding = NULL,
@@ -119,6 +120,7 @@ tab_options(
   footnotes.border.lr.color = NULL,
   footnotes.sep = NULL,
   footnotes.marks = NULL,
+  source_notes.align = NULL,
   source_notes.background.color = NULL,
   source_notes.font.size = NULL,
   source_notes.padding = NULL,
@@ -254,6 +256,8 @@ stub.}
 \item{grand_summary_row.border.style, grand_summary_row.border.width, grand_summary_row.border.color}{The style, width, and color properties for the top borders of the
 \code{grand_summary_row} location.}
 
+\item{footnotes.align}{alignment for the footnotes, specified as \code{left}, \code{right}, or \code{center}. Only implemented in LaTeX.}
+
 \item{footnotes.border.bottom.style, footnotes.border.bottom.width, footnotes.border.bottom.color}{The style, width, and color properties for the bottom border of the
 \code{footnotes} location.}
 
@@ -274,6 +278,8 @@ want to use numeric marks). We can use lowercase \code{"letters"} or uppercase
 \code{"LETTERS"}. There is the option for using a traditional symbol set where
 \code{"standard"} provides four symbols, and, \code{"extended"} adds two more
 symbols, making six.}
+
+\item{source_notes.align}{alignment for the source notes, specified as \code{left}, \code{right}, or \code{center}. Only implemented in LaTeX.}
 
 \item{source_notes.border.bottom.style, source_notes.border.bottom.width, source_notes.border.bottom.color}{The style, width, and color properties for the bottom border of the
 \code{source_notes} location.}
@@ -296,6 +302,9 @@ An object of class \code{gt_tbl}.
 \description{
 Modify the options available in a table. These options are named by the
 components, the subcomponents, and the element that can adjusted.
+}
+\details{
+Currently only \code{footnotes.align} and \code{source_notes.align} are implemented in LaTeX. These parameters are not implemented in HTML/RTF.
 }
 \section{Figures}{
 

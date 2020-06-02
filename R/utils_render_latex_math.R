@@ -32,14 +32,13 @@ sanitize_tex.default <- function(x) {
 sanitize_tex.math <- function(x) {
   vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract = TRUE))
   sanitize <- list(c("(\\\\+%)", "\\\\%"),
-                   c('!@', ''),
-                   c('\\*', '\\\\'),
+                   c('\\$\\$', ''),
                    c("(\\\\_)", '\\_'),
                    c("(\\\\+\\{)", '\\{'),
                    c("(\\\\+\\})", '\\}'),
                    c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
                    c("\\|", '\\\\vert'),
-                   c('\u00B1', '\\$\\\\pm\\$'))
+                   c('\u00B1', '\\\\pm'))
 
   vect <- vect[!is.na(vect)]
   if (length(vect) > 0) {
@@ -128,7 +127,7 @@ c.tex_math <- function(...){
 
 #' @noRd
 tex_math <- function(x){
-  if(grepl('!@', x)){
+  if(grepl('\\$\\$', x)){
     x <- structure(x,
                    class = c(class(x), 'math'))
   }

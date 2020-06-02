@@ -85,7 +85,7 @@ create_tex_width_file <- function(tbl_matrix){
                              collapse = '')
 
   vars_summary$color_declarations <- tbl_cache$color_def
-  create_log_file(whisker::whisker.render(latex_cache$calc_template,
+  create_log_file(whisker::whisker.render(latex_templates$calc_width,
                                           vars_summary))
 }
 
@@ -278,7 +278,6 @@ calculate_best <- function(tbl_matrix){
 }
 
 fmt_header_latex <- function(sizing_columns){
- tbl_cache$tbl_width <- sum(sizing_columns)
  paste0('\\begin{longtable}{',
         paste(sprintf("p{%.2fcm}", sizing_columns), collapse = ''),
         '} \n')

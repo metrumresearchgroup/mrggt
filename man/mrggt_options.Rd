@@ -10,7 +10,6 @@ mrggt_options(...)
 \item{...}{args passed on to assign function. possible values to assign are:
 \itemize{
 \item \strong{pagemargin}: numeric vector in inches with format \verb{c(left margin, right margin)}; default is \code{c(1, 1)}
-\item \strong{line.breaks}: logical; allow line breaks in table; default is \code{TRUE} (recommended)
 \item \strong{papersize}: character; default \code{'letter'}; options:
 \itemize{
 \item \emph{half letter}: 5.5 x 8.0 in
@@ -30,7 +29,6 @@ Global options to set for mrggt that effect the latex rendering
 # change paper to legal
 
 mrggt_options('pagemargin' = c(3, 4),
-             'line.breaks' = FALSE,
              'papersize' = 'legal')
 
 }
