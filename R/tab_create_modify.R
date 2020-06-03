@@ -46,6 +46,17 @@ tab_header <- function(data,
   data %>% dt_heading_title_subtitle(title = title, subtitle = subtitle)
 }
 
+
+
+tab_caption <- function(data,
+                        caption) {
+
+  # Perform input object validation
+  stop_if_not_gt(data = data)
+
+  data %>% dt_caption(caption = caption)
+}
+
 #' Add a spanner column label
 #'
 #' Set a spanner column label by mapping it to columns already in the table.

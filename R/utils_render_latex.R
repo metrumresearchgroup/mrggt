@@ -89,6 +89,14 @@ create_table_start_l <- function(data){
   calc_column_width_l(data = data)
 }
 
+#' @noRd
+create_caption_l <- function(data){
+  if(!dt_has_caption(data)){
+    return('')
+  }
+  cap <- dt_caption_get(data = data)
+  paste0("\\caption{", cap$caption, "}\\\\[\\bigskipamount]")
+}
 #' Create the columns component of a table
 #'
 #' @noRd

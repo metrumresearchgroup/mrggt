@@ -392,7 +392,7 @@ as_latex <- function(data) {
     heading_component = create_heading_component(data = data, context = "latex"),
     columns_component = create_columns_component_l(data = data),
     body_component = create_body_component_l(data = data),
-    caption =''
+    caption = create_caption_l(data = data)
   )
 
   if(is.null(tbl_cache$color_def)){
