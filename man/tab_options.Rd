@@ -304,7 +304,7 @@ Modify the options available in a table. These options are named by the
 components, the subcomponents, and the element that can adjusted.
 }
 \details{
-Currently only \code{footnotes.align} and \code{source_notes.align} are implemented in LaTeX. These parameters are not implemented in HTML/RTF.
+Currently only \code{footnotes.align} and \code{source_notes.align} are implemented in \code{LaTeX}. These parameters are not implemented in \code{HTML} or \code{RTF}.
 }
 \section{Figures}{
 

@@ -47,7 +47,31 @@ tab_header <- function(data,
 }
 
 
-
+#' Add a caption to a LaTeX table
+#'
+#' Set a caption within the `longtable` LaTeX environment.
+#' `longtable`, unlike `table`, is not a float environment tso the caption must be set within the environment.
+#'
+#' @param caption the caption to be set within `\caption{}` in the `longtable` environment. `label` can also be passed.
+#'
+#' @return An object of class `gt_tbl`.
+#'
+#' @examples
+#' # Use `gtcars` to create a gt table;
+#' # Group several columns related to car
+#' # add a caption of 'Gtcars table'
+#' # with the label `performance`
+#' tab_1 <-
+#'   gtcars %>%
+#'   dplyr::select(
+#'     -mfr, -trim, bdy_style, drivetrain,
+#'     -drivetrain, -trsmn, -ctry_origin
+#'   ) %>%
+#'   dplyr::slice(1:8) %>%
+#'   gt(rowname_col = "model") %>%
+#'   tab_caption(caption = "Gtcars table\\label{performance}")
+#'
+#' @export
 tab_caption <- function(data,
                         caption) {
 
