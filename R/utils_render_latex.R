@@ -150,7 +150,7 @@ create_columns_component_l <- function(data) {
 
     # Promote column labels to the group level wherever the
     # spanner label is NA
-    spanners[is.na(spanners)] <- headings_vars[is.na(spanners)]
+    spanners[is.na(spanners)] <- headings_vars[!headings_vars == '::stub'][is.na(spanners)]
 
     if (stub_available) {
       spanners <- c(NA_character_, spanners)
@@ -217,27 +217,53 @@ create_columns_component_l <- function(data) {
 create_summary_rows_l <- function(data){
   list_of_summaries <- dt_summary_df_get(data = data)
 
-  summary <- list_of_summaries$summary_df_display_list$`::GRAND_SUMMARY`
+  hide_stub <- function(summary){
+    to_hide <-
+      data$`_boxhead`$var[data$`_boxhead`$type == 'hidden' |
+                            data$`_boxhead`$type == 'stub']
+    summary %>% dplyr::select(!to_hide)
+  }
 
-    if("_col_merge" %in% names(data)){
-
+  merge_summary <- function(summary) {
       cols_merge <- data$`_col_merge`
       summary <- merge_summary_rows(summary, cols_merge)
-
-      if(data$`_boxhead`$var[1] == 'rowname' && data$`_boxhead`$type[1] == 'stub'){
+      if (data$`_boxhead`$var[1] == 'rowname' &&
+          data$`_boxhead`$type[1] == 'stub') {
 
         to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
+        summary <- summary %>% dplyr::select(!to_hide)
 
       } else {
-
-        to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden' | data$`_boxhead`$type == 'stub']
+        summary <- hide_stub(summary)
       }
 
-      summary <- summary %>% dplyr::select(!to_hide)
+      summary
+  }
 
-    }
+  display_summaries <- list_of_summaries$summary_df_display_list
+  if ("_col_merge" %in% names(data)) {
 
-  data.frame(lapply(summary, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
+    summaries_merged <- purrr::map(names(display_summaries), function(.x){
+      merged <- merge_summary(display_summaries[[.x]])
+      merged$SUMMARY_NAME <- rep(.x, dim(merged)[1])
+      merged
+      })
+
+  } else {
+
+    summaries_merged <- purrr::map(names(display_summaries), function(.x){
+      merged <- hide_stub(display_summaries[[.x]])
+      merged$SUMMARY_NAME <- rep(.x, dim(merged)[1])
+      merged
+    })
+  }
+
+  summaries_tbl <- do.call(rbind, summaries_merged)
+  to_format <- summaries_tbl %>% select(-SUMMARY_NAME)
+
+  df <- data.frame(lapply(to_format, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
+  df$summary_key <- summaries_tbl$SUMMARY_NAME
+  df
 
 }
 
@@ -331,26 +357,43 @@ create_body_rows_l <- function(data) {
   list(group_rows = group_rows,
        row_splits = row_splits,
        n_rows = n_rows,
-       sum_rows = sum_rows)
+       sum_rows = sum_rows,
+       groups_rows_df = groups_rows_df)
 }
 
 #' @noRd
 create_body_component_l <- function(data) {
 
   rows <- create_body_rows_l(data = data)
+  summary_positions <- rep('', rows$n_rows)
+
   data_rows <- create_data_rows(rows$n_rows, rows$row_splits, context = "latex")
+
   if (!is.null(rows$sum_rows)) {
 
-    sum_rows <- paste(c("\\midrule \n"),
-                      paste0(apply(rows$sum_rows, c(1), paste, collapse = ' & '),
-                             ' \\\\ \n'),
-                      collapse = ' ')
-  } else {
+    fmt_summary_rows <- function(.){
+      paste0(apply(., c(1), paste, collapse = ' & '), ' \\\\ \n ')
+    }
 
-    sum_rows <- ''
+    collapse_rows <- function(.){
+      paste0("\\midrule \n ", paste(c(.), collapse = ''))
+    }
+
+    rows$sum_rows$`::COLLAPSED` <- rows$sum_rows %>%
+      select(-summary_key) %>%
+      fmt_summary_rows()
+
+    summary_rows_tbl <- rows$sum_rows %>%
+      group_by(summary_key) %>%
+      summarise_at('::COLLAPSED', .funs = list(FULL_ROW = collapse_rows))
+
+    gp_rows <- rbind(rows$groups_rows_df, c('::GRAND_SUMMARY', '', 0, rows$n_rows))
+    positions <- gp_rows[match(summary_rows_tbl$summary_key, gp_rows$group),]$row_end %>% as.numeric()
+    summary_positions[positions] <- summary_rows_tbl$FULL_ROW
+
   }
 
-  paste0(paste(collapse = "", paste0(rows$group_rows, data_rows)), sum_rows)
+  paste(paste0(rows$group_rows, data_rows, summary_positions), collapse = "")
 }
 
 #' @noRd

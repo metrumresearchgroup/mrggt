@@ -19,7 +19,7 @@ get_data_rows_l <- function(data) {
   full_matrix <- rbind(col_labels, data_rows)
   dimnames(full_matrix)[[2]] <- NULL
   if(!is.null(rows$sum_rows)){
-    sum_rows <- as.matrix(rows$sum_rows)
+    sum_rows <- as.matrix(rows$sum_rows %>% select(-summary_key))
     dimnames(sum_rows)[[2]] <- NULL
     full_matrix <- rbind(full_matrix, sum_rows)
   }
