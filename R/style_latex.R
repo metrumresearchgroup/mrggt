@@ -485,7 +485,7 @@ define_colors_latex <- function(styles_df) {
 
   } else {
 
-    ''
+    NULL
 
   }
 }

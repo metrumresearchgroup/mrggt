@@ -18,15 +18,25 @@ sanitize_tex <- function (x) {
 }
 
 #' @noRd
-sanitize_tex.default <- function(x) {
-  sanitize <- list(c("(\\\\+%)", "\\\\%"),
-                   c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
-                   c('>', '\\$>\\$'),
-                   c('<', '\\$<\\$'),
-                   c('\u00B1', '\\$\\\\pm\\$'))
-
-  gsub_multiple(x, sanitize)
+sanitize_tex.default <- function(x){
+  x %>%
+  #tidy_gsub("\\\\", "\\\\textbackslash ") %>%
+  # remove {} from below
+  tidy_gsub("([&%$#_])", "\\\\\\1") %>%
+  tidy_gsub("~", "\\\\textasciitilde ") %>%
+  tidy_gsub("\\^", "\\\\textasciicircum ")
 }
+# sanitize_tex.default <- function(x) {
+#   sanitize <- list(c("(\\\\+%)", "\\\\%"),
+#                    c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
+#                    c('>', '\\$>\\$'),
+#                    c('<', '\\$<\\$'),
+#                    c('\u00B1', '\\$\\\\pm\\$'),
+#                    c('(\\_|\\\\+_)', '\\_')
+#                    )
+#
+#   gsub_multiple(x, sanitize)
+# }
 
 #' @noRd
 sanitize_tex.math <- function(x) {

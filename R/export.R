@@ -386,17 +386,25 @@ as_latex <- function(data) {
   table_start <- create_table_start_l(data = data)
 
   inputs <- list(
-    color_definitions = tbl_cache$color_def,
     table_start = table_start,
     table_font_size = type_setting(tbl_cache$font_size),
     src_foot_component = create_source_foot_note_component_l(data = data),
     heading_component = create_heading_component(data = data, context = "latex"),
     columns_component = create_columns_component_l(data = data),
     body_component = create_body_component_l(data = data),
-    caption = ''
+    caption =''
   )
 
-  tex <- whisker::whisker.render(latex_templates$portrait_table, inputs)
+  if(is.null(tbl_cache$color_def)){
+
+    tex <- whisker::whisker.render(latex_templates$portrait_table_nc, inputs)
+
+  } else {
+
+    inputs$color_definitions <- tbl_cache$color_def
+    tex <- whisker::whisker.render(latex_templates$portrait_table, inputs)
+
+  }
 
   latex_packages <- create_knit_meta()
 

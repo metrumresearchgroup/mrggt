@@ -19,7 +19,8 @@ initialize_templates <- function(){
                 'calc_width',
                 'title',
                 'subtitle',
-                'portrait_table')
+                'portrait_table',
+                'portrait_table_nc')
 
   for(tmpl in template){
     path <- system.file("templates", paste0(tmpl, '.template'), package = "mrggt")

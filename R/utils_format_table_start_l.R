@@ -13,22 +13,16 @@ get_collabels_l <- function(data) {
 }
 
 get_data_rows_l <- function(data) {
-
-  body <- dt_body_get(data = data)
-  to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
-  body <- body %>% dplyr::select(!to_hide) %>% as.matrix()
+  rows <- create_body_rows_l(data = data)
+  data_rows <- do.call(rbind, rows$row_splits)
   col_labels <- get_collabels_l(data)
-  full_matrix <- rbind(col_labels, body)
+  full_matrix <- rbind(col_labels, data_rows)
   dimnames(full_matrix)[[2]] <- NULL
-  summaries_present <- dt_summary_exists(data = data)
-
-  if(summaries_present){
-    sum_rows <- create_summary_rows_l(data = data)
-    sum_rows <- as.matrix(sum_rows)
+  if(!is.null(rows$sum_rows)){
+    sum_rows <- as.matrix(rows$sum_rows)
     dimnames(sum_rows)[[2]] <- NULL
     full_matrix <- rbind(full_matrix, sum_rows)
   }
-
   full_matrix
 }
 

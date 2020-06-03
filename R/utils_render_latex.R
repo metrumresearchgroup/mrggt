@@ -234,7 +234,7 @@ create_summary_rows_l <- function(data){
 }
 
 #' @noRd
-create_body_component_l <- function(data) {
+create_body_rows_l <- function(data) {
   boxh <- dt_boxhead_get(data = data)
   styles_tbl <- dt_styles_get(data = data)
   body <- dt_body_get(data = data)
@@ -265,7 +265,7 @@ create_body_component_l <- function(data) {
 
     default_vars <- c("rowname", default_vars)
 
-    }
+  }
 
   # Determine whether the stub is available through analysis
   # of the `stub_components`
@@ -314,19 +314,35 @@ create_body_component_l <- function(data) {
 
   dt_show <- body[, default_vars]
   row_splits <- purrr::map(seq(dim(dt_show)[1]), ~unlist(dt_show[.x, ], use.names = FALSE))
-  data_rows <- create_data_rows(n_rows, row_splits, context = "latex")
 
-  sum_rows <- ''
+  sum_rows <- NULL
   if (summaries_present) {
-    summary_rows <- create_summary_rows_l(data = data)
-
-    sum_rows <- paste(c("\\midrule \n"),
-                      paste0(apply(summary_rows, c(1), paste, collapse = ' & '),
-                             ' \\\\ \n'),
-                      collapse = ' ')
+    sum_rows <- create_summary_rows_l(data = data)
   }
 
-  paste0(paste(collapse = "", paste0(group_rows, data_rows)), sum_rows)
+  list(group_rows = group_rows,
+       row_splits = row_splits,
+       n_rows = n_rows,
+       sum_rows = sum_rows)
+}
+
+#' @noRd
+create_body_component_l <- function(data) {
+
+  rows <- create_body_rows_l(data = data)
+  data_rows <- create_data_rows(rows$n_rows, rows$row_splits, context = "latex")
+  if (!is.null(rows$sum_rows)) {
+
+    sum_rows <- paste(c("\\midrule \n"),
+                      paste0(apply(rows$sum_rows, c(1), paste, collapse = ' & '),
+                             ' \\\\ \n'),
+                      collapse = ' ')
+  } else {
+
+    sum_rows <- ''
+  }
+
+  paste0(paste(collapse = "", paste0(rows$group_rows, data_rows)), sum_rows)
 }
 
 #' @noRd
@@ -372,7 +388,6 @@ create_source_foot_note_component_l <- function(data) {
 
   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
                        footnotes)
-
 
   footnotes <- paste(paste0('\\item ',
                       footnotes,
