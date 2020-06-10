@@ -13,8 +13,8 @@ library('mrggt')
 
 ```{r}
 summary_single_table <- tribble( ~grpname, ~ NOAE, ~g_1, ~g_2, ~g_3, ~ g_4, ~g_5,
-                                 '!@ something_{<something>} CHECKMARK', 39, 5, 7, 1, 1, 1,
-                                 '!@ VENUS_{<something>} | VENUS_{<something>} ', 9, 3, 0, 2, 0, 0,
+                                 '$$something_{\\textrm{something}} \\checkmark$$', 39, 5, 7, 1, 1, 1,
+                                 '$$VENUS_{\\textrm{something}} | VENUS_{\\textrm{something}}$$ ', 9, 3, 0, 2, 0, 0,
                                  'PLUTO', 38, 0, 6, 0, 1, 2,
                                  'NEP', 11, 0, 3, 1, 0, 0)
 
@@ -34,17 +34,17 @@ df <- cbind(summary_single_table, percents_table)
 rename_col <- function(){
   to_rename <- summary_single_table %>% select(-'grpname')
   col_nm <- names(to_rename)
-  v <- list('No AE', '!@1_{<rad>}', '2', '3', '4', '5', 'N')
+  v <- list('No AE', '$$1_{\\textrm{rad}}$$', '2', '3', '4', '5', 'N')
   names(v) <- col_nm
   v
 }
 ```
 
 ```{r}
-
 df  %>%
   gt(rowname_col = 'grpname') %>%
   tab_stubhead(label = "TESTING") %>%
+  tab_caption(caption = 'something') %>%
   cols_move_to_start(
     columns = vars(N)
   ) %>%
@@ -88,10 +88,14 @@ df  %>%
   cols_label(.list = rename_col()) %>%
   tab_source_note(
     c(
-      paste0('Script code: ', knitr::current_input()),
-      paste0('Tex code: ', gsub('.Rmd', '.tex', knitr::current_input()))
+      paste0('Script code: ', 'latex_math.Rmd'),
+      paste0('Tex code: ', 'latex_math.tex')
     )
   ) %>%
-  as_latex()
+  as_latex() %>%
+  save_latex('test_this.tex', preamble = TRUE)
+```
 
+```{r}
+as.character(tbl)
 ```

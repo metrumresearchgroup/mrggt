@@ -204,11 +204,6 @@ test_that("latex mrggt_options", {
   # mrggt has default page size of 'letter'
   expect_equal(latex_cache$papersize, 'letter')
 
-  # Expect fixed value
-  # mrggt has default line breaks set to TRUE
-  expect_true(latex_cache$line.breaks)
-
-
   # change the margin size to 2 in right, 2 in left
   mrggt_options('pagemargin' = c(2, 2))
 

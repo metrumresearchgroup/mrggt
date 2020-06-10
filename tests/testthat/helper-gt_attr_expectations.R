@@ -102,7 +102,7 @@ expect_tab <- function(tab,
 
   dt_options_get(data = tab) %>%
     dim() %>%
-    expect_equal(c(128, 5))
+    expect_equal(c(132, 5))
 
   dt_transforms_get(data = tab) %>%
     length() %>%
@@ -146,7 +146,7 @@ gt_attr_names <- function() {
     "_stub_df", "_row_groups", "_stub_others",
     "_heading", "_spanners", "_stubhead",
     "_footnotes", "_source_notes", "_formats", "_styles",
-    "_summary", "_options", "_transforms", "_has_built"
+    "_summary", "_options", "_transforms", "_caption", "_has_built"
   )
 }
 

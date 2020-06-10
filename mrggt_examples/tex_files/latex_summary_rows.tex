@@ -1,0 +1,444 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Summary Rows Example},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage[singlelinecheck=off]{caption}
+\usepackage{longtable}
+\setlength{\LTleft}{0pt plus 1fill minus 1fill}
+\setlength{\LTright}{\LTleft}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{mathptmx}
+\usepackage{tikz}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\usepackage{pdflscape}
+\usepackage{everypage}
+\newlength{\hfoot}
+\newlength{\vfoot}
+\AddEverypageHook{\ifdim\textwidth=\linewidth\relax
+\else\setlength{\hfoot}{-\topmargin}%
+\addtolength{\hfoot}{-\headheight}%
+\addtolength{\hfoot}{-\headsep}%
+\addtolength{\hfoot}{-.5\linewidth}%
+\ifodd\value{page}\setlength{\vfoot}{\oddsidemargin}%
+\else\setlength{\vfoot}{\evensidemargin}\fi%
+\addtolength{\vfoot}{\textheight}%
+\addtolength{\vfoot}{\footskip}%
+\raisebox{\hfoot}[0pt][0pt]{\rlap{\hspace{\vfoot}\rotatebox[origin=cB]{90}{\thepage}}}\fi}
+\usepackage{threeparttablex}
+\def\settotextwidth{\renewcommand\TPTminimum{\textwidth}}
+
+\title{Summary Rows Example}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df <-}\StringTok{ }\KeywordTok{structure}\NormalTok{(}\KeywordTok{list}\NormalTok{(}\DataTypeTok{study =} \KeywordTok{c}\NormalTok{(}\StringTok{"rMUXpJp"}\NormalTok{, }\StringTok{"lzRBxex"}\NormalTok{, }\StringTok{"zjnhztM"}\NormalTok{, }\StringTok{"nVtVOTs"}\NormalTok{, }
+\StringTok{"ESGEvuK"}\NormalTok{, }\StringTok{"OiBwkPE"}\NormalTok{, }\StringTok{"esrrFSc"}\NormalTok{, }\StringTok{"ZJstWGR"}\NormalTok{, }\StringTok{"hslXaGB"}\NormalTok{, }\StringTok{"ftCIqmT"}\NormalTok{, }
+\StringTok{"cDNbzuX"}\NormalTok{, }\StringTok{"FUCIrcY"}\NormalTok{, }\StringTok{"QQeXChK"}\NormalTok{, }\StringTok{"nUcMNSw"}\NormalTok{, }\StringTok{"ZdIEAkd"}\NormalTok{, }\StringTok{"XypAJWj"}\NormalTok{, }
+\StringTok{"oEmNLBK"}\NormalTok{), }\DataTypeTok{a =} \KeywordTok{c}\NormalTok{(57L, 37L, 12L, 18L, 28L, 36L, 42L, 68L, 90L, }
+\NormalTok{72L, 66L, 14L, 33L, 19L, 27L, 41L, 80L), }\DataTypeTok{b =} \KeywordTok{c}\NormalTok{(1436L, 626L, 252L, }
+\NormalTok{171L, 540L, 602L, 848L, 2221L, 4218L, 3600L, 1241L, 230L, 168L, }
+\NormalTok{474L, 542L, 292L, 738L), }\DataTypeTok{c =} \KeywordTok{c}\NormalTok{(1130L, 572L, 241L, 171L, 540L, }
+\NormalTok{482L, 808L, 1763L, 3657L, 3051L, 1193L, 230L, 168L, 464L, 524L, }
+\NormalTok{288L, 550L), }\DataTypeTok{d =} \KeywordTok{c}\NormalTok{(}\DecValTok{306}\NormalTok{, }\DecValTok{54}\NormalTok{, }\DecValTok{11}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{120}\NormalTok{, }\DecValTok{40}\NormalTok{, }\DecValTok{458}\NormalTok{, }\DecValTok{561}\NormalTok{, }\DecValTok{549}\NormalTok{, }
+\DecValTok{48}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{10}\NormalTok{, }\DecValTok{18}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{188}\NormalTok{), }\DataTypeTok{e =} \KeywordTok{c}\NormalTok{(}\FloatTok{21.3}\NormalTok{, }\FloatTok{8.63}\NormalTok{, }\FloatTok{4.37}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{19.9}\NormalTok{, }
+\FloatTok{4.72}\NormalTok{, }\FloatTok{20.6}\NormalTok{, }\FloatTok{13.3}\NormalTok{, }\FloatTok{15.2}\NormalTok{, }\FloatTok{3.87}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\FloatTok{2.11}\NormalTok{, }\FloatTok{3.32}\NormalTok{, }\FloatTok{1.37}\NormalTok{, }\FloatTok{25.5}\NormalTok{)), }\DataTypeTok{row.names =} \KeywordTok{c}\NormalTok{(}\OtherTok{NA}\NormalTok{, }
+\NormalTok{17L), }\DataTypeTok{class =} \StringTok{"data.frame"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{with-rowname-column-specified-preform-summary-on-everything-but-rowname}{%
+\subsection{With rowname column specified (preform summary on everything
+but
+rowname)}\label{with-rowname-column-specified-preform-summary-on-everything-but-rowname}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{(}\DataTypeTok{rowname_col =} \StringTok{'study'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{tab_stubhead}\NormalTok{(}\StringTok{'Study'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{cols_merge}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(d, e), }
+             \DataTypeTok{pattern =} \StringTok{"\{1\} [\{2\}]"}\NormalTok{)}\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{a =} \StringTok{'ID'}\NormalTok{, }
+                          \DataTypeTok{b =}  \StringTok{'Total Samples'}\NormalTok{,}
+                          \DataTypeTok{c =} \StringTok{"Samples Above Limit"}\NormalTok{,}
+                          \DataTypeTok{d =} \StringTok{'Samples Below Limit: n[%]'}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}\KeywordTok{c}\NormalTok{(}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()),}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\KeywordTok{gsub}\NormalTok{(}\StringTok{'.Rmd'}\NormalTok{, }\StringTok{'.tex'}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()))}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(a, b, c, d), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{sum}\NormalTok{(.))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(e), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{mean}\NormalTok{(.x))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\item Script code: latex\_summary\_rows.Rmd
+\item Tex code: latex\_summary\_rows.tex
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{2.50cm}p{2.50cm}p{2.50cm}p{3.70cm}p{4.78cm}} 
+\toprule
+Study & ID & Total Samples & Samples Above Limit & Samples Below Limit: n[\%] \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+rMUXpJp & 57 & 1436 & 1130 & 306 [21.30] \\ 
+lzRBxex & 37 & 626 & 572 & 54 [8.63] \\ 
+zjnhztM & 12 & 252 & 241 & 11 [4.37] \\ 
+nVtVOTs & 18 & 171 & 171 & 0 [0.00] \\ 
+ESGEvuK & 28 & 540 & 540 & 0 [0.00] \\ 
+OiBwkPE & 36 & 602 & 482 & 120 [19.90] \\ 
+esrrFSc & 42 & 848 & 808 & 40 [4.72] \\ 
+ZJstWGR & 68 & 2221 & 1763 & 458 [20.60] \\ 
+hslXaGB & 90 & 4218 & 3657 & 561 [13.30] \\ 
+ftCIqmT & 72 & 3600 & 3051 & 549 [15.20] \\ 
+cDNbzuX & 66 & 1241 & 1193 & 48 [3.87] \\ 
+FUCIrcY & 14 & 230 & 230 & 0 [0.00] \\ 
+QQeXChK & 33 & 168 & 168 & 0 [0.00] \\ 
+nUcMNSw & 19 & 474 & 464 & 10 [2.11] \\ 
+ZdIEAkd & 27 & 542 & 524 & 18 [3.32] \\ 
+XypAJWj & 41 & 292 & 288 & 4 [1.37] \\ 
+oEmNLBK & 80 & 738 & 550 & 188 [25.50] \\ 
+\midrule 
+ Total & $740.00$ & $18,199.00$ & $15,832.00$ & $2,367.00$ [$8.48$] \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{without-row-name-column-perform-summary-on-all-columns-in-frame}{%
+\subsection{Without row name column (perform summary on all columns in
+frame)}\label{without-row-name-column-perform-summary-on-all-columns-in-frame}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{study) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{cols_merge}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(d, e), }
+             \DataTypeTok{pattern =} \StringTok{"\{1\} [\{2\}]"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{a =} \StringTok{'ID'}\NormalTok{, }
+                          \DataTypeTok{b =}  \StringTok{'Total Samples'}\NormalTok{,}
+                          \DataTypeTok{c =} \StringTok{"Samples Above Limit"}\NormalTok{,}
+                          \DataTypeTok{d =} \StringTok{'Samples Below Limit: n[%]'}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}\KeywordTok{c}\NormalTok{(}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()),}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\KeywordTok{gsub}\NormalTok{(}\StringTok{'.Rmd'}\NormalTok{, }\StringTok{'.tex'}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()))}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(a, b, c, d), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{sum}\NormalTok{(.))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(e), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{mean}\NormalTok{(.x))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\item Script code: latex\_summary\_rows.Rmd
+\item Tex code: latex\_summary\_rows.tex
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{2.50cm}p{2.50cm}p{2.50cm}p{3.70cm}p{4.78cm}} 
+\toprule
+ & ID & Total Samples & Samples Above Limit & Samples Below Limit: n[\%] \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ & 57 & 1436 & 1130 & 306 [21.30] \\ 
+ & 37 & 626 & 572 & 54 [8.63] \\ 
+ & 12 & 252 & 241 & 11 [4.37] \\ 
+ & 18 & 171 & 171 & 0 [0.00] \\ 
+ & 28 & 540 & 540 & 0 [0.00] \\ 
+ & 36 & 602 & 482 & 120 [19.90] \\ 
+ & 42 & 848 & 808 & 40 [4.72] \\ 
+ & 68 & 2221 & 1763 & 458 [20.60] \\ 
+ & 90 & 4218 & 3657 & 561 [13.30] \\ 
+ & 72 & 3600 & 3051 & 549 [15.20] \\ 
+ & 66 & 1241 & 1193 & 48 [3.87] \\ 
+ & 14 & 230 & 230 & 0 [0.00] \\ 
+ & 33 & 168 & 168 & 0 [0.00] \\ 
+ & 19 & 474 & 464 & 10 [2.11] \\ 
+ & 27 & 542 & 524 & 18 [3.32] \\ 
+ & 41 & 292 & 288 & 4 [1.37] \\ 
+ & 80 & 738 & 550 & 188 [25.50] \\ 
+\midrule 
+ Total & $740.00$ & $18,199.00$ & $15,832.00$ & $2,367.00$ [$8.48$] \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{only-perform-on-select-columns}{%
+\subsection{Only perform on select
+columns}\label{only-perform-on-select-columns}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{study) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{cols_merge}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(d, e), }
+             \DataTypeTok{pattern =} \StringTok{"\{1\} [\{2\}]"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{a =} \StringTok{'ID'}\NormalTok{, }
+                          \DataTypeTok{b =}  \StringTok{'Total Samples'}\NormalTok{,}
+                          \DataTypeTok{c =} \StringTok{"Samples Above Limit"}\NormalTok{,}
+                          \DataTypeTok{d =} \StringTok{'Samples Below Limit: n[%]'}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}\KeywordTok{c}\NormalTok{(}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()),}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\KeywordTok{gsub}\NormalTok{(}\StringTok{'.Rmd'}\NormalTok{, }\StringTok{'.tex'}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()))}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(a, b, d), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{sum}\NormalTok{(.))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(e), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{mean}\NormalTok{(.x))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\item Script code: latex\_summary\_rows.Rmd
+\item Tex code: latex\_summary\_rows.tex
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{2.50cm}p{2.50cm}p{2.50cm}p{3.70cm}p{4.78cm}} 
+\toprule
+ & ID & Total Samples & Samples Above Limit & Samples Below Limit: n[\%] \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ & 57 & 1436 & 1130 & 306 [21.30] \\ 
+ & 37 & 626 & 572 & 54 [8.63] \\ 
+ & 12 & 252 & 241 & 11 [4.37] \\ 
+ & 18 & 171 & 171 & 0 [0.00] \\ 
+ & 28 & 540 & 540 & 0 [0.00] \\ 
+ & 36 & 602 & 482 & 120 [19.90] \\ 
+ & 42 & 848 & 808 & 40 [4.72] \\ 
+ & 68 & 2221 & 1763 & 458 [20.60] \\ 
+ & 90 & 4218 & 3657 & 561 [13.30] \\ 
+ & 72 & 3600 & 3051 & 549 [15.20] \\ 
+ & 66 & 1241 & 1193 & 48 [3.87] \\ 
+ & 14 & 230 & 230 & 0 [0.00] \\ 
+ & 33 & 168 & 168 & 0 [0.00] \\ 
+ & 19 & 474 & 464 & 10 [2.11] \\ 
+ & 27 & 542 & 524 & 18 [3.32] \\ 
+ & 41 & 292 & 288 & 4 [1.37] \\ 
+ & 80 & 738 & 550 & 188 [25.50] \\ 
+\midrule 
+ Total & $740.00$ & $18,199.00$ & — & $2,367.00$ [$8.48$] \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\hypertarget{perform-multiple-summaries}{%
+\subsection{perform multiple
+summaries}\label{perform-multiple-summaries}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{study) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{gt}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{cols_merge}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(d, e), }
+             \DataTypeTok{pattern =} \StringTok{"\{1\} [\{2\}]"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{a =} \StringTok{'ID'}\NormalTok{, }
+                          \DataTypeTok{b =}  \StringTok{'Total Samples'}\NormalTok{,}
+                          \DataTypeTok{c =} \StringTok{"Samples Above Limit"}\NormalTok{,}
+                          \DataTypeTok{d =} \StringTok{'Samples Below Limit: n[%]'}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}\KeywordTok{c}\NormalTok{(}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()),}
+    \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\KeywordTok{gsub}\NormalTok{(}\StringTok{'.Rmd'}\NormalTok{, }\StringTok{'.tex'}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()))}
+\NormalTok{  )) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(a, b, c, d), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{sum}\NormalTok{(.),}
+                                                      \DataTypeTok{Average =} \OperatorTok{~}\KeywordTok{mean}\NormalTok{(.))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summary_rows}\NormalTok{(}\DataTypeTok{columns =} \KeywordTok{vars}\NormalTok{(e), }\DataTypeTok{fns =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{Total =} \OperatorTok{~}\KeywordTok{mean}\NormalTok{(.))) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{ThreePartTable}
+
+\settotextwidth\begin{TableNotes}
+\centering
+\footnotesize
+\item
+\item Script code: latex\_summary\_rows.Rmd
+\item Tex code: latex\_summary\_rows.tex
+\end{TableNotes}
+\setlength{\tabcolsep}{3pt}
+\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
+\begin{longtable}{p{2.50cm}p{2.50cm}p{2.50cm}p{3.70cm}p{4.78cm}} 
+\toprule
+ & ID & Total Samples & Samples Above Limit & Samples Below Limit: n[\%] \\ 
+\endfirsthead
+\endhead
+\bottomrule
+\addlinespace
+\insertTableNotes
+\endlastfoot
+\midrule
+ & 57 & 1436 & 1130 & 306 [21.30] \\ 
+ & 37 & 626 & 572 & 54 [8.63] \\ 
+ & 12 & 252 & 241 & 11 [4.37] \\ 
+ & 18 & 171 & 171 & 0 [0.00] \\ 
+ & 28 & 540 & 540 & 0 [0.00] \\ 
+ & 36 & 602 & 482 & 120 [19.90] \\ 
+ & 42 & 848 & 808 & 40 [4.72] \\ 
+ & 68 & 2221 & 1763 & 458 [20.60] \\ 
+ & 90 & 4218 & 3657 & 561 [13.30] \\ 
+ & 72 & 3600 & 3051 & 549 [15.20] \\ 
+ & 66 & 1241 & 1193 & 48 [3.87] \\ 
+ & 14 & 230 & 230 & 0 [0.00] \\ 
+ & 33 & 168 & 168 & 0 [0.00] \\ 
+ & 19 & 474 & 464 & 10 [2.11] \\ 
+ & 27 & 542 & 524 & 18 [3.32] \\ 
+ & 41 & 292 & 288 & 4 [1.37] \\ 
+ & 80 & 738 & 550 & 188 [25.50] \\ 
+\midrule 
+ Total & $740.00$ & $18,199.00$ & $15,832.00$ & $2,367.00$ [$8.48$] \\ 
+ \midrule 
+ Average & $43.53$ & $1,070.53$ & $931.29$ & $139.24$ [—] \\ 
+\bottomrule
+\end{longtable}
+\end{ThreePartTable}
+
+\end{document}

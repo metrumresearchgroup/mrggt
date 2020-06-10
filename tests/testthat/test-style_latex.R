@@ -85,7 +85,7 @@ test_that("latex math styling", {
   # Create a `tbl_latex` object with `gt()`; this table
   # math formatting
   tbl_math <- dplyr::tribble( ~grpname,
-                                   '!@ something_{<something>}')
+                                   '$$ something_{\\text{something}}$$')
   tbl_gt <-
     gt(data = tbl_math) %>%
     as_latex() %>%
@@ -97,17 +97,7 @@ test_that("latex math styling", {
   # Create a `tbl_latex` object with `gt()`; this table
   # math formatting
   tbl_math <- dplyr::tribble( ~grpname,
-                              'CHECKMARK')
-  tbl_gt <-
-    gt(data = tbl_math) %>%
-    as_latex() %>%
-    as.character()
-
-  #Expect a fixed pattern
-  expect_true(grepl('\\checkmark', tbl_gt, fixed = TRUE))
-
-  tbl_math <- dplyr::tribble( ~grpname,
-                              '!@ *beta_{<abc>}')
+                              '$$ \\beta_{\\text{abc}}$$')
   tbl_gt <-
     gt(data = tbl_math) %>%
     as_latex() %>%
@@ -261,12 +251,12 @@ test_that("latex preset font sizing", {
 
   #Expect a fixed pattern
   #row orange and columns color, count, and grpname are now large (large in latex)
-  expect_true(grepl('{\\large orange}', tbl_gt, fixed = TRUE))
-  expect_true(grepl('{\\large 5}', tbl_gt, fixed = TRUE))
+  expect_true(grepl('{\\Large orange}', tbl_gt, fixed = TRUE))
+  expect_true(grepl('{\\Large 5}', tbl_gt, fixed = TRUE))
 
   #Expect a fixed pattern
   #only fontsize in orange row has been changed
-  expect_equal(length(unlist(gregexpr('\\large', tbl_gt, fixed = TRUE))), 3)
+  expect_equal(length(unlist(gregexpr('\\Large', tbl_gt, fixed = TRUE))), 3)
 
   tbl_gt <-
     gt(data = tbl_fruit) %>%

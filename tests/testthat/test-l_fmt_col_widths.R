@@ -38,7 +38,7 @@ test_that("the calculation of column widths works correctly", {
   tbl_tex <- tbl_gt %>% as_latex() %>% as.character()
 
   # Extract the calculated column widths
-  col_widths <- unlist(qdapRegex::rm_between(tbl_tex, 'p{', '}', extract=TRUE))
+  col_widths <- unlist(qdapRegex::rm_between(tbl_tex, 'p{', 'cm}', extract=TRUE))
 
   # Expect all calculated column widths to be equal to one another
   expect_equal(length(unique(col_widths)), 1)

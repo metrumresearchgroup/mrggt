@@ -1,17 +1,5 @@
 #' Output a **gt knit_asis** or **gt preamble** object to a tex file
 #'
-#' @usage
-#'
-#'  ## Default S3 method:
-#'  save_latex(tex, path, ...)
-#'
-#'  ## S3 method for class `knit_asis`:
-#'  save_latex(tex, path, preamble = TRUE, append = FALSE)
-#'
-#'  ## S3 method for class `preamble`:
-#'  save_latex(tex, path, append = FALSE)
-#'
-#'
 #'
 #' @param tex a `knit_asis` object that is created using the `as_latex()` function or a `preamble` object created using `preamble()` function.
 #' @param path path or connection to write to.
@@ -56,11 +44,14 @@ save_latex <- function(tex, path, ...) {
   UseMethod('save_latex')
 }
 
+#' @rdname save_latex
+#' @export
 save_latex.knit_asis <-
   function(tex,
            path,
            preamble = FALSE,
-           append = FALSE) {
+           append = FALSE,
+           ...) {
     if (preamble) {
 
       save_latex(preamble.knit_asis(tex), path, append)
@@ -70,6 +61,8 @@ save_latex.knit_asis <-
     }
   }
 
-save_latex.preamble <- function(tex, path, append = FALSE) {
+#' @rdname save_latex
+#' @export
+save_latex.preamble <- function(tex, path, append = FALSE, ...) {
   readr::write_file(tex, path, append)
 }

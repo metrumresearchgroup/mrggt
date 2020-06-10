@@ -10,6 +10,8 @@ tab_options(
   container.height = NULL,
   container.overflow.x = NULL,
   container.overflow.y = NULL,
+  table.optimize.font = NULL,
+  table.optimize.width = NULL,
   table.width = NULL,
   table.align = NULL,
   table.margin.left = NULL,
@@ -108,6 +110,7 @@ tab_options(
   grand_summary_row.border.style = NULL,
   grand_summary_row.border.width = NULL,
   grand_summary_row.border.color = NULL,
+  footnotes.align = NULL,
   footnotes.background.color = NULL,
   footnotes.font.size = NULL,
   footnotes.padding = NULL,
@@ -119,6 +122,7 @@ tab_options(
   footnotes.border.lr.color = NULL,
   footnotes.sep = NULL,
   footnotes.marks = NULL,
+  source_notes.align = NULL,
   source_notes.background.color = NULL,
   source_notes.font.size = NULL,
   source_notes.padding = NULL,
@@ -149,6 +153,14 @@ the container dimensions. Using \code{TRUE} (the default for both) means that
 horizontal or vertical scrolling is enabled to view the entire table in
 those directions. With \code{FALSE}, the table may be clipped if the table width
 or height exceeds the \code{container.width} or \code{container.height}.}
+
+\item{table.optimize.width, table.optimize.font}{LaTeX only parameters.
+Both can be specified as \code{TRUE} or \code{FALSE}. Default is \code{TRUE}/\code{TRUE}.
+\code{mrggt} does both column width and fontsizing calculations for LaTeX tables
+to ensure they do not exceed the available page width. If \code{table.optimize.font}
+is \code{FALSE}, the value specified for \code{table.font.size} will be used and optimal
+column widths under that font size will be calculated. If \code{table.optimize.width}
+is \code{FALSE}, the \code{table.font.size} will be used and no column optimization will occur.}
 
 \item{table.width}{The width of the table. Can be specified as a
 single-length character with units of pixels or as a percentage. If
@@ -189,7 +201,7 @@ single-length character vector with units of pixels (e.g., \verb{12px}) or as a
 percentage (e.g., \verb{80\\\%}). If provided as a single-length numeric vector,
 it is assumed that the value is given in units of pixels. The \code{\link[=px]{px()}} and
 \code{\link[=pct]{pct()}} helper functions can also be used to pass in numeric values and
-obtain values as pixel or percentage units.}
+obtain values as pixel or percentage units. LaTeX: \code{table.font.size} will be ignored if \code{table.optimize.font} is \code{TRUE}.}
 
 \item{table.border.top.style, table.border.top.width, table.border.top.color, table.border.right.style, table.border.right.width, table.border.right.color, table.border.bottom.style, table.border.bottom.width, table.border.bottom.color, table.border.left.style, table.border.left.width, table.border.left.color}{The style, width, and color properties of the table's absolute top and
 absolute bottom borders.}
@@ -254,6 +266,8 @@ stub.}
 \item{grand_summary_row.border.style, grand_summary_row.border.width, grand_summary_row.border.color}{The style, width, and color properties for the top borders of the
 \code{grand_summary_row} location.}
 
+\item{footnotes.align}{alignment for the footnotes, specified as \code{left}, \code{right}, or \code{center}. Only implemented in LaTeX.}
+
 \item{footnotes.border.bottom.style, footnotes.border.bottom.width, footnotes.border.bottom.color}{The style, width, and color properties for the bottom border of the
 \code{footnotes} location.}
 
@@ -274,6 +288,8 @@ want to use numeric marks). We can use lowercase \code{"letters"} or uppercase
 \code{"LETTERS"}. There is the option for using a traditional symbol set where
 \code{"standard"} provides four symbols, and, \code{"extended"} adds two more
 symbols, making six.}
+
+\item{source_notes.align}{alignment for the source notes, specified as \code{left}, \code{right}, or \code{center}. Only implemented in LaTeX.}
 
 \item{source_notes.border.bottom.style, source_notes.border.bottom.width, source_notes.border.bottom.color}{The style, width, and color properties for the bottom border of the
 \code{source_notes} location.}

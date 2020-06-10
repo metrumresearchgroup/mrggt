@@ -385,54 +385,47 @@ as_latex <- function(data) {
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
 
-  # Create the heading component
-  heading_component <- create_heading_component(data = data, context = "latex")
+  inputs <- list(
+    table_start = table_start,
+    table_font_size = tbl_cache$font_size,
+    src_foot_component = create_source_foot_note_component_l(data = data),
+    heading_component = create_heading_component(data = data, context = "latex"),
+    columns_component = create_columns_component_l(data = data),
+    body_component = create_body_component_l(data = data),
+    caption = create_caption_l(data = data)
+  )
 
-  # Create the columns component
-  columns_component <- create_columns_component_l(data = data)
+  if(is.null(tbl_cache$color_def)){
 
-  # Create the body component
-  body_component <- create_body_component_l(data = data)
+    tex <- whisker::whisker.render(latex_templates$portrait_table_nc, inputs)
 
-  # Create the source notes component
-  #source_notes_component <- create_source_note_component_l(data = data)
-  src_foot_component <- create_source_foot_note_component_l(data = data)
+  } else {
 
-  # Create the footnotes component
-  #footnotes_component <- create_footnotes_component_l(data = data)
+    inputs$color_definitions <- tbl_cache$color_def
+    tex <- whisker::whisker.render(latex_templates$portrait_table, inputs)
 
-  # Create a LaTeX fragment for the ending tabular statement
-  table_end <- create_table_end_l()
+  }
 
   latex_packages <- create_knit_meta()
 
-  # Compose the LaTeX table
-  tex <- paste0(
-    tbl_cache$color_def,
-    src_foot_component,
-    table_start,
-    heading_component,
-    columns_component,
-    body_component,
-    table_end,
-    collapse = ""
-  )
-
   if(!orient_portrait){
-    knit_asis <- paste("\\begin{landscape}",
-                 "\\pagestyle{empty}",
-                 tex,
-                "\\end{landscape}",
-                sep = '\n') %>%
+
+    knit_asis <-
+      whisker::whisker.render(latex_templates$lscape_table,
+                              list(portrait_table = tex)) %>%
       knitr::asis_output(meta = latex_packages)
 
-    knit_asis <- structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
+    knit_asis <-
+      structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
     attr(knit_asis, 'base') <- tex
+
   } else {
+
     knit_asis <- tex %>% knitr::asis_output(meta = latex_packages)
+
   }
 
-  reset_tbl_cache()
+  initialize_tbl_cache()
   knit_asis
 }
 

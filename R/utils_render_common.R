@@ -372,6 +372,79 @@ create_data_rows <- function(n_rows,
     unname()
 }
 
+
+merge_summary_rows <- function(body, col_merge, context = 'latex'){
+  data_tbl <- body
+
+  for (i in seq(col_merge)) {
+
+    type <- col_merge[[i]]$type
+
+    if (!(type %in% c("merge", "merge_range", "merge_uncert"))) {
+      stop("Unknown `type` supplied.")
+    }
+
+    if (type == "merge") {
+
+      mutated_column <- col_merge[[i]]$vars[1]
+      mutated_column_sym <- sym(mutated_column)
+
+      columns <- col_merge[[i]]$vars
+      pattern <- col_merge[[i]]$pattern
+
+      glue_src_data <- body[, columns] %>% as.list()
+      glue_src_data <- stats::setNames(glue_src_data, seq_len(length(glue_src_data)))
+
+      body <-
+        body %>%
+        dplyr::mutate(
+          !!mutated_column_sym := glue_gt(glue_src_data, pattern) %>%
+            as.character()
+        )
+
+    } else {
+
+      mutated_column <- col_merge[[i]]$vars[1]
+      second_column <- col_merge[[i]]$vars[2]
+
+      pattern <- col_merge[[i]]$pattern
+      sep <- col_merge[[i]]$sep
+
+      # Transform the separator text depending on specific
+      # inputs and the `context`
+      sep <-
+        sep %>%
+        context_dash_mark(context = context) %>%
+        context_plusminus_mark(context = context)
+
+      # Determine rows where NA values exist
+      na_1_rows <- is.na(data_tbl[[mutated_column]])
+      na_2_rows <- is.na(data_tbl[[second_column]])
+
+      rows_to_format <-
+        if (type == "merge_range") {
+          which(!(na_1_rows & na_2_rows))
+        } else if (type == "merge_uncert") {
+          which(!(na_1_rows | na_2_rows))
+        }
+
+      body[rows_to_format, mutated_column] <-
+        glue_gt(
+          list(
+            "1" = body[[mutated_column]][rows_to_format],
+            "2" = body[[second_column]][rows_to_format],
+            "sep" = sep
+          ),
+          pattern
+        ) %>%
+        as.character()
+    }
+  }
+
+  body
+}
+
+
 # Function to build a vector of `summary` rows in the table body
 create_summary_rows <- function(n_rows,
                                 n_cols,
@@ -379,10 +452,14 @@ create_summary_rows <- function(n_rows,
                                 groups_rows_df,
                                 stub_available,
                                 summaries_present,
-                                context = "latex") {
+                                context = "latex",
+                                data = NULL) {
+
+  if(context == 'latex'){
+    return(create_summary_rows_l(data = data))
+  }
 
   lapply(seq(n_rows), function(x) {
-
     if (!stub_available ||
         !summaries_present ||
         !(x %in% groups_rows_df$row_end)) {

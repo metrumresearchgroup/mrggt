@@ -27,6 +27,7 @@ globalVariables(
   c(
     "x",
     ".",
+    "::SUMMARY_KEY",
     "are_groups_present",
     "arrange_dfs",
     "b",
@@ -120,7 +121,7 @@ utf8_aware_sub <- NULL
 
   register_s3_method("knitr", "knit_print", "gt_tbl")
   register_s3_method("htmltools", "as.tags", "gt_tbl")
-  registerS3method("lscape", "gt_tbl", lscape.gt_tbl)
+  registerS3method("lscape", "gt_tbl", "lscape.gt_tbl")
   #registerS3method("lscape", "list", lscape.list)
   registerS3method("+", "lscape_asis", '+.lscape_asis')
   registerS3method("fmt_latex_math", "default", "fmt_latex_math.default")
@@ -137,6 +138,10 @@ utf8_aware_sub <- NULL
   registerS3method("preamble", "knit_asis", "preamble.knit_asis")
   registerS3method("save_latex", "knit_asis", "save_latex.knit_asis")
   registerS3method("save_latex", "preamble", "save_latex.preamble")
+  registerS3method("find_colors", "default", "find_colors.default")
+  registerS3method("find_colors", "list", "find_colors.list")
+  registerS3method("find_colors", "cell_fill", "find_colors.cell_fill")
+  registerS3method("find_colors", "cell_text", "find_colors.cell_text")
 
 
   op <- options()

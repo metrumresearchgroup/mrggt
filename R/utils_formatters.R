@@ -282,7 +282,7 @@ to_latex_math_mode <- function(x,
   if (context != "latex") {
     return(x)
   } else {
-    return(x %>% paste_between(x_2 = c("$", "$")))
+    return(x %>% paste_between(x_2 = c("$$", "$$")))
   }
 }
 
@@ -682,6 +682,7 @@ num_fmt_factory <- function(context,
       # Format all non-NA x values with a formatting function
       format_fn(context) %>%
       # If in a LaTeX context, wrap values in math mode
+      # removing style latex handles this
       to_latex_math_mode(context) %>%
       # Handle formatting of pattern
       apply_pattern_fmt_x(pattern)

@@ -143,8 +143,8 @@
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{summary_single_table <-}\StringTok{ }\KeywordTok{tribble}\NormalTok{( }\OperatorTok{~}\NormalTok{grpname, }\OperatorTok{~}\StringTok{ }\NormalTok{NOAE, }\OperatorTok{~}\NormalTok{g_}\DecValTok{1}\NormalTok{, }\OperatorTok{~}\NormalTok{g_}\DecValTok{2}\NormalTok{, }\OperatorTok{~}\NormalTok{g_}\DecValTok{3}\NormalTok{, }\OperatorTok{~}\StringTok{ }\NormalTok{g_}\DecValTok{4}\NormalTok{, }\OperatorTok{~}\NormalTok{g_}\DecValTok{5}\NormalTok{,}
-                                 \StringTok{'!@ something_\{<something>\} CHECKMARK'}\NormalTok{, }\DecValTok{39}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{,}
-                                 \StringTok{'!@ VENUS_\{<something>\} | VENUS_\{<something>\} '}\NormalTok{, }\DecValTok{9}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
+                                 \StringTok{'$$something_\{}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{textrm\{something\}\} CHECKMARK$$'}\NormalTok{, }\DecValTok{39}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{,}
+                                 \StringTok{'$$VENUS_\{}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{textrm\{something\}\} | VENUS_\{}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{textrm\{something\}\}$$ '}\NormalTok{, }\DecValTok{9}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{,}
                                  \StringTok{'PLUTO'}\NormalTok{, }\DecValTok{38}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{,}
                                  \StringTok{'NEP'}\NormalTok{, }\DecValTok{11}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{)}
 
@@ -164,7 +164,7 @@
 \NormalTok{rename_col <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{()\{}
 \NormalTok{  to_rename <-}\StringTok{ }\NormalTok{summary_single_table }\OperatorTok{%>%}\StringTok{ }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\StringTok{'grpname'}\NormalTok{)}
 \NormalTok{  col_nm <-}\StringTok{ }\KeywordTok{names}\NormalTok{(to_rename)}
-\NormalTok{  v <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}\StringTok{'No AE'}\NormalTok{, }\StringTok{'!@1_\{<rad>\}'}\NormalTok{, }\StringTok{'2'}\NormalTok{, }\StringTok{'3'}\NormalTok{, }\StringTok{'4'}\NormalTok{, }\StringTok{'5'}\NormalTok{, }\StringTok{'N'}\NormalTok{)}
+\NormalTok{  v <-}\StringTok{ }\KeywordTok{list}\NormalTok{(}\StringTok{'No AE'}\NormalTok{, }\StringTok{'$$1_\{}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{textrm\{rad\}\}$$'}\NormalTok{, }\StringTok{'2'}\NormalTok{, }\StringTok{'3'}\NormalTok{, }\StringTok{'4'}\NormalTok{, }\StringTok{'5'}\NormalTok{, }\StringTok{'N'}\NormalTok{)}
   \KeywordTok{names}\NormalTok{(v) <-}\StringTok{ }\NormalTok{col_nm}
 \NormalTok{  v}
 \NormalTok{\}}
@@ -173,7 +173,7 @@
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{df  }\OperatorTok{%>%}
+\NormalTok{tbl <-}\StringTok{ }\NormalTok{df  }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{gt}\NormalTok{(}\DataTypeTok{rowname_col =} \StringTok{'grpname'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{tab_stubhead}\NormalTok{(}\DataTypeTok{label =} \StringTok{"TESTING"}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{cols_move_to_start}\NormalTok{(}
@@ -219,30 +219,45 @@
 \StringTok{  }\KeywordTok{cols_label}\NormalTok{(}\DataTypeTok{.list =} \KeywordTok{rename_col}\NormalTok{()) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{tab_source_note}\NormalTok{(}
     \KeywordTok{c}\NormalTok{(}
-      \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()),}
-      \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\KeywordTok{gsub}\NormalTok{(}\StringTok{'.Rmd'}\NormalTok{, }\StringTok{'.tex'}\NormalTok{, knitr}\OperatorTok{::}\KeywordTok{current_input}\NormalTok{()))}
+      \KeywordTok{paste0}\NormalTok{(}\StringTok{'Script code: '}\NormalTok{, }\StringTok{'latex_math.Rmd'}\NormalTok{),}
+      \KeywordTok{paste0}\NormalTok{(}\StringTok{'Tex code: '}\NormalTok{, }\StringTok{'latex_math.tex'}\NormalTok{)}
 \NormalTok{    )}
 \NormalTok{  ) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{as_latex}\NormalTok{()}
+\NormalTok{tbl}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{ThreePartTable}
-\settotextwidth\begin{TableNotes}
-\centering
+
+
+\settotextwidth
+\begin{TableNotes}
+\setlength\labelsep{0pt}
 \footnotesize
+\arraybackslash\raggedright
+
 \item \textsuperscript{1}Color indicates height of sun.
+
 \item
+\arraybackslash\raggedright
+
 \item Script code: latex\_math.Rmd
 \item Tex code: latex\_math.tex
+
 \end{TableNotes}
+
+
 \setlength{\tabcolsep}{3pt}
 \captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
-\begin{longtable}{p{4.68cm}p{1.69cm}p{1.69cm}p{1.69cm}p{1.69cm}p{1.69cm}p{1.69cm}p{1.69cm}} 
+\begin{longtable}{p{5.65cm}p{1.41cm}p{1.55cm}p{1.41cm}p{1.41cm}p{1.41cm}p{1.41cm}p{1.41cm}} 
+
+
 \toprule
 & \multicolumn{2}{c}{} & \multicolumn{5}{c}{Distance} \\ 
  \cmidrule(lr){4-8}
-TESTING & N & No AE & $1_{\text{rad}}\textsuperscript{1}$ & 2\textsuperscript{1} & 3\textsuperscript{1} & 4\textsuperscript{1} & 5\textsuperscript{1} \\ 
+TESTING & N & No AE & $1_{\textrm{rad}}\textsuperscript{1}$ & 2\textsuperscript{1} & 3\textsuperscript{1} & 4\textsuperscript{1} & 5\textsuperscript{1}\\ 
+
 \endfirsthead
 \endhead
 \bottomrule
@@ -250,12 +265,23 @@ TESTING & N & No AE & $1_{\text{rad}}\textsuperscript{1}$ & 2\textsuperscript{1}
 \insertTableNotes
 \endlastfoot
 \midrule
-$ something_{\text{something}} \text{\checkmark}$ & 54 & 39 (0.72) & 5 (0.09) & 7 (0.13) & 1 (0.02) & 1 (0.02) & 1 (0.02) \\ 
-$ VENUS_{\text{something}} \vert VENUS_{\text{something}} $ & 14 & 9 (0.64) & 3 (0.21) & 0 (0.00) & 2 (0.14) & 0 (0.00) & 0 (0.00) \\ 
+$something_{\textrm{something}} \text{\checkmark}$ & 54 & 39 (0.72) & 5 (0.09) & 7 (0.13) & 1 (0.02) & 1 (0.02) & 1 (0.02) \\ 
+$VENUS_{\textrm{something}} \vert VENUS_{\textrm{something}} $ & 14 & 9 (0.64) & 3 (0.21) & 0 (0.00) & 2 (0.14) & 0 (0.00) & 0 (0.00) \\ 
 PLUTO & 47 & 38 (0.81) & 0 (0.00) & 6 (0.13) & 0 (0.00) & 1 (0.02) & 2 (0.04) \\ 
 NEP & 15 & 11 (0.73) & 0 (0.00) & 3 (0.20) & 1 (0.07) & 0 (0.00) & 0 (0.00) \\ 
+
 \bottomrule
 \end{longtable}
 \end{ThreePartTable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{as.character}\NormalTok{(tbl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "\\begin{ThreePartTable}\n\n\n\\settotextwidth\n\\begin{TableNotes}\n\\setlength\\labelsep{0pt}\n\\footnotesize\n\\arraybackslash\\raggedright\n\n\\item \\textsuperscript{1}Color indicates height of sun.\n\n\\item\n\\arraybackslash\\raggedright\n\n\\item Script code: latex\\_math.Rmd\n\\item Tex code: latex\\_math.tex\n\n\\end{TableNotes}\n\n\n\\setlength{\\tabcolsep}{3pt}\n\\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\\textwidth}\n\\begin{longtable}{p{5.65cm}p{1.41cm}p{1.55cm}p{1.41cm}p{1.41cm}p{1.41cm}p{1.41cm}p{1.41cm}} \n\n\n\\toprule\n& \\multicolumn{2}{c}{} & \\multicolumn{5}{c}{Distance} \\\\ \n \\cmidrule(lr){4-8}\nTESTING & N & No AE & $1_{\\textrm{rad}}\\textsuperscript{1}$ & 2\\textsuperscript{1} & 3\\textsuperscript{1} & 4\\textsuperscript{1} & 5\\textsuperscript{1}\\\\ \n\n\\endfirsthead\n\\endhead\n\\bottomrule\n\\addlinespace\n\\insertTableNotes\n\\endlastfoot\n\\midrule\n$something_{\\textrm{something}} \\text{\\checkmark}$ & 54 & 39 (0.72) & 5 (0.09) & 7 (0.13) & 1 (0.02) & 1 (0.02) & 1 (0.02) \\\\ \n$VENUS_{\\textrm{something}} \\vert VENUS_{\\textrm{something}} $ & 14 & 9 (0.64) & 3 (0.21) & 0 (0.00) & 2 (0.14) & 0 (0.00) & 0 (0.00) \\\\ \nPLUTO & 47 & 38 (0.81) & 0 (0.00) & 6 (0.13) & 0 (0.00) & 1 (0.02) & 2 (0.04) \\\\ \nNEP & 15 & 11 (0.73) & 0 (0.00) & 3 (0.20) & 1 (0.07) & 0 (0.00) & 0 (0.00) \\\\ \n\n\\bottomrule\n\\end{longtable}\n\\end{ThreePartTable}\n"
+\end{verbatim}
 
 \end{document}

@@ -1,0 +1,10 @@
+\settotextwidth
+\begin{TableNotes}
+\setlength\labelsep{0pt}
+{{{size}}}
+{{{footnotes_align}}}
+{{{footnotes}}}
+\item
+{{{sourcenotes_align}}}
+{{{sourcenotes}}}
+\end{TableNotes}

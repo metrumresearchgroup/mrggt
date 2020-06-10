@@ -1,0 +1,6 @@
+{{font_size}}{
+{{{var_assignments}}}
+\message{^^JBEGINWIDTHS={{{font_size_dec}}}PT}
+{{{var_output}}}
+\message{^^JENDWIDTHS={{{font_size_dec}}}PT^^J}
+}

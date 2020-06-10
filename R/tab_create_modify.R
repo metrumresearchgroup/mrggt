@@ -46,6 +46,41 @@ tab_header <- function(data,
   data %>% dt_heading_title_subtitle(title = title, subtitle = subtitle)
 }
 
+
+#' Add a caption to a LaTeX table
+#'
+#' Set a caption within the `longtable` LaTeX environment.
+#'
+#' @param data A table object that is created using the [gt()] function.
+#' @param caption the caption to be set within `\caption{}` in the `longtable` environment. `label` can also be passed.
+#'
+#' @return An object of class `gt_tbl`.
+#'
+#' @examples
+#' # Use `gtcars` to create a gt table;
+#' # Group several columns related to car
+#' # add a caption of 'Gtcars table'
+#' # with the label `performance`
+#' tab_1 <-
+#'   gtcars %>%
+#'   dplyr::select(
+#'     -mfr, -trim, bdy_style, drivetrain,
+#'     -drivetrain, -trsmn, -ctry_origin
+#'   ) %>%
+#'   dplyr::slice(1:8) %>%
+#'   gt(rowname_col = "model") %>%
+#'   tab_caption(caption = "Gtcars table\\label{performance}")
+#'
+#' @export
+tab_caption <- function(data,
+                        caption) {
+
+  # Perform input object validation
+  stop_if_not_gt(data = data)
+
+  data %>% dt_caption(caption = caption)
+}
+
 #' Add a spanner column label
 #'
 #' Set a spanner column label by mapping it to columns already in the table.
@@ -1142,6 +1177,13 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   horizontal or vertical scrolling is enabled to view the entire table in
 #'   those directions. With `FALSE`, the table may be clipped if the table width
 #'   or height exceeds the `container.width` or `container.height`.
+#' @param table.optimize.width,table.optimize.font LaTeX only parameters.
+#'   Both can be specified as `TRUE` or `FALSE`. Default is `TRUE`/`TRUE`.
+#'   `mrggt` does both column width and fontsizing calculations for LaTeX tables
+#'   to ensure they do not exceed the available page width. If `table.optimize.font`
+#'   is `FALSE`, the value specified for `table.font.size` will be used and optimal
+#'   column widths under that font size will be calculated. If `table.optimize.width`
+#'   is `FALSE`, the `table.font.size` will be used and no column optimization will occur.
 #' @param table.width The width of the table. Can be specified as a
 #'   single-length character with units of pixels or as a percentage. If
 #'   provided as a single-length numeric vector, it is assumed that the value is
@@ -1179,7 +1221,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   percentage (e.g., `80\%`). If provided as a single-length numeric vector,
 #'   it is assumed that the value is given in units of pixels. The [px()] and
 #'   [pct()] helper functions can also be used to pass in numeric values and
-#'   obtain values as pixel or percentage units.
+#'   obtain values as pixel or percentage units. LaTeX: `table.font.size` will be ignored if `table.optimize.font` is `TRUE`.
 #' @param heading.align Controls the horizontal alignment of the heading title
 #'   and subtitle. We can either use `"center"`, `"left"`, or `"right"`.
 #' @param heading.title.font.weight,heading.subtitle.font.weight,column_labels.font.weight,row_group.font.weight,stub.font.weight
@@ -1241,6 +1283,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param grand_summary_row.border.style,grand_summary_row.border.width,grand_summary_row.border.color
 #'   The style, width, and color properties for the top borders of the
 #'   `grand_summary_row` location.
+#' @param footnotes.align alignment for the footnotes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param footnotes.border.bottom.style,footnotes.border.bottom.width,footnotes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `footnotes` location.
@@ -1260,6 +1303,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   `"LETTERS"`. There is the option for using a traditional symbol set where
 #'   `"standard"` provides four symbols, and, `"extended"` adds two more
 #'   symbols, making six.
+#' @param source_notes.align alignment for the source notes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param source_notes.border.bottom.style,source_notes.border.bottom.width,source_notes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `source_notes` location.
@@ -1377,6 +1421,8 @@ tab_options <- function(data,
                         container.height = NULL,
                         container.overflow.x = NULL,
                         container.overflow.y = NULL,
+                        table.optimize.font = NULL,
+                        table.optimize.width = NULL,
                         table.width = NULL,
                         table.align = NULL,
                         table.margin.left = NULL,
@@ -1475,6 +1521,7 @@ tab_options <- function(data,
                         grand_summary_row.border.style = NULL,
                         grand_summary_row.border.width = NULL,
                         grand_summary_row.border.color = NULL,
+                        footnotes.align = NULL,
                         footnotes.background.color = NULL,
                         footnotes.font.size = NULL,
                         footnotes.padding = NULL,
@@ -1486,6 +1533,7 @@ tab_options <- function(data,
                         footnotes.border.lr.color = NULL,
                         footnotes.sep = NULL,
                         footnotes.marks = NULL,
+                        source_notes.align = NULL,
                         source_notes.background.color = NULL,
                         source_notes.font.size = NULL,
                         source_notes.padding = NULL,

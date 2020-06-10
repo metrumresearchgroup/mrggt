@@ -79,6 +79,7 @@ Collate:
     'dt__.R'
     'dt_body.R'
     'dt_boxhead.R'
+    'dt_caption.R'
     'dt_cols_merge.R'
     'dt_data.R'
     'dt_footnotes.R'

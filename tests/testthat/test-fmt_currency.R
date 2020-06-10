@@ -558,9 +558,9 @@ test_that("the `currency()` helper function works correctly", {
          currency = currency(html = "&#8383;", latex = "BTC", default = "BTC"),
          decimals = 4) %>%
        render_formats_test(context = "latex"))[["num_1"]],
-    c("$\\text{BTC}1,836.2300$", "$\\text{BTC}2,763.3900$",
-      "$\\text{BTC}937.2900$", "$\\text{BTC}643.0000$",
-      "$\\text{BTC}212.2320$", "$\\text{BTC}0.0000$", "$-\\text{BTC}23.2400$")
+    c("$$\\text{BTC}1,836.2300$$", "$$\\text{BTC}2,763.3900$$",
+      "$$\\text{BTC}937.2900$$", "$$\\text{BTC}643.0000$$",
+      "$$\\text{BTC}212.2320$$", "$$\\text{BTC}0.0000$$", "$$-\\text{BTC}23.2400$$")
   )
 
   # Format the `num_1` column using the `currency()` helper function;
@@ -586,8 +586,8 @@ test_that("the `currency()` helper function works correctly", {
          currency = currency(html = "HKD", latex = "HK$", default = "hkd"),
          decimals = 2) %>%
        render_formats_test(context = "latex"))[["num_1"]],
-    c("$\\text{HK\\$}1,836.23$", "$\\text{HK\\$}2,763.39$",
-      "$\\text{HK\\$}937.29$", "$\\text{HK\\$}643.00$",
-      "$\\text{HK\\$}212.23$", "$\\text{HK\\$}0.00$", "$-\\text{HK\\$}23.24$")
+    c("$$\\text{HK\\$}1,836.23$$", "$$\\text{HK\\$}2,763.39$$",
+      "$$\\text{HK\\$}937.29$$", "$$\\text{HK\\$}643.00$$",
+      "$$\\text{HK\\$}212.23$$", "$$\\text{HK\\$}0.00$$", "$$-\\text{HK\\$}23.24$$")
   )
 })
