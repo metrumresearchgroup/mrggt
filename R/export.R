@@ -382,6 +382,9 @@ as_latex <- function(data) {
   styles_tbl <- dt_styles_get(data = data)
   tbl_cache$color_def <- define_colors_latex(styles_tbl)
 
+  # Create a LaTeX fragment for the column sep of the table
+  column_sep <- latex_column_sep(data = data)
+
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
 
@@ -392,7 +395,8 @@ as_latex <- function(data) {
     heading_component = create_heading_component(data = data, context = "latex"),
     columns_component = create_columns_component_l(data = data),
     body_component = create_body_component_l(data = data),
-    caption = create_caption_l(data = data)
+    caption = create_caption_l(data = data),
+    column_sep = column_sep
   )
 
   if(is.null(tbl_cache$color_def)){

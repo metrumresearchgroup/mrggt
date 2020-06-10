@@ -35,6 +35,7 @@ initialize_templates <- function(){
 initialize_tbl_cache <- function() {
   tbl_cache$color_def <- NULL
   tbl_cache$font_size <- NULL
+  tbl_cache$col_sep <- NULL
 }
 
 initialize_templates()

@@ -47,6 +47,15 @@ footnote_mark_to_latex <- function(mark) {
 }
 
 #' @noRd
+latex_column_sep <- function(data){
+  col_sep <-
+    gsub('px', '', dt_options_get_value(data, 'column_sep')) %>% as.numeric()
+  tbl_cache$col_sep <- round(col_sep*0.75, 1)
+  paste0('{', tbl_cache$col_sep, 'pt}')
+}
+
+
+#' @noRd
 latex_body_row <- function(content,
                            type) {
 

@@ -44,6 +44,7 @@ tab_options(
   heading.border.lr.style = NULL,
   heading.border.lr.width = NULL,
   heading.border.lr.color = NULL,
+  column_sep = NULL,
   column_labels.background.color = NULL,
   column_labels.font.size = NULL,
   column_labels.font.weight = NULL,
@@ -222,6 +223,13 @@ border shares space with that of the \code{column_labels} location. If the
 \item{heading.border.lr.style, heading.border.lr.width, heading.border.lr.color}{The style, width, and color properties for the left and right borders of
 the \code{heading} location.}
 
+\item{column_sep}{LaTeX only. The separation between the columns Specified as a
+single-length character with units of pixels. If
+provided as a single-length numeric vector, it is assumed that the value is
+given in units of pixels. The \code{\link[=px]{px()}} helper function can also
+be used to pass in a numeric value and obtain value as pixel
+units.}
+
 \item{column_labels.text_transform, row_group.text_transform, stub.text_transform, summary_row.text_transform, grand_summary_row.text_transform}{Options to apply text transformations to the \code{column_labels}, \code{row_group},
 \code{stub}, \code{summary_row}, and \code{grand_summary_row} text elements. Either of the
 \code{"uppercase"}, \code{"lowercase"}, or \code{"capitalize"} keywords can be used.}
@@ -312,6 +320,23 @@ An object of class \code{gt_tbl}.
 \description{
 Modify the options available in a table. These options are named by the
 components, the subcomponents, and the element that can adjusted.
+}
+\note{
+LaTeX implementation of \code{tab_options} is a work in progress.
+\itemize{
+\item Currently implemented in LaTeX:
+\itemize{
+\item \code{table.font.size}
+\item Only available for LaTeX:
+\itemize{
+\item \code{table.optimize.width}
+\item \code{table.optimize.font}
+\item \code{column_sep}
+\item \code{footnotes.align}
+\item \code{sourcenotes.align}
+}
+}
+}
 }
 \section{Figures}{
 

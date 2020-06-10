@@ -1248,6 +1248,12 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param heading.border.lr.style,heading.border.lr.width,heading.border.lr.color
 #'   The style, width, and color properties for the left and right borders of
 #'   the `heading` location.
+#' @param column_sep LaTeX only. The separation between the columns Specified as a
+#'   single-length character with units of pixels. If
+#'   provided as a single-length numeric vector, it is assumed that the value is
+#'   given in units of pixels. The [px()] helper function can also
+#'   be used to pass in a numeric value and obtain value as pixel
+#'   units.
 #' @param column_labels.vlines.style,column_labels.vlines.width,column_labels.vlines.color
 #'   The style, width, and color properties for all vertical lines ('vlines')
 #'   of the the `column_labels`.
@@ -1319,6 +1325,18 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'
 #' @return An object of class `gt_tbl`.
 #'
+#'
+#' @note
+#' LaTeX implementation of `tab_options` is a work in progress.
+#'  - Currently implemented in LaTeX:
+#'     - `table.font.size`
+#'     - Only available for LaTeX:
+#'       - `table.optimize.width`
+#'       - `table.optimize.font`
+#'       - `column_sep`
+#'       - `footnotes.align`
+#'       - `sourcenotes.align`
+
 #' @examples
 #' # Use `exibble` to create a gt table with
 #' # all the main parts added; we can use this
@@ -1455,6 +1473,7 @@ tab_options <- function(data,
                         heading.border.lr.style = NULL,
                         heading.border.lr.width = NULL,
                         heading.border.lr.color = NULL,
+                        column_sep = NULL,
                         column_labels.background.color = NULL,
                         column_labels.font.size = NULL,
                         column_labels.font.weight = NULL,

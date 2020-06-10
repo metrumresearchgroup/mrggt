@@ -68,6 +68,7 @@ dt_options_tbl <-
     "table_border_left_style",            TRUE,  "table",            "value",   "none",
     "table_border_left_width",            TRUE,  "table",            "px",      "2px",
     "table_border_left_color",            TRUE,  "table",            "value",   "#D3D3D3",
+    "column_sep",                         TRUE,  "table",            "px",      "3.984px",
     "heading_background_color",           TRUE,  "heading",          "value",   NA_character_,
     "heading_align",                      TRUE,  "heading",          "value",   "center",
     "heading_title_font_size",            TRUE,  "heading",          "px",      "125%",

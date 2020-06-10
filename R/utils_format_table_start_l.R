@@ -175,7 +175,7 @@ available_width_table <- function(number_columns){
   page_width <- full_width - sum(latex_cache$margin)*2.54
 
   # 3pt col sep per col; 1 pt -> 0.0352778 cm;
-  page_width - 3*0.0352778*number_columns
+  page_width - tbl_cache$col_sep*0.0352778*number_columns
 }
 
 lengths_tbl_summary <- function(lengths_tbl, type_setting) {

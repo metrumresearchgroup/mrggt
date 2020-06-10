@@ -3,7 +3,7 @@
 {{{table_font_size}}}
 {{{src_foot_component}}}
 {{{heading_component}}}
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{{{column_sep}}}
 \captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\textwidth}
 {{{table_start}}}
 {{{caption}}}
