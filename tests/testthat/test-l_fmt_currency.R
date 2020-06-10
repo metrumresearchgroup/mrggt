@@ -25,9 +25,9 @@ test_that("the `fmt_currency()` function works correctly", {
     (tbl_latex %>%
        fmt_currency(columns = "num_1", currency = "USD") %>%
        render_formats_test(context = "latex"))[["num_1"]],
-    c("$\\text{\\$}1,836.23$", "$\\text{\\$}2,763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$-\\text{\\$}23.24$")
+    c("$$\\text{\\$}1,836.23$$", "$$\\text{\\$}2,763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$-\\text{\\$}23.24$$")
   )
 
   # Format the `num_1` column as USD to 5 decimal places, use all
@@ -36,10 +36,10 @@ test_that("the `fmt_currency()` function works correctly", {
     (tbl_latex %>%
        fmt_currency(columns = "num_1", currency = "USD", decimals = 5) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1,836.23000$", "$\\text{\\$}2,763.39000$",
-      "$\\text{\\$}937.29000$", "$\\text{\\$}643.00000$",
-      "$\\text{\\$}212.23200$", "$\\text{\\$}0.00000$",
-      "$-\\text{\\$}23.24000$")
+    c("$$\\text{\\$}1,836.23000$$", "$$\\text{\\$}2,763.39000$$",
+      "$$\\text{\\$}937.29000$$", "$$\\text{\\$}643.00000$$",
+      "$$\\text{\\$}212.23200$$", "$$\\text{\\$}0.00000$$",
+      "$$-\\text{\\$}23.24000$$")
   )
 
   # Format the `num_1` column as USD, and don't include the subunits;
@@ -49,9 +49,9 @@ test_that("the `fmt_currency()` function works correctly", {
     (tbl_latex %>%
        fmt_currency(columns = "num_1", currency = "USD", use_subunits = FALSE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1,836$", "$\\text{\\$}2,763$", "$\\text{\\$}937$",
-      "$\\text{\\$}643$", "$\\text{\\$}212$", "$\\text{\\$}0$",
-      "$-\\text{\\$}23$")
+    c("$$\\text{\\$}1,836$$", "$$\\text{\\$}2,763$$", "$$\\text{\\$}937$$",
+      "$$\\text{\\$}643$$", "$$\\text{\\$}212$$", "$$\\text{\\$}0$$",
+      "$$-\\text{\\$}23$$")
   )
 
   # Format the `num_1` column as USD, don't use digit
@@ -61,9 +61,9 @@ test_that("the `fmt_currency()` function works correctly", {
     (tbl_latex %>%
        fmt_currency(columns = "num_1", currency = "USD", use_seps = FALSE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1836.23$", "$\\text{\\$}2763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$-\\text{\\$}23.24$")
+    c("$$\\text{\\$}1836.23$$", "$$\\text{\\$}2763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$-\\text{\\$}23.24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, use a single space
@@ -73,9 +73,9 @@ test_that("the `fmt_currency()` function works correctly", {
     (tbl_latex %>%
        fmt_currency(columns = "num_1", currency = "USD", sep_mark = " ") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1 836.23$", "$\\text{\\$}2 763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$-\\text{\\$}23.24$")
+    c("$$\\text{\\$}1 836.23$$", "$$\\text{\\$}2 763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$-\\text{\\$}23.24$$")
   )
 
   # Format the `num_1` column as USD, use a period for the digit grouping
@@ -87,9 +87,9 @@ test_that("the `fmt_currency()` function works correctly", {
          columns = "num_1", currency = "USD",
          sep_mark = ".", dec_mark = ",") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1.836,23$", "$\\text{\\$}2.763,39$", "$\\text{\\$}937,29$",
-      "$\\text{\\$}643,00$", "$\\text{\\$}212,23$", "$\\text{\\$}0,00$",
-      "$-\\text{\\$}23,24$")
+    c("$$\\text{\\$}1.836,23$$", "$$\\text{\\$}2.763,39$$", "$$\\text{\\$}937,29$$",
+      "$$\\text{\\$}643,00$$", "$$\\text{\\$}212,23$$", "$$\\text{\\$}0,00$$",
+      "$$-\\text{\\$}23,24$$")
   )
 
   # Format the `num_1` column as USD, apply parentheses to all negative
@@ -100,9 +100,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "USD", accounting = TRUE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1,836.23$", "$\\text{\\$}2,763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$(\\text{\\$}23.24)$")
+    c("$$\\text{\\$}1,836.23$$", "$$\\text{\\$}2,763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$(\\text{\\$}23.24)$$")
   )
 
   # Format the `num_1` column as USD, apply parentheses to all negative
@@ -113,9 +113,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "USD", accounting = TRUE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1,836.23$", "$\\text{\\$}2,763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$(\\text{\\$}23.24)$")
+    c("$$\\text{\\$}1,836.23$$", "$$\\text{\\$}2,763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$(\\text{\\$}23.24)$$")
   )
 
   # Format the `num_1` column as USD to 4 decimal places, scale all values by
@@ -127,9 +127,9 @@ test_that("the `fmt_currency()` function works correctly", {
          columns = "num_1", currency = "USD",
          decimals = 4, scale_by = 1/1000) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1.8362$", "$\\text{\\$}2.7634$", "$\\text{\\$}0.9373$",
-      "$\\text{\\$}0.6430$", "$\\text{\\$}0.2122$", "$\\text{\\$}0.0000$",
-      "$-\\text{\\$}0.0232$")
+    c("$$\\text{\\$}1.8362$$", "$$\\text{\\$}2.7634$$", "$$\\text{\\$}0.9373$$",
+      "$$\\text{\\$}0.6430$$", "$$\\text{\\$}0.2122$$", "$$\\text{\\$}0.0000$$",
+      "$$-\\text{\\$}0.0232$$")
   )
 
   # Format the `num_1` column as USD, prepend and append all values by 2
@@ -140,10 +140,10 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "USD", pattern = "a {x} b") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("a $\\text{\\$}1,836.23$ b", "a $\\text{\\$}2,763.39$ b",
-      "a $\\text{\\$}937.29$ b", "a $\\text{\\$}643.00$ b",
-      "a $\\text{\\$}212.23$ b", "a $\\text{\\$}0.00$ b",
-      "a $-\\text{\\$}23.24$ b")
+    c("a $$\\text{\\$}1,836.23$$ b", "a $$\\text{\\$}2,763.39$$ b",
+      "a $$\\text{\\$}937.29$$ b", "a $$\\text{\\$}643.00$$ b",
+      "a $$\\text{\\$}212.23$$ b", "a $$\\text{\\$}0.00$$ b",
+      "a $$-\\text{\\$}23.24$$ b")
   )
 
   # Format the `num_1` column as USD to 4 decimal places, scale all values
@@ -155,9 +155,9 @@ test_that("the `fmt_currency()` function works correctly", {
          columns = "num_1", currency = "USD", decimals = 4,
          scale_by = 1/1000, pattern = "{x}K") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1.8362$K", "$\\text{\\$}2.7634$K", "$\\text{\\$}0.9373$K",
-      "$\\text{\\$}0.6430$K", "$\\text{\\$}0.2122$K", "$\\text{\\$}0.0000$K",
-      "$-\\text{\\$}0.0232$K")
+    c("$$\\text{\\$}1.8362$$K", "$$\\text{\\$}2.7634$$K", "$$\\text{\\$}0.9373$$K",
+      "$$\\text{\\$}0.6430$$K", "$$\\text{\\$}0.2122$$K", "$$\\text{\\$}0.0000$$K",
+      "$$-\\text{\\$}0.0232$$K")
   )
 
   # Format the `num_1` column as USD, apply the `en_US` locale and use all
@@ -167,9 +167,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "USD", locale = "en_US") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{\\$}1,836.23$", "$\\text{\\$}2,763.39$", "$\\text{\\$}937.29$",
-      "$\\text{\\$}643.00$", "$\\text{\\$}212.23$", "$\\text{\\$}0.00$",
-      "$-\\text{\\$}23.24$")
+    c("$$\\text{\\$}1,836.23$$", "$$\\text{\\$}2,763.39$$", "$$\\text{\\$}937.29$$",
+      "$$\\text{\\$}643.00$$", "$$\\text{\\$}212.23$$", "$$\\text{\\$}0.00$$",
+      "$$-\\text{\\$}23.24$$")
   )
 
   # Format the `num_1` column as DKK, apply the `da_DK` locale and use all
@@ -180,9 +180,9 @@ test_that("the `fmt_currency()` function works correctly", {
          columns = "num_1", currency = "DKK", locale = "da_DK",
          placement = "right", incl_space = TRUE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.836,23 \\text{kr.}$", "$2.763,39 \\text{kr.}$",
-      "$937,29 \\text{kr.}$", "$643,00 \\text{kr.}$", "$212,23 \\text{kr.}$",
-      "$0,00 \\text{kr.}$", "$-23,24 \\text{kr.}$")
+    c("$$1.836,23 \\text{kr.}$$", "$$2.763,39 \\text{kr.}$$",
+      "$$937,29 \\text{kr.}$$", "$$643,00 \\text{kr.}$$", "$$212,23 \\text{kr.}$$",
+      "$$0,00 \\text{kr.}$$", "$$-23,24 \\text{kr.}$$")
   )
 
   # Format the `num_1` column as DKK, apply the `da_DK` locale and use all
@@ -192,9 +192,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "DKK", locale = "da_DK") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{kr.}1.836,23$", "$\\text{kr.}2.763,39$", "$\\text{kr.}937,29$",
-      "$\\text{kr.}643,00$", "$\\text{kr.}212,23$", "$\\text{kr.}0,00$",
-      "$-\\text{kr.}23,24$" )
+    c("$$\\text{kr.}1.836,23$$", "$$\\text{kr.}2.763,39$$", "$$\\text{kr.}937,29$$",
+      "$$\\text{kr.}643,00$$", "$$\\text{kr.}212,23$$", "$$\\text{kr.}0,00$$",
+      "$$-\\text{kr.}23,24$$" )
   )
 
   # Format the `num_1` column as EUR, apply the `de_AT` locale and use all
@@ -204,9 +204,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "EUR", locale = "de_AT") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{EUR}1 836,23$", "$\\text{EUR}2 763,39$", "$\\text{EUR}937,29$",
-      "$\\text{EUR}643,00$", "$\\text{EUR}212,23$", "$\\text{EUR}0,00$",
-      "$-\\text{EUR}23,24$")
+    c("$$\\text{EUR}1 836,23$$", "$$\\text{EUR}2 763,39$$", "$$\\text{EUR}937,29$$",
+      "$$\\text{EUR}643,00$$", "$$\\text{EUR}212,23$$", "$$\\text{EUR}0,00$$",
+      "$$-\\text{EUR}23,24$$")
   )
 
   # Format the `num_1` column as EUR, apply the `de_AT` locale and use all
@@ -217,9 +217,9 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "EUR", locale = "de_AT") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{EUR}1 836,23$", "$\\text{EUR}2 763,39$", "$\\text{EUR}937,29$",
-      "$\\text{EUR}643,00$", "$\\text{EUR}212,23$", "$\\text{EUR}0,00$",
-      "$-\\text{EUR}23,24$")
+    c("$$\\text{EUR}1 836,23$$", "$$\\text{EUR}2 763,39$$", "$$\\text{EUR}937,29$$",
+      "$$\\text{EUR}643,00$$", "$$\\text{EUR}212,23$$", "$$\\text{EUR}0,00$$",
+      "$$-\\text{EUR}23,24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `et_EE`
@@ -230,8 +230,8 @@ test_that("the `fmt_currency()` function works correctly", {
        fmt_currency(
          columns = "num_1", currency = "EUR", locale = "et_EE") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$\\text{EUR}1 836,23$", "$\\text{EUR}2 763,39$", "$\\text{EUR}937,29$",
-      "$\\text{EUR}643,00$", "$\\text{EUR}212,23$", "$\\text{EUR}0,00$",
-      "$-\\text{EUR}23,24$")
+    c("$$\\text{EUR}1 836,23$$", "$$\\text{EUR}2 763,39$$", "$$\\text{EUR}937,29$$",
+      "$$\\text{EUR}643,00$$", "$$\\text{EUR}212,23$$", "$$\\text{EUR}0,00$$",
+      "$$-\\text{EUR}23,24$$")
   )
 })

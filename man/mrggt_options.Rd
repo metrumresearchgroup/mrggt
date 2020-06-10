@@ -18,6 +18,7 @@ mrggt_options(...)
 \item \emph{junior legal}: 5.0 x 8.0 in
 \item \emph{ledger}: 11.0 x 17.0 in
 }
+\item \strong{document_dec}: document declaration for LaTeX in \verb{c(document type, font size)}; default is \verb{('article', 12)} corresponding to \verb{\\documentclass[12pt]\{article\}}
 }}
 }
 \description{

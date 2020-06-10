@@ -19,7 +19,7 @@ get_data_rows_l <- function(data) {
   full_matrix <- rbind(col_labels, data_rows)
   dimnames(full_matrix)[[2]] <- NULL
   if(!is.null(rows$sum_rows)){
-    sum_rows <- as.matrix(rows$sum_rows %>% select(-summary_key))
+    sum_rows <- as.matrix(rows$sum_rows %>% dplyr::select(-'::SUMMARY_KEY'))
     dimnames(sum_rows)[[2]] <- NULL
     full_matrix <- rbind(full_matrix, sum_rows)
   }
@@ -64,28 +64,49 @@ create_log_file <- function(tex_str){
   log_file
 }
 
-create_tex_width_file <- function(tbl_matrix){
+create_tex_width_file <- function(tbl_matrix, font_size = NULL){
   elements <- as.vector(tbl_matrix)
   keys <- paste0("\\", stringi::stri_rand_strings(length(elements),
                                                   7,
                                                   pattern = "[A-Za-z]"))
 
-  vars_summary <- list(var_declarations = paste0("\\newlength{", keys, "} \n"),
-                       var_assignments = paste0("\\settowidth{", keys, "}{", elements, "} \n"),
+  vars_summary <- list(var_assignments = paste0("\\settowidth{", keys, "}{", elements, "} \n"),
                        var_output =  paste0("\\message{^^J\\the", keys, "} \n"))
 
   vars_summary <- purrr::map(vars_summary,
                              paste,
                              collapse = '')
 
+  sizes <- latex_font_size_tbl()$Command[1:5]
+  if(is.null(font_size)){
+
+    size_environments <- purrr::map_chr(sizes, function(.x){
+      vars_summary$font_size_dec <- gsub('\\', '', .x, fixed = TRUE)
+      vars_summary$font_size <- .x
+      whisker::whisker.render(latex_templates$font_size_width,
+                              vars_summary)
+    })
+    vars_summary <- list(font_size_width = paste(size_environments,
+                                                 collapse = ' \n'))
+  } else {
+    vars_summary$font_size <- font_size
+    vars_summary$font_size_dec <- gsub('\\', '', font_size, fixed = TRUE)
+    vars_summary <- list(font_size_width = whisker::whisker.render(latex_templates$font_size_width,
+                                                                   vars_summary))
+  }
+
+  vars_summary$var_declarations <- paste(paste0("\\newlength{", keys, "} \n"), collapse = '')
   vars_summary$color_declarations <- tbl_cache$color_def
-  create_log_file(whisker::whisker.render(latex_templates$calc_width,
+
+
+  create_log_file(whisker::whisker.render(latex_templates$calc_width_template_new,
                                           vars_summary))
 }
 
 
-parse_tex <- function(tbl_matrix){
-  log_file <- create_tex_width_file(tbl_matrix)
+find_lengths <- function(tbl_matrix, font_size = NULL){
+  tbl_matrix <- sanitize_for_sizing(tbl_matrix)
+  log_file <- create_tex_width_file(tbl_matrix, font_size)
   tex_lines <- readr::read_lines(log_file)
 
   rangev <- mapply(`:`,
@@ -106,30 +127,43 @@ parse_tex <- function(tbl_matrix){
            nrow = nrows)
   })
 
-  names(sizes) <- c('11pt', '12pt')
+  if(is.null(font_size)){
+    names(sizes) <- gsub('\\', '', latex_font_size_tbl()$Command[1:5], fixed = TRUE)
+  } else{
+    names(sizes) <- gsub('\\', '', font_size, fixed = TRUE)
+  }
+
+  #names(sizes) <- c('11pt', '12pt')
   sizes
 }
 
-find_lengths <- function(tbl_matrix){
-  tbl_matrix_clean <- sanitize_for_sizing(tbl_matrix)
-
-  # find the length of every element when font size = 12 pt and 11 pt
-  lengths <- parse_tex(tbl_matrix_clean)
-
-  # use 11 pt and 12 calculation to determine how length changes with decreasing pt. for each element
-  lengths.slope <- slope(lengths$`11pt`,
-                         lengths$`12pt`,
-                         11,
-                         12)
-
-  # assume linear relationship between pt. and output size.
-  # use d/dx to calculate the 5-10 pt sizes for each element
-  # (faster than using the tikzDevice for every single element at all pt sizes).
-
-  lengths.addl <- purrr::map(5:10, ~ .x * lengths.slope)
-  names(lengths.addl) <- paste0(5:10, 'pt')
-  append(lengths.addl, lengths)
-}
+# find_lengths <- function(tbl_matrix, font_size){
+#   tbl_matrix_clean <- sanitize_for_sizing(tbl_matrix)
+#
+#   # find the length of every element when font size = 12 pt and 11 pt
+#   lengths <- parse_tex(tbl_matrix_clean)
+#
+#   # use 11 pt and 12 calculation to determine how length changes with decreasing pt. for each element
+#   lengths.slope <- slope(lengths$`11pt`,
+#                          lengths$`12pt`,
+#                          11,
+#                          12)
+#
+#   # assume linear relationship between pt. and output size.
+#   # use d/dx to calculate the 5-10 pt sizes for each element
+#   # (faster than using the tikzDevice for every single element at all pt sizes).
+#   browser()
+#   if(!is.null(font_size)){
+#
+#     one_font <- list(font_size*lengths.slope)
+#     names(one_font) <- paste0(font_size, 'pt')
+#     return(one_font)
+#
+#   }
+#   lengths.addl <- purrr::map(5:10, ~ .x * lengths.slope)
+#   names(lengths.addl) <- paste0(5:10, 'pt')
+#   append(lengths.addl, lengths)
+# }
 
 available_width_table <- function(number_columns){
 
@@ -144,7 +178,7 @@ available_width_table <- function(number_columns){
   page_width - 3*0.0352778*number_columns
 }
 
-lengths_tbl_summary <- function(lengths_tbl, pt_size) {
+lengths_tbl_summary <- function(lengths_tbl, type_setting) {
   page_width <- available_width_table(dim(lengths_tbl)[2])
 
   list(
@@ -152,7 +186,7 @@ lengths_tbl_summary <- function(lengths_tbl, pt_size) {
     max = apply(lengths_tbl, 2, max),
     total_size = sum(apply(lengths_tbl, 2, max)),
     fit.page = sum(apply(lengths_tbl, 2, max)) < page_width,
-    pt = as.numeric(gsub('pt', '', pt_size))
+    type_setting = paste0('\\', type_setting)
   )
 }
 
@@ -246,28 +280,41 @@ optimize_options <- function(summary){
 }
 
 rank_options <- function(option){
-  rank_pt <- option$pt
-  if(rank_pt > 8){
-    rank_pt <- rank_pt - 2
+  rank_pt <- match(option$type_setting,
+                   latex_font_size_tbl()$Command)
+
+  option$font_index <- rank_pt
+  if(rank_pt > 4){
+    rank_pt <- rank_pt + 1
   }
-  option$rank <- rank_pt - option$linebreaks
-  if(option$linebreaks == 0){
+
+  option$rank <- rank_pt - (option$linebreaks/length(option$optimized))*rank_pt
+  if(option$linebreaks < 1){
     option$rank = option$rank + 1
   }
   option
 }
 
+find_optimize_options_l <- function(tbl_matrix, font_size = NULL){
+  tbl_matrix_lengths <- find_lengths(tbl_matrix, font_size)
+  length_summary <- purrr::map2(tbl_matrix_lengths,
+                                names(tbl_matrix_lengths),
+                                lengths_tbl_summary)
+  purrr::map(length_summary, optimize_options)
+}
+
 calculate_best <- function(tbl_matrix){
-  tbl_matrix_lengths <- find_lengths(tbl_matrix)
-  length_summary <- purrr::map2(tbl_matrix_lengths, names(tbl_matrix_lengths), lengths_tbl_summary)
-  optimized_lengths <- purrr::map(length_summary, optimize_options)
+  optimized_lengths <- find_optimize_options_l(tbl_matrix)
   ranked <- purrr::map(optimized_lengths, rank_options)
-  best <- ranked[purrr::map_dbl(ranked, ~.x$rank) == max(purrr::map_dbl(ranked, ~.x$rank))]
-  if(length(best) > 1){
-    best <- best[purrr::map_dbl(best, ~.x$pt) == max(purrr::map_dbl(best, ~.x$pt))]
+  best <-
+    ranked[purrr::map_dbl(ranked, ~ .x$rank) == max(purrr::map_dbl(ranked, ~
+                                                                     .x$rank))]
+  if (length(best) > 1) {
+    best <-
+      best[purrr::map_dbl(best, ~ .x$font_index) == min(purrr::map_dbl(best, ~ abs(5 -.x$font_index)))]
   }
 
-  tbl_cache$font_size <- best[[1]]$pt
+  tbl_cache$font_size <- best[[1]]$type_setting
   fmt_header_latex(best[[1]]$optimized)
 }
 
@@ -278,7 +325,49 @@ fmt_header_latex <- function(sizing_columns){
 
 }
 
-calc_column_width_l <- function(data) {
+table_optimize_width_font_l <- function(data) {
   tbl_matrix <- get_data_rows_l(data)
   calculate_best(tbl_matrix)
 }
+
+
+table_optimize_width_l <- function(data) {
+  tbl_matrix <- get_data_rows_l(data)
+
+  font_size <- data %>%
+    dt_options_get_value('table_font_size') %>%
+    get_latex_font_size()
+
+  tbl_cache$font_size <- font_size
+
+  optimized <- find_optimize_options_l(tbl_matrix, font_size)
+
+  fmt_header_latex(optimized[[1]]$optimized)
+}
+
+table_no_optimize_l <- function(data){
+
+  tbl_cache$font_size <- data %>%
+    dt_options_get_value('table_font_size') %>%
+    get_latex_font_size()
+
+  col_alignment <-
+    dt_boxhead_get(data = data) %>%
+    dplyr::filter(type == "default") %>%
+    dplyr::pull(column_align)
+
+  # TODO: ensure that number of alignment tabs is correct
+  if (dt_stub_df_exists(data = data)) {
+    col_alignment <- c("left", col_alignment)
+  }
+
+  paste0(
+    "\\begin{longtable}{",
+    col_alignment %>% substr(1, 1) %>% paste(collapse = ""),
+    "}\n",
+    collapse = ""
+  )
+
+}
+
+

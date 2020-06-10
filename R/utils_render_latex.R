@@ -84,9 +84,19 @@ latex_group_row <- function(group_name,
     collapse = "")
 }
 
+
 #' @noRd
 create_table_start_l <- function(data){
-  calc_column_width_l(data = data)
+  optimize_width <- dt_options_get_value(data, 'table_optimize_width')
+  optimize_font <- dt_options_get_value(data, 'table_optimize_font')
+  if(!optimize_width){
+    return(table_no_optimize_l(data = data))
+  }
+  if(!optimize_font){
+    return(table_optimize_width_l(data = data))
+  }
+
+  table_optimize_width_font_l(data = data)
 }
 
 #' @noRd
@@ -245,7 +255,7 @@ create_summary_rows_l <- function(data){
 
     summaries_merged <- purrr::map(names(display_summaries), function(.x){
       merged <- merge_summary(display_summaries[[.x]])
-      merged$SUMMARY_NAME <- rep(.x, dim(merged)[1])
+      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
       merged
       })
 
@@ -253,16 +263,17 @@ create_summary_rows_l <- function(data){
 
     summaries_merged <- purrr::map(names(display_summaries), function(.x){
       merged <- hide_stub(display_summaries[[.x]])
-      merged$SUMMARY_NAME <- rep(.x, dim(merged)[1])
+      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
       merged
     })
   }
 
   summaries_tbl <- do.call(rbind, summaries_merged)
-  to_format <- summaries_tbl %>% select(-SUMMARY_NAME)
+  to_format <- summaries_tbl %>%
+    dplyr::select(-'::SUMMARY_NAME')
 
   df <- data.frame(lapply(to_format, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
-  df$summary_key <- summaries_tbl$SUMMARY_NAME
+  df[['::SUMMARY_KEY']] <- summaries_tbl[['::SUMMARY_NAME']]
   df
 
 }
@@ -368,7 +379,6 @@ create_body_component_l <- function(data) {
   summary_positions <- rep('', rows$n_rows)
 
   data_rows <- create_data_rows(rows$n_rows, rows$row_splits, context = "latex")
-
   if (!is.null(rows$sum_rows)) {
 
     fmt_summary_rows <- function(.){
@@ -380,15 +390,15 @@ create_body_component_l <- function(data) {
     }
 
     rows$sum_rows$`::COLLAPSED` <- rows$sum_rows %>%
-      select(-summary_key) %>%
+      dplyr::select(-'::SUMMARY_KEY') %>%
       fmt_summary_rows()
 
     summary_rows_tbl <- rows$sum_rows %>%
-      group_by(summary_key) %>%
-      summarise_at('::COLLAPSED', .funs = list(FULL_ROW = collapse_rows))
+      dplyr::group_by(`::SUMMARY_KEY`) %>%
+      dplyr::summarise_at('::COLLAPSED', .funs = list(FULL_ROW = collapse_rows))
 
     gp_rows <- rbind(rows$groups_rows_df, c('::GRAND_SUMMARY', '', 0, rows$n_rows))
-    positions <- gp_rows[match(summary_rows_tbl$summary_key, gp_rows$group),]$row_end %>% as.numeric()
+    positions <- gp_rows[match(summary_rows_tbl[['::SUMMARY_KEY']], gp_rows$group),]$row_end %>% as.numeric()
     summary_positions[positions] <- summary_rows_tbl$FULL_ROW
 
   }

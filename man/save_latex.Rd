@@ -2,16 +2,15 @@
 % Please edit documentation in R/utils_save_latex.R
 \name{save_latex}
 \alias{save_latex}
+\alias{save_latex.knit_asis}
+\alias{save_latex.preamble}
 \title{Output a \strong{gt knit_asis} or \strong{gt preamble} object to a tex file}
 \usage{
-## Default S3 method:
- save_latex(tex, path, ...)
+save_latex(tex, path, ...)
 
- ## S3 method for class `knit_asis`:
- save_latex(tex, path, preamble = TRUE, append = FALSE)
+\method{save_latex}{knit_asis}(tex, path, preamble = FALSE, append = FALSE, ...)
 
- ## S3 method for class `preamble`:
- save_latex(tex, path, append = FALSE)
+\method{save_latex}{preamble}(tex, path, append = FALSE, ...)
 }
 \arguments{
 \item{tex}{a \code{knit_asis} object that is created using the \code{as_latex()} function or a \code{preamble} object created using \code{preamble()} function.}

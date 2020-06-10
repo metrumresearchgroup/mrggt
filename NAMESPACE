@@ -2,6 +2,8 @@
 
 S3method(as.data.frame,gt_tbl)
 S3method(print,gt_tbl)
+S3method(save_latex,knit_asis)
+S3method(save_latex,preamble)
 export("%>%")
 export(adjust_luminance)
 export(as_latex)

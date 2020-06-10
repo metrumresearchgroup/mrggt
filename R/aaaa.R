@@ -9,6 +9,7 @@ initialize_pagecache <-function(){
                               'landscape' = c(11.0, 8.5))
   latex_cache$papersize <- 'letter'
   latex_cache$orient <- 'portrait'
+  latex_cache$document_dec <- c('article', 12)
 }
 
 
@@ -20,7 +21,9 @@ initialize_templates <- function(){
                 'title',
                 'subtitle',
                 'portrait_table',
-                'portrait_table_nc')
+                'portrait_table_nc',
+                'font_size_width',
+                'calc_width_template_new')
 
   for(tmpl in template){
     path <- system.file("templates", paste0(tmpl, '.template'), package = "mrggt")
@@ -99,6 +102,7 @@ papersize <- function(x = c('half letter',
 #'   - *legal*: 8.5 x 14.0 in
 #'   - *junior legal*: 5.0 x 8.0 in
 #'   - *ledger*: 11.0 x 17.0 in
+#' - **document_dec**: document declaration for LaTeX in `c(document type, font size)`; default is `('article', 12)` corresponding to `\documentclass[12pt]{article}`
 #'
 #' @examples
 #' # set left & right margins to 3in & 4in
@@ -113,6 +117,7 @@ mrggt_options <- function(...){
   opts <- list(...)
   avail_set <- c('papersize',
                  'pagemargin',
+                 'document_dec',
                  'orient')
 
   if(!length(names(opts)[!names(opts) %in% avail_set]) == 0){

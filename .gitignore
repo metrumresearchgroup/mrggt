@@ -5,6 +5,7 @@
 # Docs folder from `pkgdown::build_site()`
 docs/dev/
 inst/doc
+mrggt_examples/anna_tests
 
 # Session Data files
 .RData

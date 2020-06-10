@@ -27,7 +27,17 @@ test_that("a gt table contains the expected heading components", {
 
   # Expect a characteristic pattern
   grepl(
-    "\\caption{test title: test subtitle}",
+    paste(
+    "\\begin{center}",
+    "\\setlength\\labelsep{0pt}",
+    "{\\large test title } \\\\",
+    "",
+    "\\vspace{3mm}",
+    "{\\small test subtitle } \\\\",
+    "\\vspace{-3mm}",
+    "",
+    "\\end{center}",
+    sep = '\n'),
     tbl_latex %>% as_latex() %>% as.character(),
     fixed = TRUE
   ) %>%
@@ -65,11 +75,11 @@ test_that("a gt table contains the expected column spanner labels", {
 
   # Expect a characteristic pattern
   grepl(
-    paste0(
-      ".*& .multicolumn\\{2\\}\\{c\\}\\{perimeter\\} & ",
-      ".* .cmidrule\\(lr\\)\\{2-3\\}",
-      ".*area & peri & shape & perm ",
-      ".*"),
+    paste(
+      "& \\\\multicolumn\\{2\\}\\{c\\}\\{perimeter\\} & \\\\\\\\ ",
+      " \\\\cmidrule\\(lr\\)\\{2-3\\}",
+      "area & peri & shape & perm",
+      sep = '\n'),
     tbl_latex %>%
       as_latex() %>% as.character()) %>%
     expect_true()
@@ -86,11 +96,11 @@ test_that("a gt table contains the expected column spanner labels", {
 
   # Expect a characteristic pattern
   grepl(
-    paste0(
-      ".*& .multicolumn\\{2\\}\\{c\\}\\{perimeter\\} & ",
-      ".* .cmidrule\\(lr\\)\\{2-3\\}",
-      ".*area & peri & shape & perm ",
-      ".*"),
+    paste(
+      "& \\\\multicolumn\\{2\\}\\{c\\}\\{perimeter\\} & \\\\\\\\ ",
+      " \\\\cmidrule\\(lr\\)\\{2-3\\}",
+      "area & peri & shape & perm",
+      sep = '\n'),
     tbl_latex %>%
       as_latex() %>% as.character()) %>%
     expect_true()

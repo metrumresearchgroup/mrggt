@@ -7,6 +7,8 @@
 tab_caption(data, caption)
 }
 \arguments{
+\item{data}{A table object that is created using the \code{\link[=gt]{gt()}} function.}
+
 \item{caption}{the caption to be set within \verb{\\caption\{\}} in the \code{longtable} environment. \code{label} can also be passed.}
 }
 \value{
@@ -14,7 +16,6 @@ An object of class \code{gt_tbl}.
 }
 \description{
 Set a caption within the \code{longtable} LaTeX environment.
-\code{longtable}, unlike \code{table}, is not a float environment tso the caption must be set within the environment.
 }
 \examples{
 # Use `gtcars` to create a gt table;

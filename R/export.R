@@ -387,7 +387,7 @@ as_latex <- function(data) {
 
   inputs <- list(
     table_start = table_start,
-    table_font_size = type_setting(tbl_cache$font_size),
+    table_font_size = tbl_cache$font_size,
     src_foot_component = create_source_foot_note_component_l(data = data),
     heading_component = create_heading_component(data = data, context = "latex"),
     columns_component = create_columns_component_l(data = data),

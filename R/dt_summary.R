@@ -189,7 +189,6 @@ dt_summary_build <- function(data,
 
     # Get the registered function calls
     agg_funs <- fns %>% lapply(rlang::as_closure)
-
     summary_dfs_data <-
       seq_along(agg_funs) %>%
       lapply(
