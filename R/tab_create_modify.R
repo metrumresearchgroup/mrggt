@@ -138,7 +138,8 @@ tab_caption <- function(data,
 #'   as_latex()
 #'
 #' @section Figures:
-#' \if{html}{\figure{man_tab_spillover_latex1.png}{options: width=100\%}}
+#' \if{html}{\figure{man_tab_spillover_latex_1.png}{options: width=100\%}}
+#' \if{html}{\figure{man_tab_spillover_latex_2.png}{options: width=100\%}}
 #' @export
 tab_spillover <- function(data,
                          message = NULL,

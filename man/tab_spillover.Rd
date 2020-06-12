@@ -31,7 +31,8 @@ Add a message that will appear at the bottom of every page that a table spans ov
 }
 \section{Figures}{
 
-\if{html}{\figure{man_tab_spillover_latex1.png}{options: width=100\%}}
+\if{html}{\figure{man_tab_spillover_latex_1.png}{options: width=100\%}}
+\if{html}{\figure{man_tab_spillover_latex_2.png}{options: width=100\%}}
 }
 
 \examples{
