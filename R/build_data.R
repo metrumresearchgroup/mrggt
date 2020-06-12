@@ -35,7 +35,8 @@ build_data <- function(data, context) {
     dt_source_notes_build(context = context) %>%
     dt_summary_build(context = context) %>%
     dt_groups_rows_build(context = context) %>%
-    dt_caption_build(context = context)
+    dt_caption_build(context = context) %>%
+    dt_overflow_build(context = context)
 
   # Resolution of footnotes and styles --------------------------------------
 

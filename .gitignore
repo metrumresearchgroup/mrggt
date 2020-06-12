@@ -6,6 +6,7 @@
 docs/dev/
 inst/doc
 mrggt_examples/anna_tests
+inst/old_stuff
 
 # Session Data files
 .RData

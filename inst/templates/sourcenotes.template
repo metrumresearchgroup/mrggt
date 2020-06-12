@@ -1,0 +1,8 @@
+\addlinespace
+\getLTwidth\LTwidth
+\begin{minipage}{\LTwidth}
+\smallskip
+{{{sourcenotes_size}}}
+{{{sourcenotes_align}}}
+{{{sourcenotes}}}
+\end{minipage}

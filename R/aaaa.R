@@ -14,16 +14,22 @@ initialize_pagecache <-function(){
 
 
 initialize_templates <- function(){
-  template <- c('heading_component',
-                'lscape_table',
-                'source_foot_notes',
-                'calc_width',
-                'title',
-                'subtitle',
-                'portrait_table',
-                'portrait_table_nc',
-                'font_size_width',
-                'calc_width_template_new')
+  template <-
+    c(
+      "calc_width_template",
+      "collabels_everypage",
+      "collabels_firstpage",
+      "cont_next_page",
+      "font_size_width",
+      "footnotes",
+      "portrait_longtable",
+      "source_footnotes",
+      "sourcenotes",
+      "title_subtitle",
+      "title",
+      "width_calc",
+      "lscape_table"
+    )
 
   for(tmpl in template){
     path <- system.file("templates", paste0(tmpl, '.template'), package = "mrggt")
@@ -36,6 +42,7 @@ initialize_tbl_cache <- function() {
   tbl_cache$color_def <- NULL
   tbl_cache$font_size <- NULL
   tbl_cache$col_sep <- NULL
+  tbl_cache$num_cols <- NULL
 }
 
 initialize_templates()

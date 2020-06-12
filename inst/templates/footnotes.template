@@ -1,0 +1,8 @@
+\addlinespace
+\getLTwidth\LTwidth
+\begin{minipage}{\LTwidth}
+{{{footnotes_size}}}
+{{{footnotes_align}}}
+\smallskip
+{{{footnotes}}}
+\end{minipage}

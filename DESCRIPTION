@@ -88,6 +88,7 @@ Collate:
     'dt_has_built.R'
     'dt_heading.R'
     'dt_options.R'
+    'dt_overflow.R'
     'dt_row_groups.R'
     'dt_source_notes.R'
     'dt_spanners.R'

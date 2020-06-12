@@ -1,0 +1,10 @@
+{{{col_labels}}}
+\hline
+\addlinespace
+\endfirsthead
+
+\hline
+{{{col_labels}}}
+\hline
+\addlinespace
+\endhead

@@ -99,7 +99,7 @@ create_tex_width_file <- function(tbl_matrix, font_size = NULL){
   vars_summary$color_declarations <- tbl_cache$color_def
 
 
-  create_log_file(whisker::whisker.render(latex_templates$calc_width_template_new,
+  create_log_file(whisker::whisker.render(latex_templates$calc_width_template,
                                           vars_summary))
 }
 
@@ -319,6 +319,7 @@ calculate_best <- function(tbl_matrix){
 }
 
 fmt_header_latex <- function(sizing_columns){
+ tbl_cache$num_cols <- length(sizing_columns)
  paste0('\\begin{longtable}{',
         paste(sprintf("p{%.2fcm}", sizing_columns), collapse = ''),
         '} \n')
@@ -361,9 +362,14 @@ table_no_optimize_l <- function(data){
     col_alignment <- c("left", col_alignment)
   }
 
+  alignments <- col_alignment %>%
+    substr(1, 1)
+
+  tbl_cache$num_cols <- length(alignments)
+
   paste0(
     "\\begin{longtable}{",
-    col_alignment %>% substr(1, 1) %>% paste(collapse = ""),
+    alignments %>% paste(collapse = ""),
     "}\n",
     collapse = ""
   )

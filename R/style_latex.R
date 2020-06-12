@@ -230,7 +230,7 @@ get_latex_font_size <- function(size_value, func = FALSE) {
   } else {
     if (grepl('%', size_value)) {
       pt_size <-
-        latex_cache$document_dec[2] * (gsub('%', '', size_value) %>% as.numeric()) / 100
+        as.numeric(latex_cache$document_dec[2]) * (as.numeric(gsub('%', '', size_value))/ 100)
 
     } else {
       pt_size <- (gsub('px', '', size_value) %>% as.numeric()) * 0.75
@@ -248,6 +248,30 @@ get_latex_font_size <- function(size_value, func = FALSE) {
   return(font_spec$Command)
 }
 
+
+get_latex_align <- function(setting){
+
+  if(is.na(setting)){
+    return('\\arraybackslash\\raggedright\n')
+  }
+
+  switch(setting,
+         left = '\\arraybackslash\\raggedright\n',
+         right = '\\arraybackslash\\raggedleft\n',
+         center = '\\centering')
+}
+
+get_latex_col_align <- function(setting){
+
+  if(is.na(setting)){
+    return('l')
+  }
+
+  switch(setting,
+         left = 'l',
+         right = 'r',
+         center = 'c')
+}
 
 ### Condensed text helper functions
 

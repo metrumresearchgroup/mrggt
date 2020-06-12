@@ -114,10 +114,38 @@ create_caption_l <- function(data){
     return('')
   }
   cap <- dt_caption_get(data = data)
-  paste0("\\caption{", cap$caption, "}\\\\[\\bigskipamount]")
+  paste0("\\caption{", cap$caption, "}")
 }
-#' Create the columns component of a table
-#'
+
+#' @noRd
+create_overflow_message_l <- function(data){
+
+  get_styled_message <- function(setting, message){
+
+    switch(setting,
+           "bold+italic" = paste0('\\textbf{\\textit{', message, '}}'),
+           "italic" = paste0('\\textit{', message, '}'),
+           "bold" = paste0('\\textbf', message, '}'))
+  }
+
+  if(dt_has_overflow(data)){
+
+    dt_overflow <- dt_overflow_get(data)
+
+    if(!is.null(dt_overflow$message)){
+      inputs <- list(align = get_latex_col_align(dt_overflow$message.align),
+                     message = get_styled_message(dt_overflow$message.style, dt_overflow$message),
+                     num_cols = tbl_cache$num_cols)
+
+      return(whisker::whisker.render(latex_templates$cont_next_page, inputs))
+
+    }
+  }
+
+  return('')
+}
+
+
 #' @noRd
 create_columns_component_l <- function(data) {
 
@@ -127,27 +155,10 @@ create_columns_component_l <- function(data) {
   spanners_present <- dt_spanners_exists(data = data)
   styles_tbl <- dt_styles_get(data = data)
 
-  # Get the headings
-  #headings <- boxh$column_label %>% unlist()
-
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
 
-  # TODO: Implement hidden boxhead in LaTeX
-  # # Should the column labels be hidden?
-  # column_labels_hidden <-
-  #   dt_options_get_value(data = data, option = "column_labels_hidden")
-  #
-  # if (column_labels_hidden) {
-  #   return("")
-  # }
-
-  # If `stub_available` == TRUE, then replace with a set stubhead
-  # label or nothing
   if (isTRUE(stub_available) && length(stubh$label) > 0) {
-
-    #stubl <- fmt_latex_math(gsub("\\", "", stubh$label, fixed=TRUE))
-    #stublabel <- style_stubhead_l(styles_tbl, stubl)
 
     headings_labels <- prepend_vec(headings_labels, stubh$label)
     headings_vars <- prepend_vec(headings_vars, "::stub")
@@ -230,7 +241,22 @@ create_columns_component_l <- function(data) {
     table_col_spanners <- ""
   }
 
-  paste0(table_col_spanners, table_col_headings)
+  full_colheadings <- paste0(table_col_spanners, table_col_headings)
+
+  if(dt_has_overflow(data)){
+
+    if(dt_overflow_get(data)$repeat_column_labels){
+
+      return(whisker::whisker.render(latex_templates$collabels_everypage,
+                              list(col_labels = paste0(table_col_spanners,
+                                                       table_col_headings))))
+    }
+  }
+
+  return(whisker::whisker.render(latex_templates$collabels_firstpage,
+                                 list(col_labels = paste0(table_col_spanners,
+                                                          table_col_headings))))
+
 }
 
 create_summary_rows_l <- function(data){
@@ -417,9 +443,7 @@ create_body_component_l <- function(data) {
 
 #' @noRd
 create_table_end_l <- function() {
-  paste0(
-    "\\end{longtable}\n",
-    "\\end{ThreePartTable}\n")
+  return("\\end{longtable}\n")
 }
 
 
@@ -459,9 +483,8 @@ create_source_foot_note_component_l <- function(data) {
   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
                        footnotes)
 
-  footnotes <- paste(paste0('\\item ',
-                      footnotes,
-                      '\n'),
+  footnotes <- paste(paste0(footnotes,
+                      ' \\\\ \n'),
                      collapse = '')
   } else {
 
@@ -477,9 +500,8 @@ create_source_foot_note_component_l <- function(data) {
   if (length(source_note) != 0) {
 
     source_note <- fmt_latex_math(source_note) %>% extract('math_env')
-    source_note <- paste(paste0('\\item ',
-                              source_note,
-                              '\n'),
+    source_note <- paste(paste0(source_note,
+                                ' \\\\ \n'),
                        collapse = '')
   } else {
 
@@ -487,28 +509,43 @@ create_source_foot_note_component_l <- function(data) {
 
   }
 
-  footnote_align <- dt_options_get_value(data, 'footnotes_align')
-  sourcenote_align <- dt_options_get_value(data, 'source_notes_align')
-  align <- function(setting){
+  if(is.null(footnotes)){
 
-    if(is.na(setting)){
-      return('\\arraybackslash\\raggedright\n')
+    if(is.null(source_note)){
+
+      return('')
+
+    } else {
+
+      inputs <- list(
+        sourcenotes_align = get_latex_align(dt_options_get_value(data, 'source_notes_align')),
+        sourcenotes_size = get_latex_font_size(dt_options_get_value(data, 'source_notes_font_size')),
+        sourcenotes = source_note
+      )
+      return(whisker::whisker.render(latex_templates$sourcenotes, inputs))
     }
 
-    switch(setting,
-           left = '\\arraybackslash\\raggedright\n',
-           right = '\\arraybackslash\\raggedleft\n',
-           center = '\\centering')
+  } else {
+
+    inputs <- list(
+      footnotes_align = get_latex_align(dt_options_get_value(data, 'footnotes_align')),
+      footnotes_size = get_latex_font_size(dt_options_get_value(data, 'footnotes_font_size')),
+      footnotes = footnotes
+    )
+
+    if(is.null(source_note)){
+
+      return(whisker::whisker.render(latex_templates$sourcenotes, inputs))
+
+    } else{
+
+      inputs$sourcenotes_align <- get_latex_align(dt_options_get_value(data, 'source_notes_align'))
+      inputs$sourcenotes_size <- get_latex_font_size(dt_options_get_value(data, 'source_notes_font_size'))
+      inputs$sourcenotes <- source_note
+
+      return(whisker::whisker.render(latex_templates$source_footnotes, inputs))
+    }
+
   }
-
-  footnotes_align <- align(footnote_align)
-  sourcenotes_align <- align(sourcenote_align)
-  inputs <- list(size = '\\footnotesize',
-                 footnotes = footnotes,
-                 sourcenotes = source_note,
-                 footnotes_align = footnotes_align,
-                 sourcenotes_align = sourcenotes_align)
-
-  whisker::whisker.render(latex_templates$source_foot_notes, inputs)
 
 }

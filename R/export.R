@@ -379,8 +379,7 @@ as_latex <- function(data) {
   # Composition of LaTeX ----------------------------------------------------
 
   #Create a LaTeX fragment that defines the possible colors being used in table
-  styles_tbl <- dt_styles_get(data = data)
-  tbl_cache$color_def <- define_colors_latex(styles_tbl)
+  tbl_cache$color_def <- define_colors_latex(dt_styles_get(data = data))
 
   # Create a LaTeX fragment for the column sep of the table
   column_sep <- latex_column_sep(data = data)
@@ -388,27 +387,35 @@ as_latex <- function(data) {
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
 
+  continued_message <- create_overflow_message_l(data = data)
+
+  caption <- create_caption_l(data = data)
+
+  heading_component <- create_heading_component(data = data, context = "latex")
+
+  columns_component <- create_columns_component_l(data = data)
+
+  src_foot_component <- create_source_foot_note_component_l(data = data)
+
+  body_component <- create_body_component_l(data = data)
+
+  table_end <- create_table_end_l()
+
   inputs <- list(
-    table_start = table_start,
+    color_definitions = tbl_cache$color_def,
     table_font_size = tbl_cache$font_size,
-    src_foot_component = create_source_foot_note_component_l(data = data),
-    heading_component = create_heading_component(data = data, context = "latex"),
-    columns_component = create_columns_component_l(data = data),
-    body_component = create_body_component_l(data = data),
-    caption = create_caption_l(data = data),
-    column_sep = column_sep
+    column_sep = column_sep,
+    table_start = table_start,
+    caption = caption,
+    heading_component = heading_component,
+    columns_component = columns_component,
+    src_foot_component = src_foot_component,
+    continued_message = continued_message,
+    body_component = body_component,
+    table_end = table_end
   )
 
-  if(is.null(tbl_cache$color_def)){
-
-    tex <- whisker::whisker.render(latex_templates$portrait_table_nc, inputs)
-
-  } else {
-
-    inputs$color_definitions <- tbl_cache$color_def
-    tex <- whisker::whisker.render(latex_templates$portrait_table, inputs)
-
-  }
+  tex <- whisker::whisker.render(latex_templates$portrait_longtable, inputs)
 
   latex_packages <- create_knit_meta()
 

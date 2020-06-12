@@ -263,23 +263,41 @@ create_heading_component <- function(data,
   }
 
   if (context == "latex") {
-    inputs <- list(
-      title = whisker::whisker.render(latex_templates$title,
-                                      list(title = paste0(heading$title,
-                                                          footnote_title_marks)))
-      )
 
-    if (dt_heading_has_subtitle(data = data, context='latex')) {
+    if(dt_heading_has_title(data = data, context='latex')){
 
-      inputs$subtitle <- whisker::whisker.render(latex_templates$subtitle,
-                                                 list(subtitle = paste0(heading$subtitle,
-                                                                        footnote_subtitle_marks)))
+      inputs <- list(
+        title_size = get_latex_font_size(dt_options_get_value(data, "heading_title_font_size")),
+        title_align = get_latex_align(dt_options_get_value(data, "heading_align")),
+        title = paste0(heading$title, footnote_title_marks)
+        )
+
+      if(dt_heading_has_subtitle(data = data, context='latex')){
+
+        inputs$subtitle_size <- get_latex_font_size(dt_options_get_value(data, "heading_subtitle_font_size"))
+        inputs$subtitle <- paste0(heading$subtitle, footnote_subtitle_marks)
+        return(whisker::whisker.render(latex_templates$title_subtitle, inputs))
+
+      } else {
+
+        return(whisker::whisker.render(latex_templates$title, inputs))
+      }
+
     } else {
-      inputs$subtitle <- ""
-    }
 
-    heading_component <- whisker::whisker.render(latex_templates$heading_component,
-                                                 inputs)
+      if(dt_heading_has_subtitle(data = data, context='latex')){
+
+        inputs <- list(
+          title_size = get_latex_font_size(dt_options_get_value(data, "heading_subtitle_font_size")),
+          title_align = get_latex_align(dt_options_get_value(data, "heading_align")),
+          title = paste0(heading$subtitle, footnote_subtitle_marks)
+        )
+        return(whisker::whisker.render(latex_templates$title, inputs))
+
+      } else {
+        return('')
+      }
+    }
   }
 
   if (context == "rtf") {
