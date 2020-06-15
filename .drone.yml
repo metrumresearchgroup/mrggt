@@ -10,10 +10,10 @@ steps:
     path: /var/run/docker.sock
   commands:
   - $(aws ecr get-login --no-include-email --region us-east-1)
-  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09
+  - docker pull 906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08
 
 - name: R36
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/3.6"
@@ -25,14 +25,14 @@ steps:
   - container-pull
 
 - name: R40
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/4.0"
   commands:
-  - /opt/R/4.0.0/bin/R -e "devtools::install_deps(upgrade = 'never')"
-  - /opt/R/4.0.0/bin/R -e "devtools::test()"
-  - /opt/R/4.0.0/bin/R -e "devtools::check()"
+  - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
+  - /opt/R/4.0.1/bin/R -e "devtools::test()"
+  - /opt/R/4.0.1/bin/R -e "devtools::check()"
   depends_on:
   - container-pull
 
@@ -42,7 +42,7 @@ steps:
     - tag
     status:
     - success
-  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn:2020-05-09"
+  image: "906087756158.dkr.ecr.us-east-1.amazonaws.com/mpn-complete:2020-06-08"
   pull: never
   environment:
     R_LIBS_USER: "/opt/rpkgs/4.0"
@@ -50,8 +50,8 @@ steps:
   - git config --global user.email "drone@metrumrg.com"
   - git config --global user.name "Drony"
   - git fetch --tags
-  - /opt/R/4.0.0/bin/R -e "devtools::install_deps(upgrade = 'never')"
-  - /opt/R/4.0.0/bin/R -e "pkgpub::create_tagged_repo()"
+  - /opt/R/4.0.1/bin/R -e "devtools::install_deps(upgrade = 'never')"
+  - /opt/R/4.0.1/bin/R -e "pkgpub::create_tagged_repo()"
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/${DRONE_TAG}
   - aws s3 sync /tmp/${DRONE_TAG} s3://mpn.metworx.dev/releases/${DRONE_REPO_NAME}/latest_tag
   depends_on:
