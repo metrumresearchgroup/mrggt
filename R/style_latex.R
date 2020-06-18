@@ -220,32 +220,54 @@ latex_font_size_tbl <- function(){
 }
 
 #' @noRd
-get_latex_font_size <- function(size_value, func = FALSE) {
+get_latex_font_size <- function(size_value, convert = 'command') {
   fs_tbl <- latex_font_size_tbl()
-  fs_page <- paste0(latex_cache$document_dec[2], 'pt')
+  fs_page_num <- as.numeric(latex_cache$document_dec[2])
+  fs_page <- paste0(fs_page_num, 'pt')
+
+  to_num <- function(v){
+    as.numeric(gsub('%|px', '', v))
+  }
 
   if (!grepl('\\d', size_value)) {
-    font_spec <- fs_tbl[which(fs_tbl$html == size_value),]
+
+    loc <- which(fs_tbl$html == size_value)
+    font_spec <- fs_tbl[loc,]
+    pt_size <- font_spec$`12pt`
 
   } else {
+
     if (grepl('%', size_value)) {
-      pt_size <-
-        as.numeric(latex_cache$document_dec[2]) * (as.numeric(gsub('%', '', size_value))/ 100)
+
+      pt_size <- fs_page_num * to_num(size_value) / 100
 
     } else {
-      pt_size <- (gsub('px', '', size_value) %>% as.numeric()) * 0.75
+
+      pt_size <- to_num(size_value) * 0.75
 
     }
 
-    font_spec <-
-      fs_tbl[which.min(abs(pt_size - fs_tbl[[fs_page]])),]
+    loc <- which.min(abs(pt_size - fs_tbl[[fs_page]]))
+    font_spec <- fs_tbl[loc,]
   }
 
-  if (func) {
+  if (convert == 'function') {
+
     return(font_spec$func[[1]])
 
   }
-  return(font_spec$Command)
+
+  if(convert == 'command'){
+
+    return(font_spec$Command)
+
+  }
+
+  if(convert == 'pt_size'){
+
+    return(pt_size)
+
+  }
 }
 
 
@@ -471,7 +493,7 @@ create_color_definition <- function(color){
 
   }
 
-  paste0(
+  new_color <- paste0(
     "\\definecolor{",
     gsub('#', '', color),
     "}{rgb}{",
@@ -482,6 +504,8 @@ create_color_definition <- function(color){
     s[3],
     "} \n"
   )
+
+  tbl_cache$color_def <- c(tbl_cache$color_def, new_color)
 }
 
 find_colors.default <- function(x){
