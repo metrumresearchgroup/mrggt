@@ -482,7 +482,7 @@ tab_row_group <- function(data,
           data = data,
           row_groups = c(
             process_text(group[1]),
-            arrange_groups_vars
+            arrange_groups_vars[!is.na(arrange_groups_vars)]
           ) %>%
             unique()
         )
