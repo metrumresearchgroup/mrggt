@@ -189,7 +189,7 @@ test_that("latex preset font sizing", {
 
   #Expect a fixed pattern
   #only fontsize in banana row has been changed
-  expect_equal(length(unlist(gregexpr('\\footnotesize', tbl_gt, fixed = TRUE))), 4)
+  expect_equal(length(unlist(gregexpr('\\footnotesize', tbl_gt, fixed = TRUE))), 3)
 
 
   tbl_gt <-

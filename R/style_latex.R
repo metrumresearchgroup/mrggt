@@ -350,7 +350,7 @@ latex_format_condensed_size <- function(string){
 
 #' @noRd
 cell_text.size <-  function(value){
-  get_latex_font_size(value, func = TRUE)
+  get_latex_font_size(value, convert = 'function')
 }
 
 #' @noRd
