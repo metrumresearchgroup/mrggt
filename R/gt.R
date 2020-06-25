@@ -136,6 +136,8 @@ gt <- function(data,
     dt_summary_init() %>%
     dt_options_init() %>%
     dt_transforms_init() %>%
+    dt_caption_init() %>%
+    dt_overflow_init() %>%
     dt_has_built_init()
 
   # Add any user-defined table ID to the `table_id` parameter

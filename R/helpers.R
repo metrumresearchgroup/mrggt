@@ -1690,11 +1690,12 @@ random_id <- function(n = 10) {
 #' @export
 escape_latex <- function(text) {
 
-  text %>%
-    tidy_gsub("\\\\", "\\\\textbackslash ") %>%
-    tidy_gsub("([&%$#_{}])", "\\\\\\1") %>%
-    tidy_gsub("~", "\\\\textasciitilde ") %>%
-    tidy_gsub("\\^", "\\\\textasciicircum ")
+  #text %>%
+    #tidy_gsub("\\\\", "\\\\textbackslash ") %>%
+    #tidy_gsub("([&%$#_{}])", "\\\\\\1") %>%
+    #tidy_gsub("~", "\\\\textasciitilde ") %>%
+    #tidy_gsub("\\^", "\\\\textasciicircum ")
+  text
 }
 
 #' Get the LaTeX dependencies required for a **gt** table

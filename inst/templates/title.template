@@ -1,0 +1,8 @@
+\getLTwidth\LTwidth
+\begin{minipage}{\LTwidth}
+{{{title_align}}}
+\smallskip
+{{{title_size}}}
+{{{title}}} \\
+\bigskip
+\end{minipage} \\

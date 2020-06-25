@@ -25,8 +25,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2) %>%
        render_formats_test(context = "latex"))[["num_1"]],
-    c("$1,836.23$", "$2,763.39$", "$937.29$", "$643.00$",
-      "$212.23$", "$0.00$", "$-23.24$")
+    c("$$1,836.23$$", "$$2,763.39$$", "$$937.29$$", "$$643.00$$",
+      "$$212.23$$", "$$0.00$$", "$$-23.24$$")
   )
 
   # Format the `num_1` column to 5 decimal places, use all
@@ -35,8 +35,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 5) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1,836.23000$", "$2,763.39000$", "$937.29000$",
-      "$643.00000$", "$212.23200$", "$0.00000$", "$-23.24000$")
+    c("$$1,836.23000$$", "$$2,763.39000$$", "$$937.29000$$",
+      "$$643.00000$$", "$$212.23200$$", "$$0.00000$$", "$$-23.24000$$")
   )
 
   # Format the `num_1` column to 2 decimal places, drop the trailing
@@ -49,8 +49,8 @@ test_that("the `fmt_number()` function works correctly", {
          drop_trailing_zeros = TRUE
        ) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1,836.23$", "$2,763.39$", "$937.29$", "$643$",
-      "$212.23$", "$0$", "$-23.24$")
+    c("$$1,836.23$$", "$$2,763.39$$", "$$937.29$$", "$$643$$",
+      "$$212.23$$", "$$0$$", "$$-23.24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, don't use digit
@@ -60,8 +60,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, use_seps = FALSE) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1836.23$", "$2763.39$", "$937.29$", "$643.00$",
-      "$212.23$", "$0.00$", "$-23.24$")
+    c("$$1836.23$$", "$$2763.39$$", "$$937.29$$", "$$643.00$$",
+      "$$212.23$$", "$$0.00$$", "$$-23.24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, use a single space
@@ -71,8 +71,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, sep_mark = " ") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1 836.23$", "$2 763.39$", "$937.29$", "$643.00$",
-      "$212.23$", "$0.00$", "$-23.24$")
+    c("$$1 836.23$$", "$$2 763.39$$", "$$937.29$$", "$$643.00$$",
+      "$$212.23$$", "$$0.00$$", "$$-23.24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, use a period for the
@@ -85,8 +85,8 @@ test_that("the `fmt_number()` function works correctly", {
          sep_mark = ".", dec_mark = ","
        ) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.836,23$", "$2.763,39$", "$937,29$", "$643,00$",
-      "$212,23$", "$0,00$", "$-23,24$")
+    c("$$1.836,23$$", "$$2.763,39$$", "$$937,29$$", "$$643,00$$",
+      "$$212,23$$", "$$0,00$$", "$$-23,24$$")
   )
 
   # Format the `num_1` column to 4 decimal places, scale all values by
@@ -96,8 +96,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 4, scale_by = 1/1000) %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.8362$", "$2.7634$", "$0.9373$", "$0.6430$", "$0.2122$",
-      "$0.0000$", "$-0.0232$")
+    c("$$1.8362$$", "$$2.7634$$", "$$0.9373$$", "$$0.6430$$", "$$0.2122$$",
+      "$$0.0000$$", "$$-0.0232$$")
   )
 
   # Format the `num_1` column to 2 decimal places, prepend and append
@@ -107,8 +107,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, pattern = "a {x} b") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("a $1,836.23$ b", "a $2,763.39$ b", "a $937.29$ b", "a $643.00$ b",
-      "a $212.23$ b", "a $0.00$ b", "a $-23.24$ b")
+    c("a $$1,836.23$$ b", "a $$2,763.39$$ b", "a $$937.29$$ b", "a $$643.00$$ b",
+      "a $$212.23$$ b", "a $$0.00$$ b", "a $$-23.24$$ b")
   )
 
   # Format the `num_1` column to 4 decimal places, scale all values
@@ -119,8 +119,8 @@ test_that("the `fmt_number()` function works correctly", {
        fmt_number(columns = "num_1", decimals = 4,
                   scale_by = 1/1000, pattern = "{x}K") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.8362$K", "$2.7634$K", "$0.9373$K", "$0.6430$K",
-      "$0.2122$K", "$0.0000$K", "$-0.0232$K")
+    c("$$1.8362$$K", "$$2.7634$$K", "$$0.9373$$K", "$$0.6430$$K",
+      "$$0.2122$$K", "$$0.0000$$K", "$$-0.0232$$K")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `en_US`
@@ -130,8 +130,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, locale = "en_US") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1,836.23$", "$2,763.39$", "$937.29$", "$643.00$",
-      "$212.23$", "$0.00$", "$-23.24$")
+    c("$$1,836.23$$", "$$2,763.39$$", "$$937.29$$", "$$643.00$$",
+      "$$212.23$$", "$$0.00$$", "$$-23.24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `da_DK`
@@ -141,8 +141,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, locale = "da_DK") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.836,23$", "$2.763,39$", "$937,29$", "$643,00$",
-      "$212,23$", "$0,00$", "$-23,24$")
+    c("$$1.836,23$$", "$$2.763,39$$", "$$937,29$$", "$$643,00$$",
+      "$$212,23$$", "$$0,00$$", "$$-23,24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `de_AT`
@@ -152,8 +152,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, locale = "de_AT") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1 836,23$", "$2 763,39$", "$937,29$", "$643,00$",
-      "$212,23$", "$0,00$", "$-23,24$")
+    c("$$1 836,23$$", "$$2 763,39$$", "$$937,29$$", "$$643,00$$",
+      "$$212,23$$", "$$0,00$$", "$$-23,24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `et_EE`
@@ -163,8 +163,8 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, locale = "et_EE") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1 836,23$", "$2 763,39$", "$937,29$", "$643,00$",
-      "$212,23$", "$0,00$", "$-23,24$")
+    c("$$1 836,23$$", "$$2 763,39$$", "$$937,29$$", "$$643,00$$",
+      "$$212,23$$", "$$0,00$$", "$$-23,24$$")
   )
 
   # Format the `num_1` column to 2 decimal places, apply the `gl_ES`
@@ -174,7 +174,7 @@ test_that("the `fmt_number()` function works correctly", {
     (tbl_latex %>%
        fmt_number(columns = "num_1", decimals = 2, locale = "gl_ES") %>%
        render_formats_test("latex"))[["num_1"]],
-    c("$1.836,23$", "$2.763,39$", "$937,29$", "$643,00$",
-      "$212,23$", "$0,00$", "$-23,24$")
+    c("$$1.836,23$$", "$$2.763,39$$", "$$937,29$$", "$$643,00$$",
+      "$$212,23$$", "$$0,00$$", "$$-23,24$$")
   )
 })

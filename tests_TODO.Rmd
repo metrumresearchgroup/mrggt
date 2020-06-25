@@ -1,0 +1,162 @@
+
+
+```{r}
+
+tbl_colored <- dplyr::tribble(~rownm, ~grpname, ~count, ~color,
+                              'fruit 1', 'apple', 1, 'red',
+                              'fruit 2', 'banana', 2, 'yellow',
+                              'fruit 3', 'grape', 3, 'purple',
+                              'fruit 4', 'pear', 4, 'green',
+                              'fruit 5', 'orange', 5, 'orange')
+
+````
+
+
+## source notes align & footnotes align
+
+```{r}
+
+# default is "\\arraybackslash\\raggedright" (left align)
+# "\\arraybackslash\\raggedleft" (right)
+# "\\centering" (center)
+
+# follows a whisker template always inserted at index 4:
+  # whisker template:
+   # "\settotextwidth
+   # \begin{TableNotes}
+   # \setlength\labelsep{0pt}
+   # {{{size}}}
+   # {{{footnotes_align}}}
+   # {{{footnotes}}}
+   # \item
+   # {{{sourcenotes_align}}}
+   # {{{sourcenotes}}}
+   # \end{TableNotes}"
+
+
+tbl_colored %>%
+  gt(rowname_col = 'rownm') %>%
+    tab_source_note(
+    c(
+      paste0('Script code:'),
+      paste0('Tex code: ')
+    )
+  ) %>%
+  tab_options(source_notes.align = 'center') %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+
+tbl_colored %>%
+  gt(rowname_col = 'rownm') %>%
+  tab_footnote('something is footnoted', 
+               locations = cells_column_labels(columns = vars(count))) %>%
+  tab_options(source_notes.align = 'center') %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+  
+```
+
+## optimize font & columns
+```{r}
+  long_tbl <- dplyr::tribble(~ababababababababababababababababa, ~cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd, ~efefefefefefefefefefefefefefefefefefefe, ~ghghghghghghghghghghghghghghghghgh, ~ijijijijijijijijijijijijijijijiji,
+                             'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji',
+                             'ababababababababababababababababa', 'cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd', 'efefefefefefefefefefefefefefefefefefefe', 'ghghghghghghghghghghghghghghghghgh', 'ijijijijijijijijijijijijijijijiji')
+```
+
+```{r}
+# this has to be TRUE or FALSE, default is TRUE
+# if FALSE:
+   # the table.font.size is used (default is 16px or 12pt) as the font size for the table 
+   # columns are optimized to that font size
+
+# column optimization would mean output tex string contains a pattern that matches:
+
+# \\begin{longtable}{p{3.20cm}p{3.20cm}p{3.20cm}p{3.20cm}p{3.20cm}} 
+# "\\\\begin\\{longtable\\}\\{p\\{\\d*\\.?\\d*cm\\}" # regex
+
+
+# 12 pt = "\\normalsize" in latex. Table font size appears always at index 2
+long_tbl %>%
+  gt() %>%
+  tab_options(table.optimize.font = FALSE) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+# change font size and make optimize false
+# 13.33px = 10pt = "\\footnotesize" in latex
+long_tbl %>%
+  gt() %>%
+  tab_options(table.optimize.font = FALSE,
+              table.font.size = px(13.33)) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+# 19.2 px = "\\large" in latex
+# since table.optimize.font = TRUE - font size setting should be ignored and mrggt finds optimal font
+# expect "\\large" not at index 2
+long_tbl %>%
+  gt() %>%
+  tab_options(table.font.size = px(19.2)) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+
+# table.optimize.width, default is true
+# if false the column lengths are not calculated and table.font.size is used as the font size
+# if no optimization pattern is:
+  # - "\\begin{longtable}{lllll}" #l can be r or c for alignment
+  # - "\\\\begin\\{longtable\\}\\{(?:l|r|c)+\\}" # regex
+
+# should follow no optimize pattern and have font size "\\normalsize" line 2
+long_tbl %>%
+  gt() %>%
+  tab_options(table.optimize.width = FALSE) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+# should follow no optimize pattern and have font size "\\large"
+long_tbl %>%
+  gt() %>%
+  tab_options(table.optimize.width = FALSE,
+              table.font.size = px(19.2)) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+
+# table.optimize.font spec doesn't matter if width = FALSE
+# should be still following no optimize pattern and taking the table.font.size (\\normalsize default)
+long_tbl %>%
+  gt() %>%
+  tab_options(table.optimize.width = FALSE,
+              table.optimize.font = TRUE) %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+```
+
+# tab_caption
+
+```{r}
+
+# table caption needs to be specified as the first thing after \\begin{longtable} environment
+# "\\\\caption\\{this is my table caption\\}\\\\\\\\\\[\\\\bigskipamount\\]" # regex
+# no "\\\\caption" should appear if one is not passed
+long_tbl %>%
+  gt() %>%
+  tab_caption('this is my table caption') %>%
+  as_latex() %>%
+  as.character() %>%
+  strsplit('\n')
+
+```
+
+```{r}

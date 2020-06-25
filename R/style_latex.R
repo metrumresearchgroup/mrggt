@@ -10,6 +10,12 @@
 
 #' @noRd
 resolve_styles_latex <- function(data){
+
+  font_size <- data$`_options`$value[[which(data$`_options`$parameter == 'table_font_size')]]
+  if(!font_size == '16px'){
+    tbl_cache$font_size = font_size
+  }
+
   styles_tbl <- dt_styles_get(data = data)
   data$`_heading`$title <- style_title_latex(data$`_heading`$title, styles_tbl)
   data$`_heading`$subtitle <- style_subtitle_latex(data$`_heading`$subtitle, styles_tbl)
@@ -196,59 +202,97 @@ style_data_latex <- function(body, styles_df){
   .init = element)
 }
 
+#' @noRd
+latex_font_size_tbl <- function(){
+  font_size <- dplyr::tribble(
+    ~Command,     ~ "10pt",   ~ "11pt",   ~ "12pt", ~html,       ~ func,
+    "\\tiny",             5,       6,       6,       '',           rlang::quo(paste0('{\\tiny ', x, '}')),
+    "\\scriptsize",       7,       8,       8,       'xx-small',   rlang::quo(paste0('{\\scriptsize ', x, '}')),
+    "\\footnotesize",     8,       9,       10,      'x-small',    rlang::quo(paste0('{\\footnotesize ', x, '}')),
+    "\\small",            9,       10,      10.95,   'small',      rlang::quo(paste0('{\\small ', x, '}')),
+    "\\normalsize",       10,      10.95,   12,      '',           rlang::quo(paste0('{\\normalsize ', x, '}')),
+    "\\large",            12,      12,      14.4,    'medium',     rlang::quo(paste0('{\\large ', x, '}')),
+    "\\Large",            14.4,    14.4,    17.28,   'large',      rlang::quo(paste0('{\\Large ', x, '}')),
+    "\\LARGE",            17.28,   17.28,   20.74,   'x-large',    rlang::quo(paste0('{\\LARGE ', x, '}')),
+    "\\huge",             20.74,   20.74,   24.88,   'xx-large',   rlang::quo(paste0('{\\huge ', x, '}')),
+    "\\Huge",             24.88,   24.88,   24.88,     '',        rlang::quo(paste0('{\\Huge ', x, '}'))
+  )
+}
 
 #' @noRd
-latex_size_preset_values <- function(stringv){
-  sizes <-
-    list(
-      xxsmall = rlang::quo(paste0('{\\scriptsize ', x, '}')),
-      xsmall = rlang::quo(paste0('{\\footnotesize ', x, '}')),
-      small =  rlang::quo(paste0('{\\small ', x, '}')),
-      medium = rlang::quo(paste0('{\\large ', x, '}')),
-      large =  rlang::quo(paste0('{\\large ', x, '}')),
-      xlarge = rlang::quo(paste0('{\\LARGE ', x, '}')),
-      xxlarge = rlang::quo(paste0('{\\huge ', x, '}'))
-    )
+get_latex_font_size <- function(size_value, convert = 'command') {
+  fs_tbl <- latex_font_size_tbl()
+  fs_page_num <- as.numeric(latex_cache$document_dec[2])
+  fs_page <- paste0(fs_page_num, 'pt')
 
-  stringv <- tolower(gsub('-', '', stringv, fixed =TRUE))
-  size <- sizes[[stringv]]
-  if(is.null(sizes[[stringv]])){
-    stringVector <- names(sizes)
-    best_match <- stringVector[stringdist::amatch(stringv, stringVector, maxDist=Inf)]
-    size <- sizes[[best_match]]
+  to_num <- function(v){
+    as.numeric(gsub('%|px', '', v))
   }
-  size
-}
 
-#user defined custom fontsize values
-#' @noRd
-latex_size_custom_values <- function(floatv){
+  if (!grepl('\\d', size_value)) {
 
-  baselineskip <- as.character(1.2 * floatv)
-  size <- as.character(floatv)
-  exp2 <-
-    paste0('{\\fontsize{', size, '}{', baselineskip, '}\\selectfont ')
-
-  return(rlang::quo(paste0(exp2, x, '}')))
-}
-
-#determine if predefined or custom fontsize is being used
-#' @noRd
-latex_format_text_size = function(string){
-  stripped <- gsub('px', '', string, fixed=TRUE)
-  dblv <- suppressWarnings(as.double(stripped))
-
-  if(is.na(dblv)){
-
-    func <- latex_size_preset_values(stripped)
+    loc <- which(fs_tbl$html == size_value)
+    font_spec <- fs_tbl[loc,]
+    pt_size <- font_spec$`12pt`
 
   } else {
 
-    func <- latex_size_custom_values(dblv)
+    if (grepl('%', size_value)) {
+
+      pt_size <- fs_page_num * to_num(size_value) / 100
+
+    } else {
+
+      pt_size <- to_num(size_value) * 0.75
+
+    }
+
+    loc <- which.min(abs(pt_size - fs_tbl[[fs_page]]))
+    font_spec <- fs_tbl[loc,]
+  }
+
+  if (convert == 'function') {
+
+    return(font_spec$func[[1]])
 
   }
 
-  func
+  if(convert == 'command'){
+
+    return(font_spec$Command)
+
+  }
+
+  if(convert == 'pt_size'){
+
+    return(pt_size)
+
+  }
+}
+
+
+get_latex_align <- function(setting){
+
+  if(is.na(setting)){
+    return('\\arraybackslash\\raggedright\n')
+  }
+
+  switch(setting,
+         left = '\\arraybackslash\\raggedright\n',
+         right = '\\arraybackslash\\raggedleft\n',
+         center = '\\centering')
+}
+
+get_latex_col_align <- function(setting){
+
+  if(is.na(setting)){
+    return('l')
+  }
+
+  switch(setting,
+         left = 'l',
+         right = 'r',
+         center = 'c')
 }
 
 ### Condensed text helper functions
@@ -297,7 +341,7 @@ latex_format_condensed_size <- function(string){
 
   } else {
 
-    func <- latex_size_custom_values(dblv)
+    func <- latex_condensed_custom_values(dblv)
 
   }
 
@@ -306,20 +350,7 @@ latex_format_condensed_size <- function(string){
 
 #' @noRd
 cell_text.size <-  function(value){
-  stripped <- gsub('px', '', value, fixed=TRUE)
-  dblv <- suppressWarnings(as.double(stripped))
-
-  if(is.na(dblv)){
-
-    func <- latex_size_preset_values(stripped)
-
-  } else {
-
-    func <- latex_size_custom_values(dblv)
-
-  }
-
-  func
+  get_latex_font_size(value, convert = 'function')
 }
 
 #' @noRd
@@ -450,39 +481,69 @@ cell_fill.color <- function(value){
 #user inputted hex colors must be translated to rgb
 #' @noRd
 create_color_definition <- function(color){
-  s <- grDevices::col2rgb(color)
-  tbl_cache$color <- c(gsub('#', '', color), tbl_cache$color)
-  paste0(
+  if(startsWith(color, 'rgba')){
+
+    rgba <- stringr::str_split(gsub('rgba|\\(|\\)', '', color), ',')[[1]] %>% as.numeric()
+    rgb_overlay <- rgba[1:3]
+    s <- (rgba[4]*rgba[1:3] + (1 - rgba[4])*c(255, 255, 255))/255
+
+  } else {
+
+    s <- grDevices::col2rgb(color)/255
+
+  }
+
+  new_color <- paste0(
     "\\definecolor{",
     gsub('#', '', color),
     "}{rgb}{",
-    s[1] / 255,
+    s[1],
     ",",
-    s[2] / 255,
+    s[2],
     ",",
-    s[3] / 255,
+    s[3],
     "} \n"
   )
+
+  tbl_cache$color_def <- c(tbl_cache$color_def, new_color)
 }
 
+find_colors.default <- function(x){
+  NULL
+}
+
+find_colors.cell_text <- function(x){
+  if('color' %in% names(x)){
+    return(create_color_definition(x$color))
+  }
+  NULL
+}
+
+find_colors.cell_fill <- function(x){
+  create_color_definition(x$color)
+}
+
+
+find_colors.list <- function(x){
+  purrr::map(x, find_colors)
+}
+
+find_colors <- function(x){
+  UseMethod('find_colors')
+}
 #determine if user needs a color definition in latex code (required)
 #if the name 'colors' appears in the styles df, needs a color definition
 #' @noRd
 define_colors_latex <- function(styles_df) {
-  v <- purrr::flatten(purrr::flatten(styles_df$styles))
-  x <-
-    as.data.frame(list(names = names(v), values = unlist(v, use.names = FALSE)))
-  colors <- x[x$names == 'color',]$values
+  colors <- unique(unlist(find_colors(purrr::flatten(styles_df$styles)),
+                          use.names = FALSE))
 
-  if (length(colors) > 0) {
+  if (length(colors) == 0) {
 
-    paste(unique(purrr::map_chr(colors, create_color_definition)), collapse = '')
-
-  } else {
-
-    ''
+    return(NULL)
 
   }
+  paste(colors, collapse = '')
 }
 
 #' @noRd

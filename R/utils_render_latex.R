@@ -1,4 +1,4 @@
-
+# needs to be implemented: \caption{\thelongtablecaption}\\[\bigskipamount]
 # Create a vector of LaTeX packages to use as table dependencies
 latex_packages <- function() {
   c("amsmath", "booktabs", "caption", "longtable", "xcolor", "amssymb", "color", "colortbl", "array", "mathptmx", "tikz", "pdflscape", "everypage", "threeparttablex")
@@ -47,6 +47,15 @@ footnote_mark_to_latex <- function(mark) {
 }
 
 #' @noRd
+latex_column_sep <- function(data){
+  col_sep <-
+    gsub('px', '', dt_options_get_value(data, 'column_sep')) %>% as.numeric()
+  tbl_cache$col_sep <- round(col_sep*0.75, 1)
+  paste0('{', tbl_cache$col_sep, 'pt}')
+}
+
+
+#' @noRd
 latex_body_row <- function(content,
                            type) {
 
@@ -65,16 +74,8 @@ latex_body_row <- function(content,
 #' @noRd
 latex_heading_row <- function(content) {
 
-  paste0(
-    paste(paste(content, collapse = " & "), "\\\\ \n"),
-    "\\endfirsthead\n",
-    "\\endhead\n",
-    "\\bottomrule\n",
-    "\\addlinespace\n",
-    "\\insertTableNotes\n",
-    "\\endlastfoot\n",
-    "\\midrule\n",
-    collapse = "")
+  paste0(paste(content, collapse = " & "), "\\\\ \n")
+
 }
 
 #' @noRd
@@ -92,19 +93,59 @@ latex_group_row <- function(group_name,
     collapse = "")
 }
 
+
 #' @noRd
 create_table_start_l <- function(data){
-  header <- calc_column_width_l(data = data)
-  separation <- '\\setlength{\\tabcolsep}{3pt}\n'
-  paste0(
-    separation,
-    '\\captionsetup[table]{labelformat=empty,skip=3pt, justification=raggedright, width =\\textwidth}\n',
-    header
-  )
+  optimize_width <- dt_options_get_value(data, 'table_optimize_width')
+  optimize_font <- dt_options_get_value(data, 'table_optimize_font')
+  if(!optimize_width){
+    return(table_no_optimize_l(data = data))
+  }
+  if(!optimize_font){
+    return(table_optimize_width_l(data = data))
+  }
+
+  table_optimize_width_font_l(data = data)
 }
 
-#' Create the columns component of a table
-#'
+#' @noRd
+create_caption_l <- function(data){
+  if(!dt_has_caption(data)){
+    return('')
+  }
+  cap <- dt_caption_get(data = data)
+  paste0("\\caption{", cap$caption, "}")
+}
+
+#' @noRd
+create_overflow_message_l <- function(data){
+
+  get_styled_message <- function(setting, message){
+
+    switch(setting,
+           "bold+italic" = paste0('\\textbf{\\textit{', message, '}}'),
+           "italic" = paste0('\\textit{', message, '}'),
+           "bold" = paste0('\\textbf', message, '}'))
+  }
+
+  if(dt_has_overflow(data)){
+
+    dt_overflow <- dt_overflow_get(data)
+
+    if(!is.null(dt_overflow$message)){
+      inputs <- list(align = get_latex_col_align(dt_overflow$message.align),
+                     message = get_styled_message(dt_overflow$message.style, dt_overflow$message),
+                     num_cols = tbl_cache$num_cols)
+
+      return(whisker::whisker.render(latex_templates$cont_next_page, inputs))
+
+    }
+  }
+
+  return('')
+}
+
+
 #' @noRd
 create_columns_component_l <- function(data) {
 
@@ -114,32 +155,10 @@ create_columns_component_l <- function(data) {
   spanners_present <- dt_spanners_exists(data = data)
   styles_tbl <- dt_styles_get(data = data)
 
-  # Get the headings
-  #headings <- boxh$column_label %>% unlist()
-
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
-  #headings_labels <- purrr::map_chr(headings_labels, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
 
-  #key <- as.list(headings_labels)
-  #names(key) <- headings_vars
-  #headings_labels <- lapply(headings_vars, latex_style_headings, styles_df = styles_tbl, key = key)  %>% unlist(use.names = FALSE)
-
-  # TODO: Implement hidden boxhead in LaTeX
-  # # Should the column labels be hidden?
-  # column_labels_hidden <-
-  #   dt_options_get_value(data = data, option = "column_labels_hidden")
-  #
-  # if (column_labels_hidden) {
-  #   return("")
-  # }
-
-  # If `stub_available` == TRUE, then replace with a set stubhead
-  # label or nothing
   if (isTRUE(stub_available) && length(stubh$label) > 0) {
-
-    #stubl <- fmt_latex_math(gsub("\\", "", stubh$label, fixed=TRUE))
-    #stublabel <- style_stubhead_l(styles_tbl, stubl)
 
     headings_labels <- prepend_vec(headings_labels, stubh$label)
     headings_vars <- prepend_vec(headings_vars, "::stub")
@@ -161,7 +180,7 @@ create_columns_component_l <- function(data) {
 
     # Promote column labels to the group level wherever the
     # spanner label is NA
-    spanners[is.na(spanners)] <- headings_vars[is.na(spanners)]
+    spanners[is.na(spanners)] <- headings_vars[!headings_vars == '::stub'][is.na(spanners)]
 
     if (stub_available) {
       spanners <- c(NA_character_, spanners)
@@ -222,12 +241,80 @@ create_columns_component_l <- function(data) {
     table_col_spanners <- ""
   }
 
-  paste0("\\toprule\n", table_col_spanners, table_col_headings)
+  full_colheadings <- paste0(table_col_spanners, table_col_headings)
+
+  if(dt_has_overflow(data)){
+
+    if(dt_overflow_get(data)$repeat_column_labels){
+
+      return(whisker::whisker.render(latex_templates$collabels_everypage,
+                              list(col_labels = paste0(table_col_spanners,
+                                                       table_col_headings))))
+    }
+  }
+
+  return(whisker::whisker.render(latex_templates$collabels_firstpage,
+                                 list(col_labels = paste0(table_col_spanners,
+                                                          table_col_headings))))
+
+}
+
+create_summary_rows_l <- function(data){
+  list_of_summaries <- dt_summary_df_get(data = data)
+
+  hide_stub <- function(summary){
+    to_hide <-
+      data$`_boxhead`$var[data$`_boxhead`$type == 'hidden' |
+                            data$`_boxhead`$type == 'stub']
+    summary %>% dplyr::select(!to_hide)
+  }
+
+  merge_summary <- function(summary) {
+      cols_merge <- data$`_col_merge`
+      summary <- merge_summary_rows(summary, cols_merge)
+      if (data$`_boxhead`$var[1] == 'rowname' &&
+          data$`_boxhead`$type[1] == 'stub') {
+
+        to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
+        summary <- summary %>% dplyr::select(!to_hide)
+
+      } else {
+        summary <- hide_stub(summary)
+      }
+
+      summary
+  }
+
+  display_summaries <- list_of_summaries$summary_df_display_list
+  if ("_col_merge" %in% names(data)) {
+
+    summaries_merged <- purrr::map(names(display_summaries), function(.x){
+      merged <- merge_summary(display_summaries[[.x]])
+      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
+      merged
+      })
+
+  } else {
+
+    summaries_merged <- purrr::map(names(display_summaries), function(.x){
+      merged <- hide_stub(display_summaries[[.x]])
+      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
+      merged
+    })
+  }
+
+  summaries_tbl <- do.call(rbind, summaries_merged)
+  to_format <- summaries_tbl %>%
+    dplyr::select(-'::SUMMARY_NAME')
+
+  df <- data.frame(lapply(to_format, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
+  df[['::SUMMARY_KEY']] <- summaries_tbl[['::SUMMARY_NAME']]
+  df
+
 }
 
 #' @noRd
-create_body_component_l <- function(data) {
-
+create_body_rows_l <- function(data) {
   boxh <- dt_boxhead_get(data = data)
   styles_tbl <- dt_styles_get(data = data)
   body <- dt_body_get(data = data)
@@ -249,8 +336,15 @@ create_body_component_l <- function(data) {
   # Get the column headings for the visible (e.g., `default`) columns
   default_vars <- dt_boxhead_get_vars_default(data = data)
 
+  # TRUE when no stub and all summary
+  # FALSE when stub and all summary
+  # FALSE when no stub and no all summary
+  # FALSE when stub and all-stub summary <- need
+  # FALSE when stub and no all summary
   if ("rowname" %in% names(body)) {
+
     default_vars <- c("rowname", default_vars)
+
   }
 
   # Determine whether the stub is available through analysis
@@ -279,10 +373,10 @@ create_body_component_l <- function(data) {
         group_label = gsub("^NA", "\\textemdash", group_label))
   }
 
-  #groups_rows_df$group_label <- purrr::map_chr(groups_rows_df$group_label, function(.){style_group_rows_latex(fmt_latex_math(.),  styles_tbl)})
   group_rows <- create_group_rows(n_rows, groups_rows_df, context = "latex", n_cols = n_cols)
 
-  if (stub_available) {
+  if (stub_available && !("rowname" %in% names(body))) {
+
     default_vars <- c("::rowname", default_vars)
 
     body <-
@@ -290,37 +384,66 @@ create_body_component_l <- function(data) {
       dplyr::select(rowname) %>%
       dplyr::rename(`::rowname` = rowname) %>%
       cbind(body)
+
   }
 
-
   # Split `body_content` by slices of rows and create data rows
-  body_content <- as.vector(t(body[, default_vars]))
+  #body_content <- as.vector(t(body[, default_vars]))
   #body_content <- purrr::map_chr(body_content, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
-  row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
-  #row_splits <- style_data_latex(row_splits, styles_tbl)
-  data_rows <- create_data_rows(n_rows, row_splits, context = "latex")
+  #row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
 
+  dt_show <- body[, default_vars]
+  row_splits <- purrr::map(seq(dim(dt_show)[1]), ~unlist(dt_show[.x, ], use.names = FALSE))
 
-  summary_rows <-
-    create_summary_rows(
-      n_rows = n_rows,
-      n_cols = n_cols,
-      list_of_summaries = list_of_summaries,
-      groups_rows_df = groups_rows_df,
-      stub_available = stub_available,
-      summaries_present = summaries_present,
-      context = "latex"
-    )
+  sum_rows <- NULL
+  if (summaries_present) {
+    sum_rows <- create_summary_rows_l(data = data)
+  }
 
-  #summary_rows <- purrr::map_chr(summary_rows, fmt_latex_math)
-  paste0(paste(collapse = "", paste0(group_rows, data_rows, summary_rows)), "\\bottomrule\n")
+  list(group_rows = group_rows,
+       row_splits = row_splits,
+       n_rows = n_rows,
+       sum_rows = sum_rows,
+       groups_rows_df = groups_rows_df)
+}
+
+#' @noRd
+create_body_component_l <- function(data) {
+
+  rows <- create_body_rows_l(data = data)
+  summary_positions <- rep('', rows$n_rows)
+
+  data_rows <- create_data_rows(rows$n_rows, rows$row_splits, context = "latex")
+  if (!is.null(rows$sum_rows)) {
+
+    fmt_summary_rows <- function(.){
+      paste0(apply(., c(1), paste, collapse = ' & '), ' \\\\ \n ')
+    }
+
+    collapse_rows <- function(.){
+      paste0("\\midrule \n ", paste(c(.), collapse = ''))
+    }
+
+    rows$sum_rows$`::COLLAPSED` <- rows$sum_rows %>%
+      dplyr::select(-'::SUMMARY_KEY') %>%
+      fmt_summary_rows()
+
+    summary_rows_tbl <- rows$sum_rows %>%
+      dplyr::group_by(`::SUMMARY_KEY`) %>%
+      dplyr::summarise_at('::COLLAPSED', .funs = list(FULL_ROW = collapse_rows))
+
+    gp_rows <- rbind(rows$groups_rows_df, c('::GRAND_SUMMARY', '', 0, rows$n_rows))
+    positions <- gp_rows[match(summary_rows_tbl[['::SUMMARY_KEY']], gp_rows$group),]$row_end %>% as.numeric()
+    summary_positions[positions] <- summary_rows_tbl$FULL_ROW
+
+  }
+
+  paste(paste0(rows$group_rows, data_rows, summary_positions), collapse = "")
 }
 
 #' @noRd
 create_table_end_l <- function() {
-  paste0(
-    "\\end{longtable}\n",
-    "\\end{ThreePartTable}\n")
+  return("\\end{longtable}\n")
 }
 
 
@@ -351,14 +474,17 @@ create_source_foot_note_component_l <- function(data) {
     tidy_gsub("<br\\s*?(/|)>", "\\newline") %>%
     tidy_gsub("&nbsp;", " ")
 
-  footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
-                       footnotes_tbl[["footnotes"]] %>%
-                         unescape_html() %>%
-                         markdown_to_latex())
+  footnotes <- footnotes_tbl[["footnotes"]] %>%
+    unescape_html() %>%
+    markdown_to_latex() %>%
+    fmt_latex_math() %>%
+    extract('math_env')
 
-  footnotes <- paste(paste0('\\item ',
-                      footnotes,
-                      '\n'),
+  footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
+                       footnotes)
+
+  footnotes <- paste(paste0(footnotes,
+                      ' \\\\ \n'),
                      collapse = '')
   } else {
 
@@ -373,9 +499,9 @@ create_source_foot_note_component_l <- function(data) {
   # rows, then return an empty footnotes component
   if (length(source_note) != 0) {
 
-    source_note <- paste(paste0('\\item ',
-                              source_note,
-                              '\n'),
+    source_note <- fmt_latex_math(source_note) %>% extract('math_env')
+    source_note <- paste(paste0(source_note,
+                                ' \\\\ \n'),
                        collapse = '')
   } else {
 
@@ -383,19 +509,43 @@ create_source_foot_note_component_l <- function(data) {
 
   }
 
-  size <- type_setting(tbl_cache$font_size)
-  full_cap <-  paste0(
-      '\\begin{ThreePartTable}\n',
-      size,
-      '\\settotextwidth',
-      '\\begin{TableNotes}\n',
-      '\\centering\n',
-      '\\footnotesize\n',
-      footnotes,
-      '\\item\n',
-      source_note,
-      '\\end{TableNotes}\n'
+  if(is.null(footnotes)){
+
+    if(is.null(source_note)){
+
+      return('')
+
+    } else {
+
+      inputs <- list(
+        sourcenotes_align = get_latex_align(dt_options_get_value(data, 'source_notes_align')),
+        sourcenotes_size = get_latex_font_size(dt_options_get_value(data, 'source_notes_font_size')),
+        sourcenotes = source_note
+      )
+      return(whisker::whisker.render(latex_templates$sourcenotes, inputs))
+    }
+
+  } else {
+
+    inputs <- list(
+      footnotes_align = get_latex_align(dt_options_get_value(data, 'footnotes_align')),
+      footnotes_size = get_latex_font_size(dt_options_get_value(data, 'footnotes_font_size')),
+      footnotes = footnotes
     )
 
-  return(full_cap)
+    if(is.null(source_note)){
+
+      return(whisker::whisker.render(latex_templates$sourcenotes, inputs))
+
+    } else{
+
+      inputs$sourcenotes_align <- get_latex_align(dt_options_get_value(data, 'source_notes_align'))
+      inputs$sourcenotes_size <- get_latex_font_size(dt_options_get_value(data, 'source_notes_font_size'))
+      inputs$sourcenotes <- source_note
+
+      return(whisker::whisker.render(latex_templates$source_footnotes, inputs))
+    }
+
+  }
+
 }

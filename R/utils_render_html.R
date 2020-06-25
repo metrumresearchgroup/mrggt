@@ -264,21 +264,40 @@ create_heading_component <- function(data,
 
   if (context == "latex") {
 
-    title_row <-
-      paste0(heading$title, footnote_title_marks)
+    if(dt_heading_has_title(data = data, context='latex')){
 
-    if (dt_heading_has_subtitle(data = data, context='latex')) {
+      inputs <- list(
+        title_size = get_latex_font_size(dt_options_get_value(data, "heading_title_font_size")),
+        title_align = get_latex_align(dt_options_get_value(data, "heading_align")),
+        title = paste0(heading$title, footnote_title_marks)
+        )
 
-      subtitle_row <-
-        paste0(heading$subtitle, footnote_subtitle_marks) %>%
-        paste_left(": ")
+      if(dt_heading_has_subtitle(data = data, context='latex')){
+
+        inputs$subtitle_size <- get_latex_font_size(dt_options_get_value(data, "heading_subtitle_font_size"))
+        inputs$subtitle <- paste0(heading$subtitle, footnote_subtitle_marks)
+        return(whisker::whisker.render(latex_templates$title_subtitle, inputs))
+
+      } else {
+
+        return(whisker::whisker.render(latex_templates$title, inputs))
+      }
 
     } else {
-      subtitle_row <- ""
-    }
 
-    heading_component <-
-      paste0("\\caption{", title_row, subtitle_row, "} \\\\\n")
+      if(dt_heading_has_subtitle(data = data, context='latex')){
+
+        inputs <- list(
+          title_size = get_latex_font_size(dt_options_get_value(data, "heading_subtitle_font_size")),
+          title_align = get_latex_align(dt_options_get_value(data, "heading_align")),
+          title = paste0(heading$subtitle, footnote_subtitle_marks)
+        )
+        return(whisker::whisker.render(latex_templates$title, inputs))
+
+      } else {
+        return('')
+      }
+    }
   }
 
   if (context == "rtf") {

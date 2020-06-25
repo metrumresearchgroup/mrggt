@@ -46,6 +46,118 @@ tab_header <- function(data,
   data %>% dt_heading_title_subtitle(title = title, subtitle = subtitle)
 }
 
+
+#' Add a caption to a LaTeX table
+#'
+#' Set a caption within the `longtable` LaTeX environment.
+#'
+#' @param data A table object that is created using the [gt()] function.
+#' @param caption the caption to be set within `\caption{}` in the `longtable` environment. `label` can also be passed.
+#'
+#' @return An object of class `gt_tbl`.
+#'
+#' @examples
+#' # Use `gtcars` to create a gt table;
+#' # Group several columns related to car
+#' # add a caption of 'Gtcars table'
+#' # with the label `performance`
+#' tab_1 <-
+#'   gtcars %>%
+#'   dplyr::select(
+#'     -mfr, -trim, bdy_style, drivetrain,
+#'     -drivetrain, -trsmn, -ctry_origin
+#'   ) %>%
+#'   dplyr::slice(1:8) %>%
+#'   gt(rowname_col = "model") %>%
+#'   tab_caption(caption = "Gtcars table\\label{performance}")
+#'
+#' @export
+tab_caption <- function(data,
+                        caption) {
+
+  # Perform input object validation
+  stop_if_not_gt(data = data)
+
+  data %>% dt_caption(caption = caption)
+}
+
+#' Add a spillover message for LaTeX table outputs
+#'
+#' Add a message that will appear at the bottom of every page that a table spans over until the table is completed.
+#'
+#' @param data A table object that is created using the [gt()] function.
+#' @param message message to display at `\endhead` (see `longtable` documentation)
+#' @param message.align the alignment of the message. `left`, `right`, `center`, default is `right`
+#' @param message.style styling for the message. `italic`, `bold`, `bold+italic`, default is `italic`
+#' @param repeat_column_labels repeat the column labels + spanners for every page the table spans. default is `FALSE`
+#'
+#' @return An object of class `gt_tbl`.
+#'
+#' @examples
+#'
+#' # Create a very long table
+#' fruit_tbl <-
+#'   data.frame(
+#'     rownm = rep(c(
+#'       'fruit 1', 'fruit 2', 'fruit 3', 'fruit 4', 'fruit 5'
+#'     ), 6),
+#'     grpname = rep(c(
+#'       'apple', 'banana', 'grape', 'pear', 'orange'
+#'     ), 6),
+#'     count = rep(c(1, 2, 3, 4, 5), 6),
+#'     color = rep(c(
+#'       'red', 'yellow', 'purple', 'green', 'orange'
+#'     ), 6),
+#'     stringsAsFactors = FALSE
+#'   )
+#'
+#' # add spanner, stubhead
+#' # add footnotes, sourcenotes
+#' # add spillover message to appear at bottom of table
+#' # repeat the column labels/spanners on every page
+#'
+#' fruit_tbl %>%
+#'   gt(rowname_col = 'rownm') %>%
+#'   tab_stubhead(label = 'Category') %>%
+#'   tab_row_group(group = 'Repeating Group',
+#'                 rows = 1:5) %>%
+#'   tab_spanner(label = 'Summary',
+#'               columns = vars(grpname, count, color)) %>%
+#'   summary_rows(columns = vars(count),
+#'                groups = c('Repeating Group'),
+#'                fns = list(Total = ~sum(.))) %>%
+#'   tab_footnote(footnote = 'Total number present in set',
+#'                locations = cells_column_labels('count')) %>%
+#'   tab_source_note(c('Source: mrggt help guide')) %>%
+#'   tab_options(source_notes.align = 'center') %>%
+#'   tab_options(footnotes.align = 'left') %>%
+#'   tab_spillover(message = 'Continued on Next Page...',
+#'                 message.align = 'right',
+#'                 message.style = 'italic',
+#'                 repeat_column_labels = TRUE) %>%
+#'   as_latex()
+#'
+#' @section Figures:
+#' \if{html}{\figure{man_tab_spillover_latex_1.png}{options: width=100\%}}
+#' \if{html}{\figure{man_tab_spillover_latex_2.png}{options: width=100\%}}
+#' @export
+tab_spillover <- function(data,
+                         message = NULL,
+                         message.align = c('right', 'left', 'center'),
+                         message.style = c('italic', 'bold', 'bold+italic'),
+                         repeat_column_labels = FALSE) {
+
+  # Perform input object validation
+  stop_if_not_gt(data = data)
+
+  message.align <- match.arg(message.align)
+  message.style <- match.arg(message.style)
+  data %>% dt_overflow(overflow = list(message = message,
+                                      message.align = message.align,
+                                      message.style = message.style,
+                                      repeat_column_labels = repeat_column_labels))
+}
+
 #' Add a spanner column label
 #'
 #' Set a spanner column label by mapping it to columns already in the table.
@@ -370,7 +482,7 @@ tab_row_group <- function(data,
           data = data,
           row_groups = c(
             process_text(group[1]),
-            arrange_groups_vars
+            arrange_groups_vars[!is.na(arrange_groups_vars)]
           ) %>%
             unique()
         )
@@ -1142,6 +1254,13 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   horizontal or vertical scrolling is enabled to view the entire table in
 #'   those directions. With `FALSE`, the table may be clipped if the table width
 #'   or height exceeds the `container.width` or `container.height`.
+#' @param table.optimize.width,table.optimize.font LaTeX only parameters.
+#'   Both can be specified as `TRUE` or `FALSE`. Default is `TRUE`/`TRUE`.
+#'   `mrggt` does both column width and fontsizing calculations for LaTeX tables
+#'   to ensure they do not exceed the available page width. If `table.optimize.font`
+#'   is `FALSE`, the value specified for `table.font.size` will be used and optimal
+#'   column widths under that font size will be calculated. If `table.optimize.width`
+#'   is `FALSE`, the `table.font.size` will be used and no column optimization will occur.
 #' @param table.width The width of the table. Can be specified as a
 #'   single-length character with units of pixels or as a percentage. If
 #'   provided as a single-length numeric vector, it is assumed that the value is
@@ -1179,7 +1298,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   percentage (e.g., `80\%`). If provided as a single-length numeric vector,
 #'   it is assumed that the value is given in units of pixels. The [px()] and
 #'   [pct()] helper functions can also be used to pass in numeric values and
-#'   obtain values as pixel or percentage units.
+#'   obtain values as pixel or percentage units. LaTeX: `table.font.size` will be ignored if `table.optimize.font` is `TRUE`.
 #' @param heading.align Controls the horizontal alignment of the heading title
 #'   and subtitle. We can either use `"center"`, `"left"`, or `"right"`.
 #' @param heading.title.font.weight,heading.subtitle.font.weight,column_labels.font.weight,row_group.font.weight,stub.font.weight
@@ -1206,6 +1325,12 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param heading.border.lr.style,heading.border.lr.width,heading.border.lr.color
 #'   The style, width, and color properties for the left and right borders of
 #'   the `heading` location.
+#' @param column_sep LaTeX only. The separation between the columns Specified as a
+#'   single-length character with units of pixels. If
+#'   provided as a single-length numeric vector, it is assumed that the value is
+#'   given in units of pixels. The [px()] helper function can also
+#'   be used to pass in a numeric value and obtain value as pixel
+#'   units.
 #' @param column_labels.vlines.style,column_labels.vlines.width,column_labels.vlines.color
 #'   The style, width, and color properties for all vertical lines ('vlines')
 #'   of the the `column_labels`.
@@ -1241,6 +1366,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #' @param grand_summary_row.border.style,grand_summary_row.border.width,grand_summary_row.border.color
 #'   The style, width, and color properties for the top borders of the
 #'   `grand_summary_row` location.
+#' @param footnotes.align alignment for the footnotes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param footnotes.border.bottom.style,footnotes.border.bottom.width,footnotes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `footnotes` location.
@@ -1260,6 +1386,7 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'   `"LETTERS"`. There is the option for using a traditional symbol set where
 #'   `"standard"` provides four symbols, and, `"extended"` adds two more
 #'   symbols, making six.
+#' @param source_notes.align alignment for the source notes, specified as `left`, `right`, or `center`. Only implemented in LaTeX.
 #' @param source_notes.border.bottom.style,source_notes.border.bottom.width,source_notes.border.bottom.color
 #'   The style, width, and color properties for the bottom border of the
 #'   `source_notes` location.
@@ -1275,6 +1402,18 @@ set_style.cells_grand_summary <- function(loc, data, style) {
 #'
 #' @return An object of class `gt_tbl`.
 #'
+#'
+#' @note
+#' LaTeX implementation of `tab_options` is a work in progress.
+#'  - Currently implemented in LaTeX:
+#'     - `table.font.size`
+#'     - Only available for LaTeX:
+#'       - `table.optimize.width`
+#'       - `table.optimize.font`
+#'       - `column_sep`
+#'       - `footnotes.align`
+#'       - `sourcenotes.align`
+
 #' @examples
 #' # Use `exibble` to create a gt table with
 #' # all the main parts added; we can use this
@@ -1377,6 +1516,8 @@ tab_options <- function(data,
                         container.height = NULL,
                         container.overflow.x = NULL,
                         container.overflow.y = NULL,
+                        table.optimize.font = NULL,
+                        table.optimize.width = NULL,
                         table.width = NULL,
                         table.align = NULL,
                         table.margin.left = NULL,
@@ -1409,6 +1550,7 @@ tab_options <- function(data,
                         heading.border.lr.style = NULL,
                         heading.border.lr.width = NULL,
                         heading.border.lr.color = NULL,
+                        column_sep = NULL,
                         column_labels.background.color = NULL,
                         column_labels.font.size = NULL,
                         column_labels.font.weight = NULL,
@@ -1475,6 +1617,7 @@ tab_options <- function(data,
                         grand_summary_row.border.style = NULL,
                         grand_summary_row.border.width = NULL,
                         grand_summary_row.border.color = NULL,
+                        footnotes.align = NULL,
                         footnotes.background.color = NULL,
                         footnotes.font.size = NULL,
                         footnotes.padding = NULL,
@@ -1486,6 +1629,7 @@ tab_options <- function(data,
                         footnotes.border.lr.color = NULL,
                         footnotes.sep = NULL,
                         footnotes.marks = NULL,
+                        source_notes.align = NULL,
                         source_notes.background.color = NULL,
                         source_notes.font.size = NULL,
                         source_notes.padding = NULL,

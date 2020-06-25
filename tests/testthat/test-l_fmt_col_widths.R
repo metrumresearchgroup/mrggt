@@ -38,7 +38,7 @@ test_that("the calculation of column widths works correctly", {
   tbl_tex <- tbl_gt %>% as_latex() %>% as.character()
 
   # Extract the calculated column widths
-  col_widths <- unlist(qdapRegex::rm_between(tbl_tex, 'p{', '}', extract=TRUE))
+  col_widths <- unlist(qdapRegex::rm_between(tbl_tex, 'p{', 'cm}', extract=TRUE))
 
   # Expect all calculated column widths to be equal to one another
   expect_equal(length(unique(col_widths)), 1)
@@ -88,8 +88,8 @@ test_that("the calculation of column widths works correctly", {
   sizing_options <- c('tiny', 'scriptsize', 'footnotesize', 'small', '')
 
   # grab the second element of the character string (fontsize setting)
-  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[2]
-  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[2]
+  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[13]
+  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[13]
 
   # strip the leading \\ on the fontsize and trailing whitespace
   long_fs <- gsub('\\', '', trimws(long_fs), fixed = TRUE)

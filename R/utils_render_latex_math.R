@@ -18,40 +18,29 @@ sanitize_tex <- function (x) {
 }
 
 #' @noRd
-sanitize_tex.default <- function(x) {
-  sanitize <- list(c("(\\\\+%)", "\\\\%"),
-                   c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
-                   c('>', '\\$>\\$'),
-                   c('<', '\\$<\\$'),
-                   c('\u00B1', '\\$\\\\pm\\$'))
-
-  gsub_multiple(x, sanitize)
+sanitize_tex.default <- function(x){
+  x %>%
+  #tidy_gsub("\\\\", "\\\\textbackslash ") %>%
+  # remove {} from below
+  tidy_gsub("([&%$#_])", "\\\\\\1") %>%
+  tidy_gsub("~", "\\\\textasciitilde ") %>%
+  tidy_gsub(">", "\\$>\\$") %>%
+  tidy_gsub("<", "\\$<\\$") %>%
+  tidy_gsub("\\^", "\\\\textasciicircum ") %>%
+  tidy_gsub("\u00B1", "\\$\\\\pm\\$")
 }
 
 #' @noRd
 sanitize_tex.math <- function(x) {
-  vect <- unlist(qdapRegex::rm_between(x, '<', '>', extract = TRUE))
   sanitize <- list(c("(\\\\+%)", "\\\\%"),
-                   c('!@', ''),
-                   c('\\*', '\\\\'),
+                   c('\\$\\$', ''),
                    c("(\\\\_)", '\\_'),
                    c("(\\\\+\\{)", '\\{'),
                    c("(\\\\+\\})", '\\}'),
                    c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
                    c("\\|", '\\\\vert'),
-                   c('\u00B1', '\\$\\\\pm\\$'))
+                   c('\u00B1', '\\\\pm'))
 
-  vect <- vect[!is.na(vect)]
-  if (length(vect) > 0) {
-    sanitize <- append(sanitize,
-                       mapply(
-                         c,
-                         paste0('<', vect, '>'),
-                         paste0('\\\\text\\{', vect, '\\}'),
-                         SIMPLIFY = F,
-                         USE.NAMES = FALSE
-                       ))
-  }
   gsub_multiple(x, sanitize)
 }
 
@@ -128,7 +117,7 @@ c.tex_math <- function(...){
 
 #' @noRd
 tex_math <- function(x){
-  if(grepl('!@', x)){
+  if(grepl('\\$\\$', x)){
     x <- structure(x,
                    class = c(class(x), 'math'))
   }

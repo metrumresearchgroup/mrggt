@@ -59,7 +59,7 @@ test_that("the `fmt_passthrough()` function works correctly", {
          pattern = "{x}%"
        ) %>%
        render_formats_test(context = "latex"))[["num_2"]],
-    c("34\\%", "74\\%", "23\\%", "93\\%", "35\\%", "76\\%", "57\\%"))
+    c("34%", "74%", "23%", "93%", "35%", "76%", "57%"))
 
   expect_equal(
     (tbl_latex %>%
@@ -79,5 +79,5 @@ test_that("the `fmt_passthrough()` function works correctly", {
          pattern = "{x}%"
        ) %>%
        render_formats_test(context = "latex"))[["num_2"]],
-    c("34\\%", "74", "23\\%", "93", "35\\%", "76", "57"))
+    c("34%", "74", "23%", "93", "35%", "76", "57"))
 })

@@ -379,60 +379,64 @@ as_latex <- function(data) {
   # Composition of LaTeX ----------------------------------------------------
 
   #Create a LaTeX fragment that defines the possible colors being used in table
-  styles_tbl <- dt_styles_get(data = data)
-  tbl_cache$color_def <- define_colors_latex(styles_tbl)
+  tbl_cache$color_def <- define_colors_latex(dt_styles_get(data = data))
+
+  # Create a LaTeX fragment for the column sep of the table
+  column_sep <- latex_column_sep(data = data)
 
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
 
-  # Create the heading component
+  continued_message <- create_overflow_message_l(data = data)
+
+  caption <- create_caption_l(data = data)
+
   heading_component <- create_heading_component(data = data, context = "latex")
 
-  # Create the columns component
   columns_component <- create_columns_component_l(data = data)
 
-  # Create the body component
-  body_component <- create_body_component_l(data = data)
-
-  # Create the source notes component
-  #source_notes_component <- create_source_note_component_l(data = data)
   src_foot_component <- create_source_foot_note_component_l(data = data)
 
-  # Create the footnotes component
-  #footnotes_component <- create_footnotes_component_l(data = data)
+  body_component <- create_body_component_l(data = data)
 
-  # Create a LaTeX fragment for the ending tabular statement
   table_end <- create_table_end_l()
+
+  inputs <- list(
+    color_definitions = tbl_cache$color_def,
+    table_font_size = tbl_cache$font_size,
+    column_sep = column_sep,
+    table_start = table_start,
+    caption = caption,
+    heading_component = heading_component,
+    columns_component = columns_component,
+    src_foot_component = src_foot_component,
+    continued_message = continued_message,
+    body_component = body_component,
+    table_end = table_end
+  )
+
+  tex <- whisker::whisker.render(latex_templates$portrait_longtable, inputs)
 
   latex_packages <- create_knit_meta()
 
-  # Compose the LaTeX table
-  tex <- paste0(
-    tbl_cache$color_def,
-    src_foot_component,
-    table_start,
-    heading_component,
-    columns_component,
-    body_component,
-    table_end,
-    collapse = ""
-  )
-
   if(!orient_portrait){
-    knit_asis <- paste("\\begin{landscape}",
-                 "\\pagestyle{empty}",
-                 tex,
-                "\\end{landscape}",
-                sep = '\n') %>%
+
+    knit_asis <-
+      whisker::whisker.render(latex_templates$lscape_table,
+                              list(portrait_table = tex)) %>%
       knitr::asis_output(meta = latex_packages)
 
-    knit_asis <- structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
+    knit_asis <-
+      structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
     attr(knit_asis, 'base') <- tex
+
   } else {
+
     knit_asis <- tex %>% knitr::asis_output(meta = latex_packages)
+
   }
 
-  reset_tbl_cache()
+  initialize_tbl_cache()
   knit_asis
 }
 

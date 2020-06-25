@@ -1,0 +1,39 @@
+\documentclass[12pt]{article}
+\usepackage{calc}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{caption}[singlelinecheck=off]
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{mathptmx}
+\usepackage{tikz}
+
+\begin{document}
+\def\checkmark{\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;}
+\newlinechar=`\^^J
+
+{{{color_declarations}}}
+
+\newenvironment{localsize}[1]
+{%
+  \clearpage
+  \let\orignewcommand\newcommand
+  \let\newcommand\renewcommand
+  \makeatletter
+  \input{size#1.clo}%
+  \makeatother
+  \let\newcommand\orignewcommand
+}
+{%
+  \clearpage
+}
+
+{{{var_declarations}}}
+
+{{{font_size_width}}}
+
+\end{document}
