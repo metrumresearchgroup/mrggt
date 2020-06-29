@@ -94,9 +94,11 @@ extract.list <- function(x, y){
 
 extract.data.frame <- function(x, y){
   dfbase <- purrr::map(x, extract, y)
-  as.data.frame(dfbase,
-                row.names = rownames(x),
-                stringsAsFactors = FALSE)
+  ans <- as.data.frame(dfbase,
+                       row.names = rownames(x),
+                       stringsAsFactors = FALSE)
+  colnames(ans) <- names(dfbase)
+  ans
 }
 
 #' @noRd
