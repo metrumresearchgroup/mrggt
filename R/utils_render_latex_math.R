@@ -1,127 +1,26 @@
 #' @noRd
-gsub_multiple <- function(x, substitues) {
-  subs <- purrr::map(substitues, ~ list(
-    pattern = .x[1],
-    replacement = .x[2]
-  ))
-
-  purrr::reduce(subs,
-                ~ do.call(gsub,
-                          append(.y,
-                                 list(x = .x))),
-                .init = x)
-}
-
-#' @noRd
-sanitize_tex <- function (x) {
-  UseMethod("sanitize_tex", x)
-}
-
-#' @noRd
-sanitize_tex.default <- function(x){
+sanitize_tex_str <- function(x){
   x %>%
-  #tidy_gsub("\\\\", "\\\\textbackslash ") %>%
-  # remove {} from below
-  tidy_gsub("([&%$#_])", "\\\\\\1") %>%
-  tidy_gsub("~", "\\\\textasciitilde ") %>%
-  tidy_gsub(">", "\\$>\\$") %>%
-  tidy_gsub("<", "\\$<\\$") %>%
-  tidy_gsub("\\^", "\\\\textasciicircum ") %>%
-  tidy_gsub("\u00B1", "\\$\\\\pm\\$")
+    #tidy_gsub("\\\\", "\\\\textbackslash ") %>%
+    # remove {} from below
+    tidy_gsub("([&%$#_])", "\\\\\\1") %>%
+    tidy_gsub("~", "\\\\textasciitilde ") %>%
+    tidy_gsub(">", "\\$>\\$") %>%
+    tidy_gsub("<", "\\$<\\$") %>%
+    tidy_gsub("\\^", "\\\\textasciicircum ") %>%
+    tidy_gsub("\u00B1", "\\$\\\\pm\\$")
 }
 
 #' @noRd
-sanitize_tex.math <- function(x) {
-  sanitize <- list(c("(\\\\+%)", "\\\\%"),
-                   c('\\$\\$', ''),
-                   c("(\\\\_)", '\\_'),
-                   c("(\\\\+\\{)", '\\{'),
-                   c("(\\\\+\\})", '\\}'),
-                   c("CHECKMARK", '\\\\text\\{\\\\checkmark\\}'),
-                   c("\\|", '\\\\vert'),
-                   c('\u00B1', '\\\\pm'))
-
-  gsub_multiple(x, sanitize)
-}
-
-#' @noRd
-as.tex_math <- function (x) {
-  UseMethod("as.tex_math", x)
-}
-
-#' @noRd
-as.tex_math.default <- function(x) {
-  x <- sanitize_tex(x)
-
-  structure(
-    list(
-      .Label = x,
-      math_env = x,
-      math_env2exp = rlang::quo(paste0(x))
-    ),
-    class = c('tex_math')
-  )
-}
-
-#' @noRd
-as.tex_math.math <- function(x){
-  x <- sanitize_tex(x)
-
-  structure(
-    list(
-      .Label = x,
-      math_env = paste0('$', x, '$'),
-      math_env2exp = rlang::quo(paste0('$', x, '$'))
-    ),
-    class = c('tex_math')
-  )
-}
-
-#' @noRd
-as.list.tex_math <- function(x){
-  list(.Label = x$.Label,
-       math_env = x$math_env,
-       math_env2exp = x$math_env2exp)
-}
-
-extract <- function(x, y){
-  UseMethod('extract')
-}
-
-extract.list <- function(x, y){
-  purrr::map_chr(x, extract, y)
-}
-
-extract.data.frame <- function(x, y){
-  dfbase <- purrr::map(x, extract, y)
-  as.data.frame(dfbase,
-                row.names = rownames(x),
-                stringsAsFactors = FALSE)
-}
-
-#' @noRd
-extract.default <- function(x, y){
-  purrr::pluck(x, y)
-}
-
-#' @noRd
-print.tex_math <- function(x){
-  print(x$.Label)
-}
-
-#' @noRd
-c.tex_math <- function(...){
-  structure(list(...),
-            class = c('tex_math'))
-}
-
-#' @noRd
-tex_math <- function(x){
-  if(grepl('\\$\\$', x)){
-    x <- structure(x,
-                   class = c(class(x), 'math'))
-  }
-  x %>% as.tex_math()
+sanitize_tex_math <- function(x) {
+  x %>%
+    tidy_gsub("(\\\\+%)", "\\\\%") %>%
+    tidy_gsub('\\$\\$', '\\$') %>%
+    tidy_gsub("(\\\\_)", '\\_') %>%
+    tidy_gsub("(\\\\+\\{)", '\\{') %>%
+    tidy_gsub("(\\\\+\\})", '\\}') %>%
+    tidy_gsub("\\|", '\\\\vert') %>%
+    tidy_gsub('\u00B1', '\\\\pm')
 }
 
 #' @noRd
@@ -132,25 +31,17 @@ fmt_latex_math <- function (x, ...) {
 
 #' @noRd
 fmt_latex_math.default <- function(x){
-  vtex_math <- Vectorize(tex_math,
-                         vectorize.args = c('x'),
-                         USE.NAMES = FALSE,
-                         SIMPLIFY = FALSE)
-  x <- vtex_math(x)
-  if(length(x) == 1){
-    x <- x[[1]]
-  }
+  math_present <- grepl('\\$\\$.*\\$\\$', x)
+  x[math_present] <- sanitize_tex_math(x[math_present])
+  x[!math_present] <- sanitize_tex_str(x[!math_present])
   x
 }
 
 #' @noRd
 fmt_latex_math.data.frame <- function(x){
-  dfbase <- rapply(x, fmt_latex_math, how = 'list')
-  structure(dfbase,
-            row.names = rownames(x),
-            class = c('data.frame',
-                      'data.frame.tex_math'))
+  x[] <- lapply(x,fmt_latex_math)
+  x
 }
 
 #' @noRd
-fmt_latex_math.matrix <- function(x) apply(x, c(1, 2), fmt_latex_math)
+fmt_latex_math.matrix <- function(x) apply(x, c(2), fmt_latex_math)

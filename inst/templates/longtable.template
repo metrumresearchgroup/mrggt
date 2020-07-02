@@ -1,3 +1,12 @@
+
+{{{additional_commands}}}
+
+{{{color_definitions}}}
+{{{border_commands}}}
+{{{column_definitions}}}
+
+{{{landscape_begin}}}
+
 \makeatletter
 \def\getLTwidth#1{%
   \begingroup
@@ -9,10 +18,11 @@
 \makeatother
 \newlength\LTwidth
 
-{{{color_definitions}}}
-{{{table_font_size}}}
+\setlength{\LTleft}{0pt plus 1fill minus 1fill}
+\setlength{\LTright}{\LTleft}
 \setlength{\tabcolsep}{{{column_sep}}}
 \captionsetup[table]{labelformat=empty, justification=raggedright, width =\textwidth}
+{{{table_font_size}}}
 {{{table_start}}}
 
 {{{caption}}} \\
@@ -28,3 +38,5 @@
 
 {{{body_component}}}
 {{{table_end}}}
+
+{{{landscape_end}}}

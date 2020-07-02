@@ -16,18 +16,37 @@ get_data_rows_l <- function(data) {
   rows <- create_body_rows_l(data = data)
   data_rows <- do.call(rbind, rows$row_splits)
   col_labels <- get_collabels_l(data)
+
+  if(identical(unique(data_rows[,1]), '')){
+
+    if(dim(data_rows)[2] != length(col_labels)){
+      col_labels <- c('', col_labels)
+    }
+
+  }
+
   full_matrix <- rbind(col_labels, data_rows)
   dimnames(full_matrix)[[2]] <- NULL
   if(!is.null(rows$sum_rows)){
-    sum_rows <- as.matrix(rows$sum_rows %>% dplyr::select(-'::SUMMARY_KEY'))
-    dimnames(sum_rows)[[2]] <- NULL
+
+    sum_rows <- as.matrix(rows$sum_rows %>%
+                            dplyr::select(-'::SUMMARY_KEY'))
+
+    dimnames(sum_rows) <- list('summary_rows', NULL)
+    if(dim(full_matrix)[2] != dim(sum_rows)[2]){
+
+      full_matrix <- matrix(c(rep('', dim(full_matrix)[1]), full_matrix),
+                            nrow = dim(full_matrix)[1],
+                            ncol = dim(full_matrix)[2] + 1)
+    }
+
     full_matrix <- rbind(full_matrix, sum_rows)
   }
   full_matrix
 }
 
 sanitize_for_sizing <- function(tbl_matrix){
-  rgx <- "(^\\\\multicolumn\\{\\d{1}\\}\\{(?:l|r|c)\\}{1}\\{)"
+  rgx <- "(^\\\\multicolumn\\{\\d{1}\\}\\{(?:!\\\\[a-zA-Z]+\\s)?(?:l|r|c)(?:\\s!\\\\[a-zA-Z]+)?\\}{1}\\{)"
   rgx2 <- "((?:\\}$|\\}\\s+$))"
   has_mulitcolumn <- tbl_matrix[grepl(rgx, tbl_matrix)]
   tbl_matrix[grepl(rgx, tbl_matrix)] <- gsub(rgx2, '', gsub(rgx, '', has_mulitcolumn))
@@ -319,7 +338,19 @@ calculate_best <- function(tbl_matrix){
 }
 
 fmt_header_latex <- function(sizing_columns){
+
  tbl_cache$num_cols <- length(sizing_columns)
+
+ if(!is.null(tbl_cache$v_align)){
+   tbl_cache$v_align <- purrr::map_chr(tbl_cache$v_align, function(.x){
+     paste0("\\newcommand{\\col",
+            alphanumeric_to_alpha(.x),
+            "}{",
+            round(sizing_columns[.x], 2),
+            "cm}\n")
+   })
+ }
+
  paste0('\\begin{longtable}{',
         paste(sprintf("p{%.2fcm}", sizing_columns), collapse = ''),
         '} \n')
@@ -366,6 +397,14 @@ table_no_optimize_l <- function(data){
     substr(1, 1)
 
   tbl_cache$num_cols <- length(alignments)
+
+  if(!is.null(tbl_cache$v_align)){
+    tbl_cache$v_align <- purrr::map_chr(tbl_cache$v_align, function(.x){
+      paste0("\\newcommand{\\col",
+             alphanumeric_to_alpha(.x),
+             "}{\\textwidth}\n")
+    })
+  }
 
   paste0(
     "\\begin{longtable}{",
