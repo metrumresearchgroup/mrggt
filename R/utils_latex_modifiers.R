@@ -191,24 +191,11 @@ preamble <- function(tex, full_tex = TRUE) {
 }
 
 preamble.knit_asis <- function(tex, full_tex = TRUE) {
-  return_tex <-
-    unlist(purrr::map(attributes(tex)$knit_meta, function(x) {
-      pkg <- paste0('\\usepackage{', x$name, '}')
-      if (!is.null(x$options)) {
-        pkg <- paste0(pkg, '[', paste(x$options, collapse = ','), ']')
-      }
-      c(pkg, x$extra_lines)
-    }))
-
+  return_tex <- latex_templates$package_dep
   if (full_tex) {
-    return_tex <-
-      c(
-        '\\documentclass[12pt]{article}',
-        return_tex,
-        '\\begin{document}',
-        as.character(tex),
-        '\\end{document}'
-      )
+
+    return_tex <- whisker::whisker.render(latex_templates$preamble,
+                                          list(table = tex))
 
   }
 

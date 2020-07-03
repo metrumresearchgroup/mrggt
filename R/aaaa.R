@@ -22,13 +22,14 @@ initialize_templates <- function(){
       "cont_next_page",
       "font_size_width",
       "footnotes",
-      "portrait_longtable",
+      "longtable",
       "source_footnotes",
       "sourcenotes",
       "title_subtitle",
       "title",
       "width_calc",
-      "lscape_table"
+      "preamble",
+      "package_dep"
     )
 
   for(tmpl in template){
@@ -43,6 +44,11 @@ initialize_tbl_cache <- function() {
   tbl_cache$font_size <- NULL
   tbl_cache$col_sep <- NULL
   tbl_cache$num_cols <- NULL
+  tbl_cache$border_cmd <- NULL
+  tbl_cache$border_cols_matrix <- NULL
+  tbl_cache$border_data_matrix <- NULL
+  tbl_cache$additional_cmds <- NULL
+  tbl_cache$v_align <- NULL
 }
 
 initialize_templates()

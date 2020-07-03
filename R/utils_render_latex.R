@@ -7,6 +7,8 @@ latex_packages <- function() {
 # If the rmarkdown package is available, use the
 # `latex_dependency()` function to load latex packages
 # without requiring the user to do so
+
+
 create_knit_meta <- function(shrink = FALSE){
 if (requireNamespace("rmarkdown", quietly = TRUE)) {
 
@@ -54,6 +56,15 @@ latex_column_sep <- function(data){
   paste0('{', tbl_cache$col_sep, 'pt}')
 }
 
+
+latex_border_cmd <- function(){
+  if(is.null(tbl_cache$border_cmd)){
+    return(NULL)
+  } else {
+    tbl_cache$border_cmd <- c('\\newcommand{\\resetborderstyle}{\\arrayrulecolor{black}}',
+                              tbl_cache$border_cmd)
+  }
+}
 
 #' @noRd
 latex_body_row <- function(content,
@@ -154,6 +165,7 @@ create_columns_component_l <- function(data) {
   stub_available <- dt_stub_df_exists(data = data)
   spanners_present <- dt_spanners_exists(data = data)
   styles_tbl <- dt_styles_get(data = data)
+  summaries_present <- dt_summary_exists(data = data)
 
   headings_vars <- boxh %>% dplyr::filter(type == "default") %>% dplyr::pull(var)
   headings_labels <- dt_boxhead_get_vars_labels_default(data = data)
@@ -163,7 +175,7 @@ create_columns_component_l <- function(data) {
     headings_labels <- prepend_vec(headings_labels, stubh$label)
     headings_vars <- prepend_vec(headings_vars, "::stub")
 
-  } else if (isTRUE(stub_available)) {
+  } else if (isTRUE(stub_available) | (summaries_present && !stub_available)) {
 
     headings_labels <- prepend_vec(headings_labels, "")
     headings_vars <- prepend_vec(headings_vars, "::stub")
@@ -259,10 +271,10 @@ create_columns_component_l <- function(data) {
 
 }
 
-create_summary_rows_l <- function(data){
+create_summary_rows_l <- function(data) {
   list_of_summaries <- dt_summary_df_get(data = data)
 
-  hide_stub <- function(summary){
+  hide_stub <- function(summary) {
     to_hide <-
       data$`_boxhead`$var[data$`_boxhead`$type == 'hidden' |
                             data$`_boxhead`$type == 'stub']
@@ -270,44 +282,43 @@ create_summary_rows_l <- function(data){
   }
 
   merge_summary <- function(summary) {
-      cols_merge <- data$`_col_merge`
-      summary <- merge_summary_rows(summary, cols_merge)
-      if (data$`_boxhead`$var[1] == 'rowname' &&
-          data$`_boxhead`$type[1] == 'stub') {
+    cols_merge <- data$`_col_merge`
+    summary <- merge_summary_rows(summary, cols_merge)
+    if (data$`_boxhead`$var[1] == 'rowname' &&
+        data$`_boxhead`$type[1] == 'stub') {
+      to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
+      summary <- summary %>% dplyr::select(!to_hide)
 
-        to_hide <- data$`_boxhead`$var[data$`_boxhead`$type == 'hidden']
-        summary <- summary %>% dplyr::select(!to_hide)
+    } else {
+      summary <- hide_stub(summary)
+    }
 
-      } else {
-        summary <- hide_stub(summary)
-      }
-
-      summary
+    summary
   }
 
   display_summaries <- list_of_summaries$summary_df_display_list
   if ("_col_merge" %in% names(data)) {
-
-    summaries_merged <- purrr::map(names(display_summaries), function(.x){
-      merged <- merge_summary(display_summaries[[.x]])
-      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
-      merged
+    summaries_merged <-
+      purrr::map(names(display_summaries), function(.x) {
+        merged <- merge_summary(display_summaries[[.x]])
+        merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
+        merged
       })
 
   } else {
-
-    summaries_merged <- purrr::map(names(display_summaries), function(.x){
-      merged <- hide_stub(display_summaries[[.x]])
-      merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
-      merged
-    })
+    summaries_merged <-
+      purrr::map(names(display_summaries), function(.x) {
+        merged <- hide_stub(display_summaries[[.x]])
+        merged[['::SUMMARY_NAME']] <- rep(.x, dim(merged)[1])
+        merged
+      })
   }
 
   summaries_tbl <- do.call(rbind, summaries_merged)
   to_format <- summaries_tbl %>%
     dplyr::select(-'::SUMMARY_NAME')
 
-  df <- data.frame(lapply(to_format, function(.x){fmt_latex_math(.x) %>% extract('math_env')}))
+  df <- to_format %>% fmt_latex_math()
   df[['::SUMMARY_KEY']] <- summaries_tbl[['::SUMMARY_NAME']]
   df
 
@@ -336,11 +347,6 @@ create_body_rows_l <- function(data) {
   # Get the column headings for the visible (e.g., `default`) columns
   default_vars <- dt_boxhead_get_vars_default(data = data)
 
-  # TRUE when no stub and all summary
-  # FALSE when stub and all summary
-  # FALSE when no stub and no all summary
-  # FALSE when stub and all-stub summary <- need
-  # FALSE when stub and no all summary
   if ("rowname" %in% names(body)) {
 
     default_vars <- c("rowname", default_vars)
@@ -373,7 +379,22 @@ create_body_rows_l <- function(data) {
         group_label = gsub("^NA", "\\textemdash", group_label))
   }
 
-  group_rows <- create_group_rows(n_rows, groups_rows_df, context = "latex", n_cols = n_cols)
+  # if there is a summary row available, but no stub and stubhead, offset the cols by 1:
+  if(!dt_stub_df_exists(data) && !dt_stubhead_has_label(data) && summaries_present){
+    n_cols <- n_cols + 1
+    default_vars <- c("::rowname", default_vars)
+
+    body <-
+      dt_stub_df_get(data = data) %>%
+      dplyr::select(rowname) %>%
+      dplyr::rename(`::rowname` = rowname) %>%
+      cbind(body)
+  }
+
+  group_rows <- create_group_rows(n_rows,
+                                  groups_rows_df,
+                                  context = "latex",
+                                  n_cols = n_cols)
 
   if (stub_available && !("rowname" %in% names(body))) {
 
@@ -387,13 +408,13 @@ create_body_rows_l <- function(data) {
 
   }
 
-  # Split `body_content` by slices of rows and create data rows
-  #body_content <- as.vector(t(body[, default_vars]))
-  #body_content <- purrr::map_chr(body_content, function(.){fmt_latex_math(gsub("\\", "", ., fixed=TRUE))})
-  #row_splits <- split(body_content, ceiling(seq_along(body_content) / n_cols))
-
   dt_show <- body[, default_vars]
-  row_splits <- purrr::map(seq(dim(dt_show)[1]), ~unlist(dt_show[.x, ], use.names = FALSE))
+  row_splits <- purrr::map(seq(dim(dt_show)[1]), function(.x){
+    row_split <- unlist(dt_show[.x, ], use.names = FALSE)
+    row_split[is.na(row_split)] <- ''
+    row_split
+  }
+    )
 
   sum_rows <- NULL
   if (summaries_present) {
@@ -403,9 +424,41 @@ create_body_rows_l <- function(data) {
   list(group_rows = group_rows,
        row_splits = row_splits,
        n_rows = n_rows,
+       n_cols = n_cols,
        sum_rows = sum_rows,
        groups_rows_df = groups_rows_df)
 }
+
+
+get_border_commands_tb <- function() {
+  border_matrix <- tbl_cache$border_data_matrix
+  tb_borders <-
+    purrr::map_chr(seq(dim(border_matrix)[1]), function(rown) {
+      border_row <- border_matrix[rown,]
+
+      if(identical(unique(border_row), '~')){
+        return('')
+      }
+
+      if(length(unique(border_row)) == 1){
+
+        if(grepl("^\\d{1}$", unique(border_row))){
+          return('COL')
+        }
+      }
+
+      row_styles <- paste(border_row, collapse = '')
+      return(paste0('\\hhline{',
+                    row_styles,
+                    '}\\resetborderstyle\n'))
+    })
+
+  if (identical(unique(tb_borders), '')) {
+    return(NULL)
+  }
+  return(tb_borders)
+}
+
 
 #' @noRd
 create_body_component_l <- function(data) {
@@ -413,15 +466,22 @@ create_body_component_l <- function(data) {
   rows <- create_body_rows_l(data = data)
   summary_positions <- rep('', rows$n_rows)
 
-  data_rows <- create_data_rows(rows$n_rows, rows$row_splits, context = "latex")
+  data_rows <- create_data_rows(rows$n_rows,
+                                rows$row_splits,
+                                context = "latex")
+
   if (!is.null(rows$sum_rows)) {
 
+    if(dim(rows$sum_rows %>%
+           dplyr::select(-'::SUMMARY_KEY'))[1] != rows$n_cols){
+
+    }
     fmt_summary_rows <- function(.){
       paste0(apply(., c(1), paste, collapse = ' & '), ' \\\\ \n ')
     }
 
     collapse_rows <- function(.){
-      paste0("\\midrule \n ", paste(c(.), collapse = ''))
+      paste0(paste(c(.), collapse = ''))
     }
 
     rows$sum_rows$`::COLLAPSED` <- rows$sum_rows %>%
@@ -438,7 +498,28 @@ create_body_component_l <- function(data) {
 
   }
 
-  paste(paste0(rows$group_rows, data_rows, summary_positions), collapse = "")
+  borders <- get_border_commands_tb()
+  borders[borders == 'COL'] <- R.utils::insert(data_rows,
+                                               which(summary_positions != '') + 1,
+                                               summary_positions[!summary_positions == ''])
+
+  summary_locations <- which(borders == summary_positions[!summary_positions == ''])
+
+  for(i in summary_locations){
+    if(borders[i -1] == ""){
+      borders[i - 1] <- "\\midrule \n "
+    }
+    if(borders[i + 1] == ""){
+      borders[i + 1] <- "\\midrule \n "
+    }
+  }
+
+  all_cols <- R.utils::insert(borders,
+                  which(borders %in% data_rows[which(rows$group_rows != '')]) - 1,
+                  rows$group_rows[rows$group_rows != ''])
+
+  paste(all_cols[all_cols != ''], collapse = '')
+
 }
 
 #' @noRd
@@ -548,4 +629,20 @@ create_source_foot_note_component_l <- function(data) {
 
   }
 
+}
+
+create_landscape_start <- function(orient){
+  if(orient){
+    return(NULL)
+  }
+  return(paste("\\begin{landscape}",
+        "\\pagestyle{empty}",
+        sep = "\n"))
+}
+
+create_landscape_end <- function(orient){
+  if(orient){
+    return(NULL)
+  }
+  return(paste("\\end{landscape}"))
 }

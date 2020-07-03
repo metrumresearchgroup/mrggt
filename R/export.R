@@ -378,14 +378,13 @@ as_latex <- function(data) {
 
   # Composition of LaTeX ----------------------------------------------------
 
-  #Create a LaTeX fragment that defines the possible colors being used in table
-  tbl_cache$color_def <- define_colors_latex(dt_styles_get(data = data))
-
   # Create a LaTeX fragment for the column sep of the table
   column_sep <- latex_column_sep(data = data)
 
   # Create a LaTeX fragment for the start of the table
   table_start <- create_table_start_l(data = data)
+
+  landscape_start <- create_landscape_start(orient_portrait)
 
   continued_message <- create_overflow_message_l(data = data)
 
@@ -401,8 +400,14 @@ as_latex <- function(data) {
 
   table_end <- create_table_end_l()
 
+  landscape_end <- create_landscape_end(orient_portrait)
+
   inputs <- list(
-    color_definitions = tbl_cache$color_def,
+    additional_commands = paste(tbl_cache$additional_cmds, collapse = '\n'),
+    color_definitions = paste(tbl_cache$color_def, collapse = ''),
+    border_commands = paste(tbl_cache$border_cmd, collapse = '\n'),
+    column_definitions = paste(tbl_cache$v_align, collapse = ''),
+    landscape_begin = landscape_start,
     table_font_size = tbl_cache$font_size,
     column_sep = column_sep,
     table_start = table_start,
@@ -412,32 +417,25 @@ as_latex <- function(data) {
     src_foot_component = src_foot_component,
     continued_message = continued_message,
     body_component = body_component,
-    table_end = table_end
+    table_end = table_end,
+    landscape_end = landscape_end
   )
 
-  tex <- whisker::whisker.render(latex_templates$portrait_longtable, inputs)
-
   latex_packages <- create_knit_meta()
+  tex <- whisker::whisker.render(latex_templates$longtable,
+                                 inputs) %>%
+    knitr::asis_output(meta = latex_packages)
+
 
   if(!orient_portrait){
 
-    knit_asis <-
-      whisker::whisker.render(latex_templates$lscape_table,
-                              list(portrait_table = tex)) %>%
-      knitr::asis_output(meta = latex_packages)
-
-    knit_asis <-
-      structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
-    attr(knit_asis, 'base') <- tex
-
-  } else {
-
-    knit_asis <- tex %>% knitr::asis_output(meta = latex_packages)
+    tex <-
+      structure(tex, class = c(class(tex), 'lscape_asis'))
 
   }
 
   initialize_tbl_cache()
-  knit_asis
+  tex
 }
 
 #' Output a **gt** object as RTF

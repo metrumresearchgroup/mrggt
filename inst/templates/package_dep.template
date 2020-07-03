@@ -1,0 +1,36 @@
+%font
+\usepackage[T1]{fontenc}
+%bolding
+\usepackage{bm}
+
+% for math
+\usepackage{amsmath}
+\usepackage[utopia]{mathdesign}
+
+% for the table
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{array}
+\usepackage{hhline}
+
+% for color
+\usepackage{color}
+\usepackage{colortbl}
+
+% for landscape
+\usepackage{pdflscape}
+\usepackage{everypage}
+
+% for math/text strike out
+\usepackage{calc}
+
+% for capitalizing titles
+\usepackage{titlecaps}
+
+%for verticle alignment
+\usepackage{makecell}
+\usepackage{pbox}
+
+%condensed text
+\usepackage[tracking=true]{microtype}
