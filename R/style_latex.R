@@ -621,6 +621,8 @@ check_column_offset <- function(data){
     } else {
       return(0)
     }
+  } else {
+    return(0)
   }
 }
 
@@ -635,16 +637,23 @@ resolve_style_functions_latex <- function(data){
   }
 
   col_offset <- check_column_offset(data = data)
-
   styles_tbl <- styles_full %>%
     dplyr::mutate(align = align[colnum]) %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(func = cell_style_to_latex(styles,
-                                             colnum,
-                                             rownum,
-                                             align,
-                                             col_offset)) %>%
-    dplyr::ungroup()
+    dplyr::rowwise()
+
+  if(dim(styles_tbl)[1] == 0){
+    styles_tbl <- styles_tbl %>%
+      dplyr::mutate(func = align)
+  } else {
+    styles_tbl <- styles_tbl %>%
+      dplyr::mutate(func =  cell_style_to_latex(styles,
+                                         colnum,
+                                         rownum,
+                                         align,
+                                         col_offset))
+  }
+
+  styles_tbl <- styles_tbl %>% dplyr::ungroup()
   data$`_styles` <- styles_tbl
   data
 }

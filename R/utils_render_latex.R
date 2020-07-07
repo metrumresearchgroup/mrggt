@@ -499,36 +499,40 @@ create_body_component_l <- function(data) {
 
   borders <- get_border_commands_tb()
 
-  # if summaries do not exist
-  if(length(summary_positions[!summary_positions == '']) == 0){
-    borders[borders == 'COL'] <- data_rows
+
+  summary_values <- summary_positions[!summary_positions == '']
+  group_rows_values <- rows$group_rows[rows$group_rows != '']
+  mock_data_rows <- seq(length(data_rows))
+  mock_summary_rows <- rep('::SUMMARY', length(summary_values))
+
+  if(length(summary_values) == 0){
+
+    borders[borders == 'COL'] <- mock_data_rows
+
   } else {
-    borders[borders == 'COL'] <- R.utils::insert(data_rows,
+    borders[borders == 'COL'] <- R.utils::insert(mock_data_rows,
                                                  which(summary_positions != '') + 1,
-                                                 summary_positions[!summary_positions == ''])
+                                                 mock_summary_rows)
 
-    summary_locations <- which(borders == summary_positions[!summary_positions == ''])
+    summary_borders <- c(which(borders == '::SUMMARY') -1,
+                         which(borders == '::SUMMARY') + 1)
 
-    for(i in summary_locations){
-      if(borders[i -1] == ""){
-        borders[i - 1] <- "\\midrule \n "
-      }
-      if(borders[i + 1] == ""){
-        borders[i + 1] <- "\\midrule \n "
-      }
-    }
+    empty_b <- which(borders == '')
+    borders[empty_b[which(empty_b %in% summary_borders)]] <- "\\midrule \n "
   }
 
+  if(!length(group_rows_values) == 0){
 
-  if(!length(rows$group_rows[rows$group_rows != '']) == 0){
-    all_cols <- R.utils::insert(borders,
-                                which(borders %in% data_rows[which(rows$group_rows != '')]) - 1,
-                                rows$group_rows[rows$group_rows != ''])
-  } else {
-    all_cols <- borders
+    gr_positions <- as.character(which(rows$group_rows != ''))
+    borders <- R.utils::insert(borders,
+                               which(borders %in% gr_positions) - 1,
+                               group_rows_values)
   }
 
-  paste(all_cols[all_cols != ''], collapse = '')
+  borders[borders == '::SUMMARY'] <- summary_values
+  borders[grepl('^\\d+$', borders)] <- data_rows
+
+  paste(borders[borders!= ''], collapse = '')
 
 }
 

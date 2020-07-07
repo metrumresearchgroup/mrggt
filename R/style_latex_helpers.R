@@ -16,7 +16,6 @@ latex_font_size_tbl <- function(){
 }
 
 #' @noRd
-#' works in both math mode and text mode
 define_overline_latex <- function(){
   paste(
     "\\newsavebox\\OBox",
@@ -30,7 +29,6 @@ define_overline_latex <- function(){
 
 
 #' @noRd
-#' works in both math mode and text mode
 define_strikeout_latex <- function(){
   paste(
   "\\newsavebox\\CBox",
@@ -150,46 +148,6 @@ create_color_definition <- function(color){
 
   tbl_cache$color_def <- unique(c(tbl_cache$color_def, new_color))
 }
-
-find_colors.default <- function(x){
-  NULL
-}
-
-find_colors.cell_text <- function(x){
-  if('color' %in% names(x)){
-    return(create_color_definition(x$color))
-  }
-  NULL
-}
-
-find_colors.cell_fill <- function(x){
-  create_color_definition(x$color)
-}
-
-
-find_colors.list <- function(x){
-  purrr::map(x, find_colors)
-}
-
-find_colors <- function(x){
-  UseMethod('find_colors')
-}
-#determine if user needs a color definition in latex code (required)
-#if the name 'colors' appears in the styles df, needs a color definition
-#' @noRd
-define_colors_latex <- function(styles_df) {
-  colors <- unique(unlist(find_colors(purrr::flatten(styles_df$styles)),
-                          use.names = FALSE))
-
-  if (length(colors) == 0) {
-
-    return(NULL)
-
-  }
-  paste(colors, collapse = '')
-}
-
-
 
 alphanumeric_to_alpha <- function(phrase){
 
