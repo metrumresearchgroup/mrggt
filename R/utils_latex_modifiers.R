@@ -96,19 +96,26 @@ latex_scale <- function(latex_code,
 
 '+.lscape_asis' <- function(a, b){
   knit_meta <- attributes(a)$knit_meta
-  combined_base <- paste0(attributes(a)$base,
-                          '\n',
-                          attributes(b)$base)
+  a <- (a %>% strsplit('\n'))[[1]]
+  b <- (b %>% strsplit('\n'))[[1]]
+  a <- a[! a %in% c('\\begin{landscape}', '\\pagestyle{empty}', "\\end{landscape}")]
+  b <- b[! b %in% c('\\begin{landscape}', '\\pagestyle{empty}', "\\end{landscape}")]
+
+  start_def <- which(startsWith(b, "\\makeatletter"))
+  end_def <- which(startsWith(b, "\\newlength\\LTwidth"))
+  b <- b[-(start_def:end_def)]
 
 
-  knit_asis <- paste("\\begin{landscape}",
-                   "\\pagestyle{empty}",
-                   combined_base,
-                   "\\end{landscape}",
-                   sep = '\n') %>% knitr::asis_output(meta = knit_meta)
+  combined_base <- c(a, b)
+  combined_base <- c('\\begin{landscape}',
+                     '\\pagestyle{empty}',
+                     combined_base,
+                     '\\end{landscape}')
+
+  knit_asis <- paste(combined_base,
+                   collapse = '\n') %>% knitr::asis_output(meta = knit_meta)
 
   lscape_asis <- structure(knit_asis, class = c(class(knit_asis), 'lscape_asis'))
-  attr(lscape_asis, 'base') <- combined_base
   lscape_asis
 }
 

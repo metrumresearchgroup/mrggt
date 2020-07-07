@@ -242,7 +242,6 @@ create_columns_component_l <- function(data) {
 
     }
 
-
     multicol <- paste0(paste(multicol, collapse = ""), "\\\\ \n")
     cmidrule <- paste0(paste(cmidrule, collapse = ""), "\n")
 
@@ -442,7 +441,7 @@ get_border_commands_tb <- function() {
 
       if(length(unique(border_row)) == 1){
 
-        if(grepl("^\\d{1}$", unique(border_row))){
+        if(grepl("^\\d+$", unique(border_row))){
           return('COL')
         }
       }
@@ -499,24 +498,35 @@ create_body_component_l <- function(data) {
   }
 
   borders <- get_border_commands_tb()
-  borders[borders == 'COL'] <- R.utils::insert(data_rows,
-                                               which(summary_positions != '') + 1,
-                                               summary_positions[!summary_positions == ''])
 
-  summary_locations <- which(borders == summary_positions[!summary_positions == ''])
+  # if summaries do not exist
+  if(length(summary_positions[!summary_positions == '']) == 0){
+    borders[borders == 'COL'] <- data_rows
+  } else {
+    borders[borders == 'COL'] <- R.utils::insert(data_rows,
+                                                 which(summary_positions != '') + 1,
+                                                 summary_positions[!summary_positions == ''])
 
-  for(i in summary_locations){
-    if(borders[i -1] == ""){
-      borders[i - 1] <- "\\midrule \n "
-    }
-    if(borders[i + 1] == ""){
-      borders[i + 1] <- "\\midrule \n "
+    summary_locations <- which(borders == summary_positions[!summary_positions == ''])
+
+    for(i in summary_locations){
+      if(borders[i -1] == ""){
+        borders[i - 1] <- "\\midrule \n "
+      }
+      if(borders[i + 1] == ""){
+        borders[i + 1] <- "\\midrule \n "
+      }
     }
   }
 
-  all_cols <- R.utils::insert(borders,
-                  which(borders %in% data_rows[which(rows$group_rows != '')]) - 1,
-                  rows$group_rows[rows$group_rows != ''])
+
+  if(!length(rows$group_rows[rows$group_rows != '']) == 0){
+    all_cols <- R.utils::insert(borders,
+                                which(borders %in% data_rows[which(rows$group_rows != '')]) - 1,
+                                rows$group_rows[rows$group_rows != ''])
+  } else {
+    all_cols <- borders
+  }
 
   paste(all_cols[all_cols != ''], collapse = '')
 
@@ -558,8 +568,7 @@ create_source_foot_note_component_l <- function(data) {
   footnotes <- footnotes_tbl[["footnotes"]] %>%
     unescape_html() %>%
     markdown_to_latex() %>%
-    fmt_latex_math() %>%
-    extract('math_env')
+    fmt_latex_math()
 
   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
                        footnotes)
@@ -580,7 +589,7 @@ create_source_foot_note_component_l <- function(data) {
   # rows, then return an empty footnotes component
   if (length(source_note) != 0) {
 
-    source_note <- fmt_latex_math(source_note) %>% extract('math_env')
+    source_note <- fmt_latex_math(source_note)
     source_note <- paste(paste0(source_note,
                                 ' \\\\ \n'),
                        collapse = '')

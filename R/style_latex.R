@@ -157,7 +157,6 @@ style_spanners_latex <- function(data) {
     spanner_labels_math <- spanner_labels %>% fmt_latex_math()
 
     to_style <- styles_tbl[styles_tbl$locname == 'columns_groups', ]
-
     for(i in seq(length(spanner_labels))){
       if(spanner_labels[i] %in% to_style$grpname){
         spanner_labels_math[i] <- apply_style_wrap(spanner_labels_math[i],
@@ -408,6 +407,10 @@ create_border_pos_matrix <- function(data){
   tbl <- get_data_rows_l(data)
   tbl <- tbl[rownames(tbl) != 'col_labels',]
   dim_tbl <- dim(tbl)
+
+  if(is.null(dim_tbl)){
+    dim_tbl <- c(1, 1)
+  }
 
   row_add <- quote(rbind(rep('~', dim_tbl[2]),
                    rep(i, dim_tbl[2]),

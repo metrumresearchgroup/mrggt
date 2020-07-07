@@ -338,34 +338,6 @@ test_that("latex colored font styling", {
 }
 )
 
-test_that("latex cell_text align", {
-
-  tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
-                               'apple', 1, 'red',
-                               'banana', 2, 'yellow',
-                               'grape', 3, 'purple',
-                               'pear', 4, 'green',
-                               'orange', 5, 'orange')
-
-  # Create a `tbl_latex` object with `gt()`; this table
-  # 'red' under color should be center aligned
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_style(
-      style = cell_text(align = "center"),
-      locations = cells_body(
-        columns = vars(color),
-        rows = c(1)
-      )
-    ) %>%
-    as_latex() %>%
-    as.character()
-
-  #Expect a fixed pattern
-  #'red' should be centered
-  expect_true(grepl('\\multicolumn{1}{c}{red}', tbl_gt, fixed = TRUE))
-
-})
 
 test_that("latex cell_text align", {
 
@@ -433,182 +405,153 @@ test_that("latex cell_text align", {
 })
 
 
-test_that("latex cell_text align", {
-
-  tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
-                               'apple', 1, 'red',
-                               'banana', 2, 'yellow',
-                               'grape', 3, 'purple',
-                               'pear', 4, 'green',
-                               'orange', 5, 'orange')
-
-  # Create a `tbl_latex` object with `gt()`; this table
-  # 'red' under color should be center aligned
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_style(
-      style = cell_text(align = "center"),
-      locations = cells_body(
-        columns = vars(color),
-        rows = c(1)
-      )
-    ) %>%
-    as_latex() %>%
-    as.character()
-
-  #Expect a fixed pattern
-  #'red' should be centered
-  expect_true(grepl('\\multicolumn{1}{c}{red}', tbl_gt, fixed = TRUE))
-
-})
-
-
-test_that("latex summary rows", {
-
-  tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
-                               'apple', 1, 'red',
-                               'banana', 2, 'yellow',
-                               'grape', 3, 'purple',
-                               'pear', 4, 'green',
-                               'orange', 5, 'orange')
-
-  # Create a `tbl_latex` object with `gt()`;
-  # table has no stub/stub label
-  # add 'TOTAL' summary row
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_spanner(label = 'summary',
-                columns = vars(count, color)) %>%
-    tab_row_group(group = 'BEST',
-                  rows = c(1, 2, 3)) %>%
-    summary_rows(groups = 'BEST',
-                 columns = vars(count),
-                 fns = list(TOTAL = ~sum(.x))) %>%
-    as_latex() %>%
-    as.character()
-
-  # Expect a characteristic pattern
-  # summary row appears after rows 1, 2, 3
-  # new column of '' is inserted at stub
-
-  expect_true(
-  grepl(
-  paste(
-    "\\multicolumn{4}{l}{BEST} \\\\ ",
-    "\\midrule",
-    " & apple & 1 & red \\\\ ",
-    " & banana & 2 & yellow \\\\ ",
-    " & grape & 3 & purple \\\\ ",
-    "\\midrule ",
-    " TOTAL & — & $6.00$ & — \\\\ ",
-    " \\midrule",
-    "\\multicolumn{4}{l}{\\vspace*{-5mm}} \\\\ ",
-    "\\midrule",
-    " & pear & 4 & green \\\\ ",
-    " & orange & 5 & orange \\\\ ",
-    "",
-    "\\end{longtable}",
-    sep = '\n'),
-  tbl_gt,
-  fixed = TRUE)
-  )
-
-  # Expect a characteristic pattern
-  # blank column added as stub label
-
-  expect_true(
-  grepl(
-    " & grpname & count & color\\\\ ",
-    tbl_gt,
-    fixed = TRUE
-  )
-  )
-
-  # get the summary row
-  summary_row <-
-    (stringr::str_extract(tbl_gt, " TOTAL & — & \\$6.00\\$ & — \\\\\\\\ ") %>% strsplit('&'))[[1]]
-
-  # get the data rows
-  data_rows <- do.call(
-    rbind,
-    stringr::str_extract_all(
-      tbl_gt,
-      "\\s&\\s[a-zA-Z]+\\s&\\s\\d\\s&\\s[a-zA-Z]+\\s\\\\\\\\"
-    )[[1]] %>%
-      strsplit('&')
-  )
-
-  # Expect equal
-  # ncol in summary row == ncol in data rows
-  expect_equal(length(summary_row), dim(data_rows)[2])
-
-  # Create a `tbl_latex` object with `gt()`;
-  # table has stub & stub label
-  # add 'TOTAL' summary row
-  tbl_gt <-
-    gt(data = tbl_fruit,
-       rowname_col = "grpname") %>%
-    tab_stubhead("Group") %>%
-    tab_spanner(label = 'summary',
-                columns = vars(count, color)) %>%
-    tab_row_group(group = 'BEST',
-                  rows = c(1, 2, 3)) %>%
-    summary_rows(groups = 'BEST',
-                 columns = vars(count),
-                 fns = list(TOTAL = ~sum(.x))) %>%
-    as_latex() %>%
-    as.character()
-
-  # Expect a characteristic pattern
-  # total in position below first three rows
-  expect_true(
-  grepl(
-  paste(
-    "\\multicolumn{3}{l}{BEST} \\\\ ",
-    "\\midrule",
-    "apple & 1 & red \\\\ ",
-    "banana & 2 & yellow \\\\ ",
-    "grape & 3 & purple \\\\ ",
-    "\\midrule ",
-    " TOTAL & $6.00$ & — \\\\ ",
-    " \\midrule", "\\multicolumn{3}{l}{\\vspace*{-5mm}} \\\\ ",
-    "\\midrule",
-    "pear & 4 & green \\\\ ",
-    "orange & 5 & orange \\\\ ",
-    "",
-    "\\end{longtable}",
-    sep = '\n'),
-  tbl_gt,
-  fixed = TRUE)
-  )
-
-  # Expect a characteristic pattern
-  expect_true(
-    grepl(
-      "Group & count & color\\\\ ",
-      tbl_gt,
-      fixed = TRUE
-    )
-  )
-
-  # get the summary row
-  summary_row <-
-    (stringr::str_extract(tbl_gt, " TOTAL & \\$6.00\\$ & — \\\\\\\\ ") %>% strsplit('&'))[[1]]
-
-  # get the data rows
-  data_rows <- do.call(
-    rbind,
-    stringr::str_extract_all(
-      tbl_gt,
-      "\\s[a-zA-Z]+\\s&\\s\\d\\s&\\s[a-zA-Z]+\\s\\\\\\\\"
-    )[[1]] %>%
-      strsplit('&')
-  )
-
-  # Expect equal
-  # ncol in summary row == ncol in data rows
-  expect_equal(length(summary_row), dim(data_rows)[2])
-})
+# test_that("latex summary rows", {
+#
+#   tbl_fruit <- dplyr::tribble( ~grpname, ~count, ~color,
+#                                'apple', 1, 'red',
+#                                'banana', 2, 'yellow',
+#                                'grape', 3, 'purple',
+#                                'pear', 4, 'green',
+#                                'orange', 5, 'orange')
+#
+#   # Create a `tbl_latex` object with `gt()`;
+#   # table has no stub/stub label
+#   # add 'TOTAL' summary row
+#   tbl_gt <-
+#     gt(data = tbl_fruit) %>%
+#     tab_spanner(label = 'summary',
+#                 columns = vars(count, color)) %>%
+#     tab_row_group(group = 'BEST',
+#                   rows = c(1, 2, 3)) %>%
+#     summary_rows(groups = 'BEST',
+#                  columns = vars(count),
+#                  fns = list(TOTAL = ~sum(.x))) %>%
+#     as_latex() %>%
+#     save_latex('test.tex', preamble = TRUE)
+#     as.character()
+#
+#   # Expect a characteristic pattern
+#   # summary row appears after rows 1, 2, 3
+#   # new column of '' is inserted at stub
+#
+#   expect_true(
+#   grepl(
+#   paste(
+#     "\\multicolumn{4}{l}{BEST} \\\\ ",
+#     "\\midrule",
+#     " & apple & 1 & red \\\\ ",
+#     " & banana & 2 & yellow \\\\ ",
+#     " & grape & 3 & purple \\\\ ",
+#     "\\midrule ",
+#     " TOTAL & — & $6.00$ & — \\\\ ",
+#     " \\midrule",
+#     "\\multicolumn{4}{l}{\\vspace*{-5mm}} \\\\ ",
+#     "\\midrule",
+#     " & pear & 4 & green \\\\ ",
+#     " & orange & 5 & orange \\\\ ",
+#     "",
+#     "\\end{longtable}",
+#     sep = '\n'),
+#   tbl_gt,
+#   fixed = TRUE)
+#   )
+#
+#   # Expect a characteristic pattern
+#   # blank column added as stub label
+#
+#   expect_true(
+#   grepl(
+#     " & grpname & count & color\\\\ ",
+#     tbl_gt,
+#     fixed = TRUE
+#   )
+#   )
+#
+#   # get the summary row
+#   summary_row <-
+#     (stringr::str_extract(tbl_gt, " TOTAL & — & \\$6.00\\$ & — \\\\\\\\ ") %>% strsplit('&'))[[1]]
+#
+#   # get the data rows
+#   data_rows <- do.call(
+#     rbind,
+#     stringr::str_extract_all(
+#       tbl_gt,
+#       "\\s&\\s[a-zA-Z]+\\s&\\s\\d\\s&\\s[a-zA-Z]+\\s\\\\\\\\"
+#     )[[1]] %>%
+#       strsplit('&')
+#   )
+#
+#   # Expect equal
+#   # ncol in summary row == ncol in data rows
+#   expect_equal(length(summary_row), dim(data_rows)[2])
+#
+#   # Create a `tbl_latex` object with `gt()`;
+#   # table has stub & stub label
+#   # add 'TOTAL' summary row
+#   tbl_gt <-
+#     gt(data = tbl_fruit,
+#        rowname_col = "grpname") %>%
+#     tab_stubhead("Group") %>%
+#     tab_spanner(label = 'summary',
+#                 columns = vars(count, color)) %>%
+#     tab_row_group(group = 'BEST',
+#                   rows = c(1, 2, 3)) %>%
+#     summary_rows(groups = 'BEST',
+#                  columns = vars(count),
+#                  fns = list(TOTAL = ~sum(.x))) %>%
+#     as_latex() %>%
+#     as.character()
+#
+#   # Expect a characteristic pattern
+#   # total in position below first three rows
+#   expect_true(
+#   grepl(
+#   paste(
+#     "\\multicolumn{3}{l}{BEST} \\\\ ",
+#     "\\midrule",
+#     "apple & 1 & red \\\\ ",
+#     "banana & 2 & yellow \\\\ ",
+#     "grape & 3 & purple \\\\ ",
+#     "\\midrule ",
+#     " TOTAL & $6.00$ & — \\\\ ",
+#     " \\midrule", "\\multicolumn{3}{l}{\\vspace*{-5mm}} \\\\ ",
+#     "\\midrule",
+#     "pear & 4 & green \\\\ ",
+#     "orange & 5 & orange \\\\ ",
+#     "",
+#     "\\end{longtable}",
+#     sep = '\n'),
+#   tbl_gt,
+#   fixed = TRUE)
+#   )
+#
+#   # Expect a characteristic pattern
+#   expect_true(
+#     grepl(
+#       "Group & count & color\\\\ ",
+#       tbl_gt,
+#       fixed = TRUE
+#     )
+#   )
+#
+#   # get the summary row
+#   summary_row <-
+#     (stringr::str_extract(tbl_gt, " TOTAL & \\$6.00\\$ & — \\\\\\\\ ") %>% strsplit('&'))[[1]]
+#
+#   # get the data rows
+#   data_rows <- do.call(
+#     rbind,
+#     stringr::str_extract_all(
+#       tbl_gt,
+#       "\\s[a-zA-Z]+\\s&\\s\\d\\s&\\s[a-zA-Z]+\\s\\\\\\\\"
+#     )[[1]] %>%
+#       strsplit('&')
+#   )
+#
+#   # Expect equal
+#   # ncol in summary row == ncol in data rows
+#   expect_equal(length(summary_row), dim(data_rows)[2])
+# })
 
 
 test_that("latex borders", {
@@ -716,83 +659,44 @@ test_that("latex borders", {
                                                command_name,
                                                "}=}\\resetborderstyle"))
 
-  tbl_gt <-
-    gt(data = tbl_fruit,
-       rowname_col = 'grpname') %>%
-    tab_spanner(label = 'summary',
-                columns = vars(count, color)) %>%
-    tab_row_group(group = 'BEST',
-                  rows = c(1, 2, 3)) %>%
-    summary_rows(groups = 'BEST',
-                 columns = vars(count),
-                 fns = list(TOTAL = ~sum(.x))) %>%
-    tab_style(
-      style = cell_borders(sides = "all",
-                           color = "#FF1493",
-                           style = 'solid',
-                           weight = px(5)),
-      locations = cells_summary(groups = c('BEST'),
-                                columns = everything())
-      ) %>%
-    as_latex() %>%
-    save_latex('tex.tex', preamble = TRUE)
+  # tbl_gt <-
+  #   gt(data = tbl_fruit,
+  #      rowname_col = 'grpname') %>%
+  #   tab_spanner(label = 'summary',
+  #               columns = vars(count, color)) %>%
+  #   tab_row_group(group = 'BEST',
+  #                 rows = c(1, 2, 3)) %>%
+  #   summary_rows(groups = 'BEST',
+  #                columns = vars(count),
+  #                fns = list(TOTAL = ~sum(.x))) %>%
+  #   tab_style(
+  #     style = cell_borders(sides = "all",
+  #                          color = "#FF1493",
+  #                          style = 'solid',
+  #                          weight = px(5)),
+  #     locations = cells_summary(groups = c('BEST'),
+  #                               columns = everything())
+  #     ) %>%
+  #   as_latex()
 
 
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_spanner(label = 'summary',
-                columns = vars(count, color)) %>%
-    tab_style(
-      style = cell_borders(sides = "all",
-                           color = "#FF1493",
-                           style = 'solid',
-                           weight = px(5)),
-      locations = cells_column_labels(
-        columns = vars(color)
-      )
-    ) %>%
-    as_latex() %>%
-    as.character()
+  # tbl_gt <-
+  #   gt(data = tbl_fruit) %>%
+  #   tab_spanner(label = 'summary',
+  #               columns = vars(count, color)) %>%
+  #   tab_style(
+  #     style = cell_borders(sides = "all",
+  #                          color = "#FF1493",
+  #                          style = 'solid',
+  #                          weight = px(5)),
+  #     locations = cells_column_labels(
+  #       columns = vars(color)
+  #     )
+  #   ) %>%
+  #   as_latex() %>%
+  #   as.character()
 
-  #Expect a fixed pattern
-  #'red' should be centered
-  expect_true(grepl('\\multicolumn{1}{c}{red}', tbl_gt, fixed = TRUE))
 
-  # Create a `tbl_latex` object with `gt()`; this table
-  # 'yellow' should be left aligned
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_style(
-      style = cell_text(align = "left"),
-      locations = cells_body(
-        columns = vars(color),
-        rows = c(2)
-      )
-    ) %>%
-    as_latex() %>%
-    as.character()
-
-  #Expect a fixed pattern
-  #'red' should be centered
-  expect_true(grepl('\\multicolumn{1}{l}{yellow}', tbl_gt, fixed = TRUE))
-
-  # Create a `tbl_latex` object with `gt()`; this table
-  # 'purple' should be right aligned
-  tbl_gt <-
-    gt(data = tbl_fruit) %>%
-    tab_style(
-      style = cell_text(align = "right"),
-      locations = cells_body(
-        columns = vars(color),
-        rows = c(3)
-      )
-    ) %>%
-    as_latex() %>%
-    as.character()
-
-  #Expect a fixed pattern
-  #'red' should be centered
-  expect_true(grepl('\\multicolumn{1}{r}{purple}', tbl_gt, fixed = TRUE))
 
 })
 

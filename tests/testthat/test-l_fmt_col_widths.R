@@ -88,8 +88,8 @@ test_that("the calculation of column widths works correctly", {
   sizing_options <- c('tiny', 'scriptsize', 'footnotesize', 'small', '')
 
   # grab the second element of the character string (fontsize setting)
-  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[13]
-  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[13]
+  long_fs <- unlist(strsplit(long_tbl_tex, '\n'))[25]
+  short_fs <- unlist(strsplit(short_tbl_tex, '\n'))[25]
 
   # strip the leading \\ on the fontsize and trailing whitespace
   long_fs <- gsub('\\', '', trimws(long_fs), fixed = TRUE)

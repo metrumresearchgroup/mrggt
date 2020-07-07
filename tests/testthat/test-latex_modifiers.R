@@ -139,9 +139,6 @@ test_that("latex landscape mode", {
   expect_true('lscape_asis' %in% class(tbls))
   expect_equal(length(class(tbls)), 2)
 
-  # Expect a fixed attribute
-  # combined tbls should have base attribute
-  expect_true('base' %in% names(attributes(tbls)))
 
 
   # Expect a characteristic pattern

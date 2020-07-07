@@ -127,6 +127,7 @@ utf8_aware_sub <- NULL
   registerS3method("fmt_latex_math", "default", "fmt_latex_math.default")
   registerS3method("fmt_latex_math", "data.frame ", "fmt_latex_math.data.frame")
   registerS3method("fmt_latex_math", "matrix", "fmt_latex_math.matrix")
+  registerS3method("fmt_latex_math", "list", "fmt_latex_math.list")
   registerS3method("preamble", "knit_asis", "preamble.knit_asis")
   registerS3method("save_latex", "knit_asis", "save_latex.knit_asis")
   registerS3method("save_latex", "preamble", "save_latex.preamble")
