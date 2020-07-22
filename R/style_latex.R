@@ -157,7 +157,6 @@ style_spanners_latex <- function(data) {
     spanner_labels_math <- spanner_labels %>% fmt_latex_math()
 
     to_style <- styles_tbl[styles_tbl$locname == 'columns_groups', ]
-
     for(i in seq(length(spanner_labels))){
       if(spanner_labels[i] %in% to_style$grpname){
         spanner_labels_math[i] <- apply_style_wrap(spanner_labels_math[i],
@@ -409,6 +408,10 @@ create_border_pos_matrix <- function(data){
   tbl <- tbl[rownames(tbl) != 'col_labels',]
   dim_tbl <- dim(tbl)
 
+  if(is.null(dim_tbl)){
+    dim_tbl <- c(1, 1)
+  }
+
   row_add <- quote(rbind(rep('~', dim_tbl[2]),
                    rep(i, dim_tbl[2]),
                    rep('~', dim_tbl[2])))
@@ -618,6 +621,8 @@ check_column_offset <- function(data){
     } else {
       return(0)
     }
+  } else {
+    return(0)
   }
 }
 
@@ -632,16 +637,23 @@ resolve_style_functions_latex <- function(data){
   }
 
   col_offset <- check_column_offset(data = data)
-
   styles_tbl <- styles_full %>%
     dplyr::mutate(align = align[colnum]) %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(func = cell_style_to_latex(styles,
-                                             colnum,
-                                             rownum,
-                                             align,
-                                             col_offset)) %>%
-    dplyr::ungroup()
+    dplyr::rowwise()
+
+  if(dim(styles_tbl)[1] == 0){
+    styles_tbl <- styles_tbl %>%
+      dplyr::mutate(func = align)
+  } else {
+    styles_tbl <- styles_tbl %>%
+      dplyr::mutate(func =  cell_style_to_latex(styles,
+                                         colnum,
+                                         rownum,
+                                         align,
+                                         col_offset))
+  }
+
+  styles_tbl <- styles_tbl %>% dplyr::ungroup()
   data$`_styles` <- styles_tbl
   data
 }

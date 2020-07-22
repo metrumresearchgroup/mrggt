@@ -38,6 +38,11 @@ fmt_latex_math.default <- function(x){
 }
 
 #' @noRd
+fmt_latex_math.list <- function(x){
+  lapply(x, fmt_latex_math)
+}
+
+#' @noRd
 fmt_latex_math.data.frame <- function(x){
   x[] <- lapply(x,fmt_latex_math)
   x

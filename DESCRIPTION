@@ -50,6 +50,7 @@ Imports:
     stringi(>= 1.4.6),
     whisker(>= 0.4),
     withr(>= 2.1.2),
+    R.utils(>= 2.9.2),
     grDevices,
     stats,
     cli,
@@ -117,6 +118,7 @@ Collate:
     'resolver.R'
     'shiny.R'
     'style_latex.R'
+    'style_latex_helpers.R'
     'summary_rows.R'
     'text_transform.R'
     'utils.R'

@@ -242,7 +242,6 @@ create_columns_component_l <- function(data) {
 
     }
 
-
     multicol <- paste0(paste(multicol, collapse = ""), "\\\\ \n")
     cmidrule <- paste0(paste(cmidrule, collapse = ""), "\n")
 
@@ -442,7 +441,7 @@ get_border_commands_tb <- function() {
 
       if(length(unique(border_row)) == 1){
 
-        if(grepl("^\\d{1}$", unique(border_row))){
+        if(grepl("^\\d+$", unique(border_row))){
           return('COL')
         }
       }
@@ -499,26 +498,41 @@ create_body_component_l <- function(data) {
   }
 
   borders <- get_border_commands_tb()
-  borders[borders == 'COL'] <- R.utils::insert(data_rows,
-                                               which(summary_positions != '') + 1,
-                                               summary_positions[!summary_positions == ''])
 
-  summary_locations <- which(borders == summary_positions[!summary_positions == ''])
 
-  for(i in summary_locations){
-    if(borders[i -1] == ""){
-      borders[i - 1] <- "\\midrule \n "
-    }
-    if(borders[i + 1] == ""){
-      borders[i + 1] <- "\\midrule \n "
-    }
+  summary_values <- summary_positions[!summary_positions == '']
+  group_rows_values <- rows$group_rows[rows$group_rows != '']
+  mock_data_rows <- seq(length(data_rows))
+  mock_summary_rows <- rep('::SUMMARY', length(summary_values))
+
+  if(length(summary_values) == 0){
+
+    borders[borders == 'COL'] <- mock_data_rows
+
+  } else {
+    borders[borders == 'COL'] <- R.utils::insert(mock_data_rows,
+                                                 which(summary_positions != '') + 1,
+                                                 mock_summary_rows)
+
+    summary_borders <- c(which(borders == '::SUMMARY') -1,
+                         which(borders == '::SUMMARY') + 1)
+
+    empty_b <- which(borders == '')
+    borders[empty_b[which(empty_b %in% summary_borders)]] <- "\\midrule \n "
   }
 
-  all_cols <- R.utils::insert(borders,
-                  which(borders %in% data_rows[which(rows$group_rows != '')]) - 1,
-                  rows$group_rows[rows$group_rows != ''])
+  if(!length(group_rows_values) == 0){
 
-  paste(all_cols[all_cols != ''], collapse = '')
+    gr_positions <- as.character(which(rows$group_rows != ''))
+    borders <- R.utils::insert(borders,
+                               which(borders %in% gr_positions) - 1,
+                               group_rows_values)
+  }
+
+  borders[borders == '::SUMMARY'] <- summary_values
+  borders[grepl('^\\d+$', borders)] <- data_rows
+
+  paste(borders[borders!= ''], collapse = '')
 
 }
 
@@ -558,8 +572,7 @@ create_source_foot_note_component_l <- function(data) {
   footnotes <- footnotes_tbl[["footnotes"]] %>%
     unescape_html() %>%
     markdown_to_latex() %>%
-    fmt_latex_math() %>%
-    extract('math_env')
+    fmt_latex_math()
 
   footnotes <-  paste0(footnote_mark_to_latex(footnotes_tbl[["fs_id"]]),
                        footnotes)
@@ -580,7 +593,7 @@ create_source_foot_note_component_l <- function(data) {
   # rows, then return an empty footnotes component
   if (length(source_note) != 0) {
 
-    source_note <- fmt_latex_math(source_note) %>% extract('math_env')
+    source_note <- fmt_latex_math(source_note)
     source_note <- paste(paste0(source_note,
                                 ' \\\\ \n'),
                        collapse = '')
